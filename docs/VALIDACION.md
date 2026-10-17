@@ -13,7 +13,7 @@ Comprobado en el entorno local del proyecto:
 - K editable, valor inicial 0,10 m: verificado con 0, 0,10 y 0,20 m, coma decimal, persistencia tras recarga, conservación al cargar referencias y migración de sesiones anteriores. Cambiar K solo cambia el total, manteniendo X₁, H₁, ΔX y coordenadas del borde.
 - Cabecera reducida a icono, nombre, instalar y ayuda. Resumen emergente de la app comprobado en móvil; el estado offline se consulta dentro de la ayuda.
 - Guía de campo: 13 apartados desplegables y tablas legibles en móvil, con desplazamiento horizontal interno y sin desbordamiento del modal.
-- Actualización PWA real entre dos compilaciones: aviso de nueva versión descargada, servidor detenido, cierre y reapertura correctos en la nueva versión desde caché; contenido nuevo a α = 10° y sesión H₁ = 3,50 m conservados.
+- Actualización PWA automática verificada desde una versión anterior con dos ventanas abiertas: recarga normal, activación al completar la caché y recarga de ambas ventanas sin Ctrl + F5 ni cerrarlas. K = 0,20 m, H₁ = 4,20 m y total 29,016 m conservados. La primera instalación no fuerza recarga; una descarga incompleta no sustituye la versión offline. Se conserva la caché anterior para servir archivos con hash durante la transición.
 - Comprobación de actualización al recuperar conexión, reanudar la app y por intervalo; prueba de aislamiento de cachés entre versiones.
 - Prueba offline real del paquete: servidor HTTP detenido, fallo de conexión confirmado desde fuera del navegador, recarga correcta desde service worker y cálculo de profundidad → X / X → profundidad sin servidor.
 - Entrada por cota de sello: Zt₀ = 100 m, Zs₁ = 96 m devuelve X₁ = 2,440 m, H₁ local = 3,972 m y H₁ con datum fijo = 4,000 m.
@@ -25,3 +25,5 @@ La versión base se verificó publicada en torresatirantadas.pages.dev después 
 La prueba de teléfono corresponde al tamaño de pantalla emulado en navegador.
 
 Capturas: `docs/screenshots/mobile-393.png` y `docs/screenshots/desktop.png`. Cambio de K: `docs/screenshots/mobile-k.png`. Ayuda ampliada: `docs/screenshots/guia-campo-mobile.png`.
+
+Captura de actualización: `docs/screenshots/actualizacion-pwa.png`.

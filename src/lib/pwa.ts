@@ -4,7 +4,8 @@ export function monitorPwa(
   onReady: () => void,
   onUpdate: () => void,
 ) {
-  let disposed = false, checking = false;
+  let disposed = false, checking = false, reloading = false;
+  let hadController = !!navigator.serviceWorker.controller;
   const workers = new Map<ServiceWorker, () => void>();
   const channels = new Set<MessageChannel>();
   function markReady() {
@@ -15,7 +16,7 @@ export function monitorPwa(
       if (!disposed && event.data === 'OFFLINE_READY') onReady();
       channel.port1.close(); channel.port2.close(); channels.delete(channel);
     };
-    registration.active.postMessage('STATUS', [channel.port2]);
+    registration.active.postMessage({type:'STATUS',protocol:2}, [channel.port2]);
   }
   function trackInstalling() {
     const worker = registration.installing;
@@ -39,8 +40,12 @@ export function monitorPwa(
     finally { checking = false; }
   }
   const resume = () => { void check(); };
+  const reload = () => { if(!disposed&&!reloading){reloading=true;window.location.reload();} };
+  const controllerChanged = () => {markReady();if(hadController)reload();hadController=true;};
+  const activated = (event:MessageEvent) => {if(event.data?.type==='PWA_UPDATE_ACTIVATED')reload();};
   registration.addEventListener('updatefound', trackInstalling);
-  navigator.serviceWorker.addEventListener('controllerchange', markReady);
+  navigator.serviceWorker.addEventListener('controllerchange', controllerChanged);
+  navigator.serviceWorker.addEventListener('message', activated);
   window.addEventListener('online', resume);
   document.addEventListener('visibilitychange', resume);
   const interval = window.setInterval(resume, 15 * 60 * 1000);
@@ -51,7 +56,8 @@ export function monitorPwa(
   return () => {
     disposed = true;
     registration.removeEventListener('updatefound', trackInstalling);
-    navigator.serviceWorker.removeEventListener('controllerchange', markReady);
+    navigator.serviceWorker.removeEventListener('controllerchange', controllerChanged);
+    navigator.serviceWorker.removeEventListener('message', activated);
     window.removeEventListener('online', resume);
     document.removeEventListener('visibilitychange', resume);
     window.clearInterval(interval);

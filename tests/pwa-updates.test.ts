@@ -7,7 +7,7 @@ test('PWA checks on reconnect and resume, preserves offline use, and cleans up l
   const serviceWorker=new EventTarget();
   const doc=Object.assign(new EventTarget(),{visibilityState:'visible'});
   const win=new EventTarget();
-  let timer:(()=>void)|undefined,cleared=false,checks=0,ready=0,updates=0,networkFails=false;
+  let timer:(()=>void)|undefined,cleared=false,checks=0,ready=0,updates=0,networkFails=false,reloads=0;
   const reg=Object.assign(new EventTarget(),{
     active:{postMessage:(_:string,ports:MessagePort[])=>ports[0].postMessage('OFFLINE_READY')},
     waiting:null,installing:null as (EventTarget&{state:string})|null,
@@ -16,7 +16,7 @@ test('PWA checks on reconnect and resume, preserves offline use, and cleans up l
   const nav={onLine:true,serviceWorker:Object.assign(serviceWorker,{controller:{},ready:Promise.resolve(reg)})};
   Object.defineProperty(globalThis,'navigator',{configurable:true,value:nav});
   Object.defineProperty(globalThis,'document',{configurable:true,value:doc});
-  Object.defineProperty(globalThis,'window',{configurable:true,value:Object.assign(win,{setInterval:(fn:()=>void)=>{timer=fn;return 1;},clearInterval:()=>{cleared=true;}})});
+  Object.defineProperty(globalThis,'window',{configurable:true,value:Object.assign(win,{location:{reload:()=>reloads++},setInterval:(fn:()=>void)=>{timer=fn;return 1;},clearInterval:()=>{cleared=true;}})});
   let stop:(()=>void)|undefined;
   const settle=()=>new Promise(resolve=>setImmediate(resolve));
   try {
@@ -33,6 +33,7 @@ test('PWA checks on reconnect and resume, preserves offline use, and cleans up l
     const worker=Object.assign(new EventTarget(),{state:'installing'});
     reg.installing=worker;reg.dispatchEvent(new Event('updatefound'));
     assert.equal(updates,0);worker.state='installed';worker.dispatchEvent(new Event('statechange'));assert.equal(updates,1);
+    serviceWorker.dispatchEvent(new Event('controllerchange'));serviceWorker.dispatchEvent(new Event('controllerchange'));assert.equal(reloads,1);
     stop();assert.ok(cleared);win.dispatchEvent(new Event('online'));timer!();await settle();assert.equal(checks,5);
   } finally {
     stop?.();

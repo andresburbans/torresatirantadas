@@ -11,20 +11,32 @@ self.addEventListener('install', event => {
       await cache.put(url,response);
     }));
     await cache.put('/__offline_ready__',new Response('1'));
-    // Update activates when all old clients close, preserving each build's assets.
+    // Only a complete release may replace the active offline version.
+    await self.skipWaiting();
   })());
 });
 self.addEventListener('activate', event=>{
   event.waitUntil((async()=>{
     const names=await caches.keys();
-    await Promise.all(names.filter(n=>n.startsWith('tirantes-')&&n!==CACHE_NAME).map(n=>caches.delete(n)));
+    const previous=names.filter(n=>n.startsWith('tirantes-')&&n!==CACHE_NAME);
+    let isUpdate=false;
+    for(const name of previous)if(await (await caches.open(name)).match('/__offline_ready__'))isUpdate=true;
+    // Retain the previous release's hashed assets while open windows navigate.
+    await Promise.all(previous.slice(0,-1).map(n=>caches.delete(n)));
     await self.clients.claim();
+    if(isUpdate){
+      const windows=await self.clients.matchAll({type:'window'});
+      for(const client of windows)client.postMessage({type:'PWA_UPDATE_ACTIVATED'});
+    }
   })());
 });
 self.addEventListener('message',event=>{
-  if(event.data==='STATUS')event.waitUntil((async()=>{
+  if(event.data==='STATUS'||event.data?.type==='STATUS')event.waitUntil((async()=>{
     const cache=await caches.open(CACHE_NAME);
     if(await cache.match('/__offline_ready__'))event.ports[0]?.postMessage('OFFLINE_READY');
+    // Older clients already send STATUS on controllerchange. Migrate them too.
+    // A message event can await navigation after activation has completed.
+    if(event.data==='STATUS'&&event.source?.type==='window')await event.source.navigate(event.source.url).catch(()=>{});
   })());
 });
 self.addEventListener('fetch',event=>{
@@ -35,6 +47,14 @@ self.addEventListener('fetch',event=>{
     // Navigation always uses the current worker's complete matching build.
     if(event.request.mode==='navigate')return (await cache.match(url.pathname))||(await cache.match('/'))||fetch(event.request);
     const cached=await cache.match(event.request);
-    return cached||fetch(event.request);
+    if(cached)return cached;
+    if(url.pathname.startsWith('/_next/static/')){
+      const names=await caches.keys();
+      for(const name of names.filter(n=>n.startsWith('tirantes-')&&n!==CACHE_NAME)){
+        const previous=await (await caches.open(name)).match(event.request);
+        if(previous)return previous;
+      }
+    }
+    return fetch(event.request);
   })());
 });
