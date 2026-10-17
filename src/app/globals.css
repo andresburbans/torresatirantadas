@@ -241,3 +241,25 @@ button,a,select,summary{touch-action:manipulation}
 .alignment-value strong{font-family:var(--mono);font-weight:500;white-space:nowrap}
 @media(min-width:801px){.fields-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:800px){.fields-grid>.field[for="k"]{grid-column:1/-1}.alignment-value{font-size:11px;line-height:1.5;margin-top:10px}}
+
+.guide-modal{max-width:800px;width:100%}
+.guide-modal .modal-close{position:sticky;top:0;right:auto;float:right;z-index:2;background:#fcfcfc;border:1px solid #dedede;box-shadow:0 2px 8px #0000000a}
+.field-guide{clear:none}
+.field-guide h2{padding-right:20px}
+.field-guide p,.field-guide li,.field-guide dd{font-size:14px;line-height:1.85;color:#555}
+.field-guide details{border-top:1px solid #ddd;margin-top:8px}
+.field-guide summary{min-height:54px;display:list-item;cursor:pointer;font-size:15px;line-height:1.6;padding:15px 4px;color:#343434;font-weight:500;list-style-position:inside}
+.field-guide details[open]>summary{border-bottom:1px solid #e5e5e5}
+.guide-content{padding:3px 4px 15px;overflow-wrap:anywhere}
+.field-guide ul,.field-guide ol{padding-left:23px;margin:15px 0;list-style:disc}
+.field-guide ol{list-style:decimal}
+.field-guide li+li{margin-top:10px}
+.field-guide dt{font-size:14px;font-weight:600;color:#444;margin-top:20px}
+.field-guide dd{margin:6px 0 0}
+.field-guide .guide-equation{font-family:var(--mono);font-size:12px;line-height:1.8;padding:14px;background:#efefef;border:1px solid #e1e1e1;border-radius:5px;color:#353535}
+.guide-table{max-width:100%;overflow:auto;overscroll-behavior-x:contain;margin:18px 0;border:1px solid #ddd;border-radius:5px}
+.guide-table table{margin:0;font-size:12px;min-width:340px}
+.guide-table caption{text-align:left;font:12px/1.7 Arial,sans-serif;padding:12px;color:#555;background:#f5f5f5}
+.guide-table th,.guide-table td{padding:11px 9px;line-height:1.6;color:#555}
+.field-guide a{color:#3f5352;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:800px){.field-guide summary{font-size:14px;padding:15px 0}.guide-content{padding-left:0;padding-right:0}.guide-table th,.guide-table td{font-size:12px;padding:10px 7px}}

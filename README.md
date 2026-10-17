@@ -106,9 +106,13 @@ El modo offline no depende de que el sistema operativo conceda almacenamiento pe
 
 ## Actualizaciones
 
-Cada compilación produce un nombre de caché según el contenido. La instalación solo se completa si todos los archivos se guardan correctamente. La nueva versión espera a que se cierren las ventanas de la versión anterior, para evitar mezclar archivos. Abrir con conexión, cerrar las ventanas de la PWA y volver a abrir permite activar la actualización descargada. Las sesiones JSON y el almacenamiento local se conservan. Las versiones anteriores sin K se recuperan asignando 0,10 m; los casos nuevos incluyen K y la distancia total además de la distancia geométrica al borde.
+Cada compilación produce un nombre de caché según el contenido. La instalación solo se completa si todos los archivos se guardan correctamente. La app comprueba actualizaciones al abrir, al recuperar conexión, al volver a estar visible y cada 15 minutos mientras está visible. La ayuda avisa cuando hay una versión descargada. La nueva versión espera a que se cierren todas las ventanas y pestañas de la versión anterior, para evitar mezclar archivos. Abrir con conexión, cerrar las ventanas de la PWA y volver a abrir permite activar la actualización descargada. Las sesiones JSON y el almacenamiento local se conservan. Las versiones anteriores sin K se recuperan asignando 0,10 m; los casos nuevos incluyen K y la distancia total además de la distancia geométrica al borde.
 
 No hay analítica, peticiones de cálculo, CDNs de interfaz ni subida de los casos. Los PDFs originales no se publican; solo se incluyen las tablas transcritas y la identificación de las láminas.
+
+## Guía de campo
+
+En **(?) → Ver fórmulas y referencias** hay una guía de 13 apartados, disponible offline. Explica el mástil y los cuatro tirantes, las clases de suelo 3/4 y los parámetros de la Tabla 2 de GI6KL, las diferencias por torre, los ángulos y sus unidades, otras pendientes además de 5°, todos los campos, las fórmulas, cotas de sello, ejemplos a 5° y 10°, K, coordenadas y actualización PWA. Distingue los datos de los planos de las hipótesis geométricas y de las decisiones de diseño de obra.
 
 ## Geometría y planos
 
