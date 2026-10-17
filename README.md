@@ -77,7 +77,7 @@ La interfaz prioriza smartphones: anclaje adaptado al ancho de pantalla, botones
 Perfil, anclaje y planta caben en el ancho móvil. La planta muestra sus coordenadas en casillas legibles debajo del dibujo. En laptop se conserva el dibujo con resultados laterales. Los cálculos continúan usando exclusivamente el borde de la viga.
 
 1. Abrir la app con conexión desde **el dominio que se usará en campo**.
-2. Esperar la indicación **Disponible sin conexión**. Se muestra después de guardar todos los archivos de la versión.
+2. Abrir la ayuda **(?)** y esperar la indicación **Disponible sin conexión**. Se muestra después de guardar todos los archivos de la versión.
 3. Instalar desde Chrome/Edge o, en Safari para iOS, Compartir → Añadir a pantalla de inicio.
 4. Probar una apertura y un cambio de profundidad en modo avión antes de salir.
 5. Completar C, β, e y φ del tirante específico. Los valores iniciales son un ejemplo T574, no una asignación automática por tipo de torre.
