@@ -6,6 +6,7 @@
 | --- | --- | --- |
 | e | Distancia mástil → cada pivote E′ o F′ | Diseño de torre; editable, ejemplo 3,30 m |
 | C | Distancia horizontal pivote → punto de afloramiento/nivelación | Ficha del tirante específico |
+| K | Constante de alineación lateral para control de cabeceo | Editable, valor inicial 0,10 m |
 | β | Inclinación vertical del tirante respecto de la horizontal | Grados, minutos, segundos |
 | φ | Ángulo horizontal desde el eje transversal ±X | Ficha de replanteo |
 | α | Pendiente del terreno en la dirección del tirante | Positiva si asciende hacia la torre |
@@ -97,6 +98,12 @@ X está acotada hasta la cara de viga próxima al punto de nivelación. Esa es l
 `D_borde = C + X₁`
 
 Los resultados, las coordenadas en planta y los casos exportados corresponden al borde indicado en los esquemas técnicos.
+
+El resultado principal de campo incorpora la constante de alineación lateral indicada por el usuario:
+
+`D_total = C + X₁ + K`
+
+K vale 0,10 m por defecto, admite cero y otros valores no negativos, y se guarda en la sesión y en los casos exportados. Se aplica como suma escalar al total de campo; no modifica X₁, H₁, ΔX ni las coordenadas geométricas del borde, que conservan R = C + X₁. Al importar casos anteriores sin K se asignan 0,10 m y se conservan las demás entradas.
 
 Los dibujos de la app son esquemáticos; las cifras provienen del motor numérico. La posición de la barra en la viga y la forma de excavación dibujadas no son detalles constructivos. La figura general no establece la altura real de la torre.
 

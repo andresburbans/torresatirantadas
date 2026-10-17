@@ -86,9 +86,9 @@ El ZIP es un artefacto generado y no se incluye en Git. Para despliegue automát
 
 ## Uso en terreno
 
-La interfaz prioriza smartphones: anclaje adaptado al ancho de pantalla, botones táctiles de al menos 44 px y entradas numéricas de 16 px o más. La barra inferior muestra X₁ y C + X₁ durante el desplazamiento; «Ajustar» lleva a los controles de campo. Se oculta al editar un campo para dejar espacio al teclado. Las áreas seguras de iOS se respetan mediante `viewport-fit=cover` y `safe-area-inset`.
+La interfaz prioriza smartphones: anclaje adaptado al ancho de pantalla, botones táctiles de al menos 44 px y entradas numéricas de 16 px o más. La barra inferior muestra el total C + X₁ + K y la proyección X₁ durante el desplazamiento; «Ajustar» lleva a los controles de campo. Se oculta al editar un campo para dejar espacio al teclado. Las áreas seguras de iOS se respetan mediante `viewport-fit=cover` y `safe-area-inset`.
 
-Perfil, anclaje y planta caben en el ancho móvil. La planta muestra sus coordenadas en casillas legibles debajo del dibujo. En laptop se conserva el dibujo con resultados laterales. Los cálculos continúan usando exclusivamente el borde de la viga.
+Perfil, anclaje y planta caben en el ancho móvil. La planta muestra sus coordenadas en casillas legibles debajo del dibujo. En laptop se conserva el dibujo con resultados laterales. La geometría usa el borde de la viga. El resultado principal suma la constante K de alineación lateral: C + X₁ + K. K es editable en Datos de proyecto, vale 0,10 m por defecto y se conserva al cargar una referencia. X₁ y el indicador «se aleja / se acerca» mantienen su cálculo. La planta conserva las coordenadas del borde con distancia C + X₁.
 
 1. Abrir la app con conexión desde **el dominio que se usará en campo**.
 2. Abrir la ayuda **(?)** y esperar la indicación **Disponible sin conexión**. Se muestra después de guardar todos los archivos de la versión.
@@ -106,7 +106,7 @@ El modo offline no depende de que el sistema operativo conceda almacenamiento pe
 
 ## Actualizaciones
 
-Cada compilación produce un nombre de caché según el contenido. La instalación solo se completa si todos los archivos se guardan correctamente. La nueva versión espera a que se cierren las ventanas de la versión anterior, para evitar mezclar archivos. Abrir con conexión, cerrar las ventanas de la PWA y volver a abrir permite activar la actualización descargada. Las sesiones JSON y el almacenamiento local se conservan.
+Cada compilación produce un nombre de caché según el contenido. La instalación solo se completa si todos los archivos se guardan correctamente. La nueva versión espera a que se cierren las ventanas de la versión anterior, para evitar mezclar archivos. Abrir con conexión, cerrar las ventanas de la PWA y volver a abrir permite activar la actualización descargada. Las sesiones JSON y el almacenamiento local se conservan. Las versiones anteriores sin K se recuperan asignando 0,10 m; los casos nuevos incluyen K y la distancia total además de la distancia geométrica al borde.
 
 No hay analítica, peticiones de cálculo, CDNs de interfaz ni subida de los casos. Los PDFs originales no se publican; solo se incluyen las tablas transcritas y la identificación de las láminas.
 

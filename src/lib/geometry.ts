@@ -1,12 +1,12 @@
 export type DMS = { deg: string; min: string; sec: string };
 export type Inputs = {
   tower: 'GI6KL' | 'G6KL' | 'GR6KL'; soil: '3' | '4'; alpha: string;
-  pivot: string; c: string; x0: string; h0: string; target: string;
+  pivot: string; c: string; k: string; x0: string; h0: string; target: string;
   beta: DMS; phi: DMS; datum: 'fixed' | 'terrain'; mode: 'depth' | 'x' | 'seal';
   groundElevation: string; id: string; guy: string;
 };
 export const DEFAULTS: Inputs = {
-  tower: 'GI6KL', soil: '3', alpha: '5', pivot: '3.3', c: '26.219',
+  tower: 'GI6KL', soil: '3', alpha: '5', pivot: '3.3', c: '26.219', k: '0.1',
   x0: '2.117', h0: '3.5', target: '4', beta: { deg: '57', min: '7', sec: '1' },
   phi: { deg: '35', min: '27', sec: '0' }, datum: 'terrain', mode: 'depth',
   groundElevation: '', id: 'T574', guy: '1',
@@ -27,10 +27,11 @@ export function toDms(value: number): DMS {
 export const format = (n: number, digits = 3) => Number.isFinite(n) ? n.toLocaleString('es-CL', { minimumFractionDigits: digits, maximumFractionDigits: digits, useGrouping: false }) : '—';
 export const angleLabel = (v: DMS) => `${v.deg}° ${v.min}′ ${v.sec}″`;
 export function calculate(input: Inputs) {
-  const c = number(input.c), x0 = number(input.x0), h0 = number(input.h0), target = number(input.target);
+  const c = number(input.c), k = number(input.k), x0 = number(input.x0), h0 = number(input.h0), target = number(input.target);
   const pivot = number(input.pivot), beta = dms(input.beta), phi = dms(input.phi), alpha = number(input.alpha);
   const errors: string[] = [];
-  if (![c, x0, h0, target, pivot, alpha].every(Number.isFinite)) errors.push('Completa las distancias con números válidos. Puedes usar coma o punto decimal.');
+  if (![c, k, x0, h0, target, pivot, alpha].every(Number.isFinite)) errors.push('Completa las distancias con números válidos. Puedes usar coma o punto decimal.');
+  if (Number.isFinite(k) && k < 0) errors.push('K de alineación lateral debe ser mayor o igual que cero.');
   if (!(c > 0 && x0 >= 0 && h0 > 0 && pivot >= 0)) errors.push('C y H₀ deben ser mayores que cero; X₀ y e no pueden ser negativos.');
   if (!(beta > 0 && beta < 90)) errors.push('β debe estar entre 0° y 90°, sin incluir los extremos. Minutos y segundos: de 0 a menos de 60.');
   if (!(phi >= 0 && phi < 90)) errors.push('φ debe estar entre 0° y menos de 90°, con minutos y segundos válidos.');
@@ -49,8 +50,8 @@ export function calculate(input: Inputs) {
   const deltaX = x1 - x0, deltaH = h1 - h0, distance = c + x1;
   const groundShift = input.datum === 'terrain' ? -deltaX * Math.tan(alpha * rad) : 0;
   return {
-    errors, valid: errors.length === 0, c, x0, x1, h0, h1, pivot, beta, phi, alpha, slope,
-    deltaX, deltaH, distance,
+    errors, valid: errors.length === 0, c, k, x0, x1, h0, h1, pivot, beta, phi, alpha, slope,
+    deltaX, deltaH, distance, distanceTotal: distance + k,
     seal0: elevation === null ? null : elevation - h0,
     seal1: elevation === null ? null : elevation + groundShift - h1,
     // Local X transversal, Y longitudinal. φ measured from ±X. Pivot at ±Y.
@@ -64,12 +65,15 @@ export type Result = ReturnType<typeof calculate>;
 export function isInputs(value: unknown): value is Inputs {
   if (!value || typeof value !== 'object') return false;
   const v = value as Record<string,unknown>;
-  const textKeys = ['alpha','pivot','c','x0','h0','target','groundElevation','id','guy'];
+  const textKeys = ['alpha','pivot','c','k','x0','h0','target','groundElevation','id','guy'];
   const angle = (a: unknown) => !!a && typeof a === 'object' && ['deg','min','sec'].every(k => typeof (a as Record<string,unknown>)[k] === 'string');
   return textKeys.every(k => typeof v[k] === 'string') && angle(v.beta) && angle(v.phi) && ['GI6KL','G6KL','GR6KL'].includes(String(v.tower)) && ['3','4'].includes(String(v.soil)) && ['fixed','terrain'].includes(String(v.datum)) && ['depth','x','seal'].includes(String(v.mode)) && ['1','2','3','4'].includes(String(v.guy));
 }
-/** Keeps previous saved cases compatible while discarding retired/unknown input fields. */
+/** Older sessions receive the default K; retired/unknown input fields are discarded. */
 export function readInputs(value: unknown): Inputs | null {
-  if (!isInputs(value)) return null;
-  return Object.fromEntries(Object.keys(DEFAULTS).map(key => [key, value[key as keyof Inputs]])) as Inputs;
+  if (!value || typeof value !== 'object') return null;
+  const previous = value as Record<string, unknown>;
+  const migrated = Object.hasOwn(previous, 'k') ? previous : { ...previous, k: DEFAULTS.k };
+  if (!isInputs(migrated)) return null;
+  return Object.fromEntries(Object.keys(DEFAULTS).map(key => [key, migrated[key as keyof Inputs]])) as Inputs;
 }

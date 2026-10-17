@@ -56,3 +56,24 @@ test('target seal elevation yields the same physical translation in both datums'
  assert.ok(terrain.h1<4); // Local ground descends as the anchor moves away.
  assert.equal(calculate({...DEFAULTS,mode:'seal',target:'96'}).valid,false);
 });
+
+test('K adds an alignment allowance without changing excavation or edge coordinates',()=>{
+ const base=calculate({...DEFAULTS,k:'0'});
+ for(const k of ['0.1','0,2','0.35']){
+  const adjusted=calculate({...DEFAULTS,k});
+  assert.ok(adjusted.valid);
+  assert.equal(adjusted.distanceTotal,base.distance+number(k));
+  assert.equal(adjusted.x1,base.x1);assert.equal(adjusted.h1,base.h1);
+  assert.equal(adjusted.deltaX,base.deltaX);assert.equal(adjusted.distance,base.distance);
+  assert.deepEqual(adjusted.plan,base.plan);
+ }
+ assert.equal(base.distanceTotal,base.distance);
+ for(const k of ['','abc','-0.1'])assert.equal(calculate({...DEFAULTS,k}).valid,false);
+});
+
+test('saved cases without K migrate to 0.1 and explicit values survive JSON round trips',()=>{
+ const {k:_,...previous}=DEFAULTS;
+ assert.deepEqual(readInputs(previous),DEFAULTS);
+ for(const k of ['0','0.2'])assert.equal(readInputs(JSON.parse(JSON.stringify({...DEFAULTS,k})))?.k,k);
+ assert.equal(readInputs({...DEFAULTS,k:null}),null);
+});

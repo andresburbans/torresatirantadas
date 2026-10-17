@@ -93,7 +93,7 @@ button,a,select,summary{touch-action:manipulation}
   .results{border-left:0;border-top:1px solid #ddd;padding:18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:9px 14px}
   .results-kicker{grid-column:1/-1;grid-row:1;margin-bottom:2px}
   .result-tag{font-size:11px;padding:4px 6px}
-  .result-label{grid-row:2;grid-column:1;font-size:12px;color:#656565;align-items:center}
+  .result-label{grid-row:2;grid-column:1/-1;font-size:12px;color:#656565;align-items:center}
   .result-label>span{font-size:12px}
   .hero-result{grid-row:3;grid-column:1;font-size:42px;letter-spacing:-2px;margin:2px 0;color:#282828}
   .hero-result>span{font-size:15px;color:#666}
@@ -106,7 +106,7 @@ button,a,select,summary{touch-action:manipulation}
   .result-row strong{font-size:14px;color:#3f3f3f}
   .result-row strong small{font-size:11px;color:#666}
   .result-row .angle-result{font-size:14px}
-  .stakeout{grid-column:2;grid-row:2/5;align-self:stretch;margin:0;padding:12px 10px;background:#e6e6e6;border-radius:6px;display:flex;flex-direction:column;justify-content:center}
+  .stakeout{grid-column:2;grid-row:3/5;align-self:stretch;margin:0;padding:12px 10px;background:#e6e6e6;border-radius:6px;display:flex;flex-direction:column;justify-content:center}
   .stakeout .tiny-label{font-size:9px;line-height:1.6;color:#5d5d5d}
   .stakeout .result-row{display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-size:12px;margin:7px 0 0;color:#5b5b5b}
   .stakeout .result-row strong{font-size:23px;letter-spacing:-.7px;color:#2d2d2d}
@@ -234,3 +234,10 @@ button,a,select,summary{touch-action:manipulation}
 .about-steps li+li{margin-top:9px}
 .about-details{margin-top:14px;min-height:44px;font-size:12px;color:#555;justify-content:flex-start}
 @media(max-width:800px){.about-steps{font-size:14px;line-height:1.8}.header-actions{gap:6px}}
+
+.result-label{display:block;font-weight:500;line-height:1.6;color:#656565}
+.result-label>span{display:block;margin-top:5px;color:#545454}
+.alignment-value{display:flex;flex-wrap:wrap;justify-content:space-between;gap:5px;margin-top:12px;font-size:10px;color:#737373}
+.alignment-value strong{font-family:var(--mono);font-weight:500;white-space:nowrap}
+@media(min-width:801px){.fields-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:800px){.fields-grid>.field[for="k"]{grid-column:1/-1}.alignment-value{font-size:11px;line-height:1.5;margin-top:10px}}
