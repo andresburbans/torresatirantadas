@@ -1,0 +1,5 @@
+# Pages publica la exportación estática, nunca la raíz del repositorio.
+# El comando `npm run build` se configura en el panel de Cloudflare Pages.
+name = "torresatirantadas"
+pages_build_output_dir = "./out"
+compatibility_date = "2026-10-17"

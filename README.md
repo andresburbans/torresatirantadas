@@ -52,6 +52,20 @@ Usar **`npm run build`**, porque después de Next.js genera el inventario comple
 
 Crear el commit en GitHub no conecta automáticamente el repositorio ni el dominio en tu cuenta de Cloudflare.
 
+### Corregir un despliegue con 404
+
+Si el registro dice **`No build command specified. Skipping build step.`**, Pages ha omitido la compilación. Un despliegue marcado como correcto solo confirma la carga de archivos; si se publicó la raíz del repositorio, no existe un `index.html` de la aplicación y la URL devuelve 404.
+
+En el proyecto Pages existente, abrir **Settings → Build → Build configuration → Edit** y guardar:
+
+- **Build command:** `npm run build`.
+- **Build output directory:** `out` (también fijado por `pages_build_output_dir` en `wrangler.toml`).
+- **Root directory:** vacía, para usar la raíz del repositorio.
+
+Después ejecutar **Retry deployment** desde Deployments sobre el último commit de `main`. El registro debe mostrar la instalación de dependencias, `next build`, el mensaje `PWA: … archivos incluidos en caché de instalación` y la publicación de `out`. Comprobar que `/`, `/sw.js` y `/manifest.webmanifest` respondan correctamente.
+
+`wrangler.toml` fija la carpeta publicada, pero **no configura el comando de compilación de la integración Git de Pages**. Ese comando se guarda una vez en el panel. No subir la raíz del repositorio ni seleccionar `.next` como salida.
+
 ### Plan gratuito y alternativa Workers
 
 La aplicación sirve exclusivamente archivos estáticos y calcula en el dispositivo. Pages Free admite 500 compilaciones mensuales, 20.000 archivos por sitio y hasta 100 dominios personalizados por proyecto. Las solicitudes estáticas son gratuitas e ilimitadas. Este nivel de alojamiento es independiente de la renovación del dominio.
