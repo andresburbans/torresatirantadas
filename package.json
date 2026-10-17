@@ -1,0 +1,14 @@
+{
+  "name": "lineas-tirantes",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build && node scripts/build-sw.mjs",
+    "preview": "node scripts/serve.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "dependencies": { "next": "16.4.2", "react": "19.3.1", "react-dom": "19.3.1", "lucide-react": "^0.468.0" },
+  "devDependencies": { "typescript": "^5.9.3", "@types/node": "^22", "@types/react": "^19", "@types/react-dom": "^19", "tailwindcss": "4.3.3", "@tailwindcss/postcss": "4.3.3", "tsx": "^4.20.0" }
+}
