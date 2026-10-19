@@ -99,6 +99,12 @@ La versión 2 guarda **T1, T2, T3, T4 y M1** como fichas independientes. El sele
 
 Ajustar guarda al escribir. Guardar, ×, Escape y tocar fuera guardan y cierran. Los campos incompletos se conservan; las salidas que los necesitan permanecen en «—». La sesión antigua se migra a una clave nueva de almacenamiento, manteniendo intacta la copia anterior.
 
+**Catálogo de amarres:** el apartado 01 de Ajustar integra búsqueda de torre y coordenadas, sin un apartado 05 separado. Contiene los 316 puntos suministrados para 148 torres, con sus N/E/Z a tres decimales, descripción y fecha originales, en `src/data/tower-references.json`. Funciona sin conexión porque se compila en la app. Buscar `574`, `T574` o `T274A` y pulsar el resultado carga las RF41/RF32 identificadas de forma única. No se deduce familia, suelo, pivotes ni cotas de sello a partir del número. Los demás parámetros se conservan y deben revisarse al cambiar de torre. Una nueva torre o un cambio de Z del amarre del nivel vacía la vista (+).
+
+Las coordenadas se bloquean al abrir Ajustar, incluida la Z repetida en Nivel. «Habilitar edición» permite modificarlas manualmente; se guardan como antes. El bloqueo es de interfaz para evitar toques, no un control de acceso. No se modifica el esquema de los archivos exportados ni de las sesiones anteriores.
+
+No se inventan asignaciones en datos ambiguos: T305–T308, T317, T322, T327 y T328 ofrecen alternativas `_1`/`_2` para escoger. T251, T476 y T480 tienen dos RF41 y ninguna RF32 identificada; T320 tiene una RF41 y dos puntos sin etiqueta de amarre; T321 tiene cuatro puntos sin identificar. T311 conserva también su punto `RfN` como consulta. Las referencias ambiguas o ausentes quedan vacías al seleccionar la torre, evitando heredar coordenadas de otra. Elegir una alternativa carga sus coordenadas; los puntos no identificados se consultan sin asignarlos automáticamente.
+
 La convención inicial de los planos es **F′ para T1/T4, E′ para T2/T3; T1/T2 a −X**. Las notas del usuario intercambiaban E′/F′, por eso la pareja y el lado transversal son editables. +Y va de F′ hacia E′ y +X a su derecha; esos ejes no se presumen norte/este geográficos. Se deben comprobar con la ficha real. Ver [docs/TORRE-CAMPO.md](docs/TORRE-CAMPO.md).
 
 La planta utiliza los datos independientes de cada tirante. Sus coordenadas corresponden al borde C + X₁, sin K. Las N/E reales deben pertenecer al mismo sistema y unidad; no se transforman datum ni husos. M1 usa sus N/E o, si ambas están vacías, el punto medio E′–F′ expresamente identificado.

@@ -48,3 +48,12 @@ Las coordenadas de prueba son sintéticas. La configuración inicial conserva F�
 - Cambiar la referencia del nivel vacía vista (+); HI queda pendiente hasta introducir la nueva lectura. Cambiar el cero de la estación no altera esa vista.
 - Prueba final con servidor detenido y conexión HTTP fallida: recarga desde caché, distancia 28,779 m, giro 31°21′58,39″ y mira 5,530 m. M1 recupera mira 3,500 m y falta de excavación 1,000 m. T2 conserva H₁ = 3,80 m y lectura 2,00 m. Diagramas ocultos conservados tras recarga.
 - Capturas actuales: `docs/screenshots/torre-mobile.png`, `docs/screenshots/mastil-mobile.png` y `docs/screenshots/ajustar-mobile.png`. Los datos mostrados son un ejemplo DEMO con coordenadas sintéticas.
+
+## Catálogo de coordenadas · 19 octubre 2026
+
+- Incorporados los 316 registros originales para 148 torres. N/E/Z conservados como texto con tres decimales; descripciones y fechas sin reinterpretar. Siete puntos carecen de identificación RF41/RF32 y permanecen como consulta.
+- Cuatro pruebas nuevas verifican integridad del catálogo, búsqueda normalizada (incluida T274A), selección, compatibilidad con esquema 2, conservación de datos de proyecto, renovación de vista (+) y tratamiento de referencias duplicadas/ausentes. Total: 30 pruebas correctas; compilación estática y TypeScript correctos.
+- Interfaz: buscar y seleccionar T574 precarga RF41 N 7250330.350 / E 430641.386 / Z 2252.033 y RF32 N 7250277.301 / E 430645.250 / Z 2253.679. Todas las coordenadas y la Z duplicada en Nivel están en modo solo lectura inicialmente. No existe el apartado 05: las cinco ternas están en 01.
+- Habilitar edición, cambiar E de RF41, cerrar con × y reabrir conserva la edición y vuelve a bloquearla. Repetir selección de catálogo repone los valores suministrados. T305 queda sin selección inicial por duplicados; escoger RF41_2 carga N 7385378.140 manteniendo el bloqueo manual.
+- Revisado sin desbordamiento horizontal a 360 y 393 px y a 1366 px; campos móviles a 16 px o más. Capturas: `buscar-torre-mobile.png`, `referencias-bloqueo-mobile.png` y `referencias-mobile.png` en `docs/screenshots`.
+- Prueba con servidor de vista previa detenido y HTTP inaccesible: recarga desde caché, búsqueda de T588 no utilizada previamente y precarga de RF41 N 7243220.178 / RF32 Z 2413.041 correctas. Campos bloqueados, anchura del área de ajustes y contenido iguales (352 px). El catálogo forma parte del JavaScript precargado; no depende de un servicio externo.

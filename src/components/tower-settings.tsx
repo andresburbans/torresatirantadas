@@ -1,16 +1,31 @@
+import { useState } from 'react';
+import { Lock, LockOpen, Search } from 'lucide-react';
 import { ALPHAS, CATALOG, type Soil, type Tower } from '@/lib/catalog';
 import { angleLabel, format } from '@/lib/geometry';
 import { applyPreset, GUYS, POINTS, leveling, orientation, phiFor, setPhi, type Coord, type PointId, type TowerProject } from '@/lib/tower';
 import { Angle, Field, Select } from './form-controls';
+import { loadTowerReferences, matchingReference, referencesFor, REFERENCE_TOWERS, searchTowers, selectTowerReference } from '@/lib/tower-references';
 
 type Props={project:TowerProject;change:(fn:(p:TowerProject)=>TowerProject)=>void};
 export function TowerSettings({project:p,change}:Props){
-  function coord(id:keyof TowerProject['survey']['coords'],key:keyof Coord,value:string){change(v=>({...v,survey:{...v.survey,coords:{...v.survey.coords,[id]:{...v.survey.coords[id],[key]:value}}}}));}
+  const [editable,setEditable]=useState(false),[query,setQuery]=useState(''),[loaded,setLoaded]=useState(false);
+  const matches=searchTowers(query),rows=referencesFor(p.id),unidentified=rows.filter(r=>r.ref===null);
+  function coord(id:keyof TowerProject['survey']['coords'],key:keyof Coord,value:string){
+    if(!editable)return;
+    change(v=>({...v,survey:{...v.survey,backsight:id===v.survey.levelRef&&key==='z'&&value!==v.survey.coords[id].z?'':v.survey.backsight,coords:{...v.survey.coords,[id]:{...v.survey.coords[id],[key]:value}}}}));
+  }
+  function chooseTower(id:string){change(v=>loadTowerReferences(v,id));setQuery('');setEditable(false);setLoaded(true);}
   function seal(id:PointId,value:string){change(v=>id==='M1'?{...v,mast:{...v.mast,sealDesign:value}}:{...v,guys:{...v.guys,[id]:{...v.guys[id],sealDesign:value}}});}
   const hi=leveling(p,'M1').hi;
   return <div className="tower-settings">
     <p className="settings-intro">Constantes de esta torre y cinco fichas independientes. Se guarda al escribir; Guardar, ×, Escape y tocar fuera conservan lo ingresado, aunque falten datos.</p>
-    <details open><summary>01 · Torre, suelo y referencia de diseño</summary><div className="settings-section">
+    <details open><summary>01 · Torre, suelo, referencia de diseño y coordenadas</summary><div className="settings-section">
+      <div className="tower-search">
+        <label className="field" htmlFor="tower-search"><span className="field-label">Buscar torre · T#</span><span className="tower-search-input"><Search size={18} aria-hidden="true"/><input id="tower-search" type="search" autoComplete="off" placeholder="Ej. 574 o T274A" value={query} onChange={e=>setQuery(e.target.value)}/></span></label>
+        <p className="setting-note">Torre actual: <strong>{p.id||'Sin número'}</strong> · {REFERENCE_TOWERS.length} torres en el catálogo sin conexión. Selecciona un resultado para cargar sus referencias.</p>
+        {query.trim()&&<div className="tower-search-results" aria-label="Resultados de torres">{matches.slice(0,8).map(id=><button type="button" key={id} onClick={()=>chooseTower(id)}><strong>{id}</strong><span>Cargar RF41 / RF32</span></button>)}<p role="status">{matches.length?`${matches.length} coincidencia${matches.length===1?'':'s'}${matches.length>8?' · Escribe más cifras para afinar la búsqueda.':''}`:'Sin coincidencias. Comprueba el número; puedes introducir coordenadas manualmente.'}</p></div>}
+        {loaded&&<p className="settings-reference" role="status">Catálogo de {p.id} seleccionado. Revisa abajo las referencias cargadas o pendientes. Los demás datos se conservan: comprueba pivotes, sellos y diseño al cambiar de torre.</p>}
+      </div>
       <div className="settings-grid">
         <Select id="settings-tower" label="Familia de torre" value={p.tower} onChange={v=>change(q=>applyPreset(q,v as Tower,q.soil,q.referenceAlpha))}>{['GI6KL','G6KL','GR6KL'].map(t=><option key={t}>{t}</option>)}</Select>
         <Select id="settings-soil" label="Suelo general" value={p.soil} onChange={v=>change(q=>applyPreset(q,q.tower,v as Soil,q.referenceAlpha))}><option value="3">S3 · Tipo 3</option><option value="4">S4 · Tipo 4</option></Select>
@@ -22,11 +37,28 @@ export function TowerSettings({project:p,change}:Props){
       <p className="setting-note">Cambiar torre, suelo o fila carga X₀/H₀ y β de la tabla en los cuatro tirantes. Los objetivos personalizados se conservan; los que seguían H₀ pasan al nuevo H₀. C, sellos, K y φ se conservan. Cada tirante puede usar después otra referencia o profundidad.</p>
       <div className="settings-reference">{p.tower} · S{p.soil} · H₀ tabulada {format(CATALOG[p.tower][p.soil].h)} m · Revisa X₀/H₀ de cada ficha antes de replantear.</div>
       <button className="button secondary" onClick={()=>change(q=>applyPreset(q,q.tower,q.soil,q.referenceAlpha))}>Aplicar referencia a los 4 tirantes</button>
+      <div className="coordinate-heading"><h3>Coordenadas N / E / Z</h3><button type="button" className="button secondary coordinate-lock" aria-pressed={editable} onClick={()=>setEditable(v=>!v)}>{editable?<LockOpen size={16}/>:<Lock size={16}/>} {editable?'Bloquear coordenadas':'Habilitar edición'}</button></div>
+      <p className="setting-note">{editable?'Edición habilitada para todas las coordenadas.':'Bloqueadas: habilita la edición para escribir. La precarga desde el catálogo sigue disponible.'} Se bloquean de nuevo al abrir Ajustar.</p>
+      {(['R41','R32','E','F','M1'] as const).map(id=>{
+        const ref=id==='R41'||id==='R32'?id:null,options=ref?referencesFor(p.id,ref):[],source=ref?matchingReference(p.id,ref,p.survey.coords[id]):undefined;
+        return <fieldset className="coordinate-fields" key={id}><legend>{id==='E'||id==='F'?`${id}′ · Pivote`:id==='M1'?'M1 · Mástil (N/E opcionales)':`${id} · Referencia`}</legend>
+          {ref&&<>
+            {options.length>1&&<Select id={`source-${ref}`} label="Referencia del catálogo · elige el punto materializado" value={source?.id??''} onChange={value=>{change(v=>selectTowerReference(v,ref,value));setEditable(false);}}><option value="" disabled>Seleccionar alternativa…</option>{options.map(r=><option key={r.id} value={r.id}>{r.description}{r.date?` · ${r.date}`:''}</option>)}</Select>}
+            <p className={`coordinate-source${options.length!==1&&!source?' coordinate-attention':''}`}>
+              {source?`Origen: ${source.description}${source.date?` · ${source.date}`:''}`:options.length>1?'Hay varias referencias identificadas. Elige una antes de usarla; las coordenadas manuales se conservan.':options.length===0?`No hay ${ref} identificada para esta torre. Completa y verifica sus coordenadas manualmente.`:'Coordenadas manuales: no coinciden con el punto del catálogo.'}
+            </p>
+          </>}
+          <div className="settings-grid">{(['n','e','z'] as const).map(axis=><Field key={axis} id={`coord-${id}-${axis}`} label={`${axis.toUpperCase()} · ${id}`} value={p.survey.coords[id][axis]} readOnly={!editable} onChange={v=>coord(id,axis,v)}/>)}</div>
+        </fieldset>;
+      })}
+      {unidentified.length>0&&<details className="unidentified-references"><summary>{unidentified.length} puntos sin etiqueta RF41/RF32</summary><p className="setting-note">El archivo no identifica su función. Se conservan como consulta; no se asignan automáticamente a un amarre.</p>{unidentified.map(r=><p className="coordinate-source" key={r.id}><strong>{r.description}</strong><br/>N {r.n} · E {r.e} · Z {r.z}{r.date&&<><br/>{r.date}</>}</p>)}</details>}
+      <p className="setting-note">Usa un mismo sistema de coordenadas y metros, sin separadores de miles. N/E de E′ y F′ define el eje real. El catálogo contiene los amarres, no los pivotes ni los sellos. Cambiar Z de la referencia del nivel vacía su vista (+): debes observarla nuevamente.</p>
+      <p className="setting-note">Si N/E de M1 quedan ambas vacías se usa el punto medio entre E′ y F′. Si el mástil no está en ese punto, ingresa sus coordenadas. Las Z de pivotes y M1 se conservan como referencia; no sustituyen las cotas de sello.</p>
     </div></details>
     <details open><summary>02 · Nivel y cinco cotas de sello</summary><div className="settings-section">
       <div className="settings-grid">
         <Select id="level-ref" label="Referencia del nivel" value={p.survey.levelRef} onChange={v=>change(q=>({...q,survey:{...q.survey,levelRef:v as 'R41'|'R32',backsight:v===q.survey.levelRef?q.survey.backsight:''}}))}><option>R41</option><option>R32</option></Select>
-        <Field id="level-reference-z" label={`Z · Cota de ${p.survey.levelRef}`} value={p.survey.coords[p.survey.levelRef].z} onChange={v=>coord(p.survey.levelRef,'z',v)}/>
+        <Field id="level-reference-z" label={`Z · Cota de ${p.survey.levelRef}`} value={p.survey.coords[p.survey.levelRef].z} readOnly={!editable} hint={!editable?'Bloqueada · Habilita edición en el apartado 01.':undefined} onChange={v=>coord(p.survey.levelRef,'z',v)}/>
         <Field id="backsight" label="Vista (+) · Mira a referencia" value={p.survey.backsight} onChange={v=>change(q=>({...q,survey:{...q.survey,backsight:v}}))}/>
       </div>
       <div className="settings-reference">Cota instrumental del nivel <strong data-testid="settings-hi">{hi===null?'—':format(hi)+' m'}</strong></div>
@@ -48,11 +80,6 @@ export function TowerSettings({project:p,change}:Props){
       </div>
       <p className="setting-note">Eje local +Y de F′ hacia E′; +X queda a su derecha. «Por eje» supone R41 hacia +Y y R32 hacia −Y desde el pivote. Usa coordenadas si no están perfectamente alineados. La correspondencia inicial es la del plano anterior; tus notas intercambiaban E′/F′, por eso queda editable. Comprueba la numeración en la planta.</p>
       <div className="guide-table"><table><caption>Giro horario Hz · vista 0° en cada amarre</caption><thead><tr><th>Punto</th><th>Armado</th><th>R41</th><th>R32</th></tr></thead><tbody>{GUYS.map(id=><tr key={id}><td>T{id}</td><td>{orientation(p,id).station}′</td>{(['R41','R32'] as const).map(z=>{const o=orientation({...p,survey:{...p.survey,zero:z}},id);return <td key={z}>{o.angle?angleLabel(o.angle):'—'}</td>;})}</tr>)}</tbody></table></div>
-    </div></details>
-    <details><summary>05 · Coordenadas N / E / Z</summary><div className="settings-section">
-      <p className="setting-note">Todas las coordenadas deben usar el mismo sistema y metros, sin separadores de miles. Z de R41/R32 se usa en nivelación. N/E de ambos pivotes define el eje real. R32 es el segundo amarre; no se creó otro punto R42.</p>
-      {(['R41','R32','E','F','M1'] as const).map(id=><fieldset className="coordinate-fields" key={id}><legend>{id==='E'||id==='F'?`${id}′ · Pivote`:id==='M1'?'M1 · Mástil (N/E opcionales)':`${id} · Referencia`}</legend><div className="settings-grid">{(['n','e','z'] as const).map(axis=><Field key={axis} id={`coord-${id}-${axis}`} label={`${axis.toUpperCase()} · ${id}`} value={p.survey.coords[id][axis]} onChange={v=>coord(id,axis,v)}/>)}</div></fieldset>)}
-      <p className="setting-note">Si N/E de M1 quedan ambas vacías se usa el punto medio entre E′ y F′. Si el mástil no está en ese punto, ingresa sus coordenadas. Las Z de pivotes y M1 se conservan como referencia; no sustituyen las cotas de sello.</p>
     </div></details>
   </div>;
 }
