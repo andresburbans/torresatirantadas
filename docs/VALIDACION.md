@@ -57,3 +57,12 @@ Las coordenadas de prueba son sintéticas. La configuración inicial conserva F�
 - Habilitar edición, cambiar E de RF41, cerrar con × y reabrir conserva la edición y vuelve a bloquearla. Repetir selección de catálogo repone los valores suministrados. T305 queda sin selección inicial por duplicados; escoger RF41_2 carga N 7385378.140 manteniendo el bloqueo manual.
 - Revisado sin desbordamiento horizontal a 360 y 393 px y a 1366 px; campos móviles a 16 px o más. Capturas: `buscar-torre-mobile.png`, `referencias-bloqueo-mobile.png` y `referencias-mobile.png` en `docs/screenshots`.
 - Prueba con servidor de vista previa detenido y HTTP inaccesible: recarga desde caché, búsqueda de T588 no utilizada previamente y precarga de RF41 N 7243220.178 / RF32 Z 2413.041 correctas. Campos bloqueados, anchura del área de ajustes y contenido iguales (352 px). El catálogo forma parte del JavaScript precargado; no depende de un servicio externo.
+
+## Aviso por versión y nombre Ajustes
+
+- «Ajustar» pasa a «Ajustes» en ambos botones, título del panel, ayuda y mensajes que remiten al panel.
+- Cada compilación incluye el identificador del commit; el aviso y sus preferencias se renuevan cuando cambia ese identificador. El resumen en español está en `src/data/release-notes.json` y se actualiza con cada cambio publicado.
+- Cuatro pruebas nuevas cubren una aparición por fecha local, persistencia entre recargas, siete fechas incluyendo el primer día, caducidad sin reinicio en visitas tardías, exclusión voluntaria, nueva versión, fechas inválidas y cruce de mes. Total: 34 pruebas correctas; compilación estática y TypeScript correctos.
+- Navegador: aparece «Nueva versión», se puede marcar «No volver a mostrar» y cerrar con Entendido; recargar el mismo día no lo repite. El botón principal abre «Ajustes de torre». El popup incorpora foco inicial, ciclo de tabulación y cierre por Escape o fondo.
+- Segunda sesión: cerrar solo con ×, sin marcar la casilla, y recargar tampoco lo repite ese día. Recarga con servidor detenido: cálculo 28,779 m disponible desde caché y aviso sin repetición. Vista móvil de 393 × 852 px, diálogo de 369 px y página de 393 px sin desbordamiento.
+- Captura: `docs/screenshots/nueva-version-mobile.png`.

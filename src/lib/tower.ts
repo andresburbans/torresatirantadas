@@ -92,7 +92,7 @@ export function orientation(p:TowerProject,id:PointId){
   }else{
     const e=coordinates(p.survey.coords.E),f=coordinates(p.survey.coords.F),ref=coordinates(p.survey.coords[p.survey.zero]);
     const occupied=station==='E'?e:f;
-    if(!e||!f||!ref)errors.push('Completa N/E de E′, F′ y de la referencia elegida en Ajustar.');
+    if(!e||!f||!ref)errors.push('Completa N/E de E′, F′ y de la referencia elegida en Ajustes.');
     else {
       const axis=azimuth(f,e);
       zeroAz=azimuth(occupied!,ref);

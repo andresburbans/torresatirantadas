@@ -38,7 +38,7 @@ export function TowerSettings({project:p,change}:Props){
       <div className="settings-reference">{p.tower} · S{p.soil} · H₀ tabulada {format(CATALOG[p.tower][p.soil].h)} m · Revisa X₀/H₀ de cada ficha antes de replantear.</div>
       <button className="button secondary" onClick={()=>change(q=>applyPreset(q,q.tower,q.soil,q.referenceAlpha))}>Aplicar referencia a los 4 tirantes</button>
       <div className="coordinate-heading"><h3>Coordenadas N / E / Z</h3><button type="button" className="button secondary coordinate-lock" aria-pressed={editable} onClick={()=>setEditable(v=>!v)}>{editable?<LockOpen size={16}/>:<Lock size={16}/>} {editable?'Bloquear coordenadas':'Habilitar edición'}</button></div>
-      <p className="setting-note">{editable?'Edición habilitada para todas las coordenadas.':'Bloqueadas: habilita la edición para escribir. La precarga desde el catálogo sigue disponible.'} Se bloquean de nuevo al abrir Ajustar.</p>
+      <p className="setting-note">{editable?'Edición habilitada para todas las coordenadas.':'Bloqueadas: habilita la edición para escribir. La precarga desde el catálogo sigue disponible.'} Se bloquean de nuevo al abrir Ajustes.</p>
       {(['R41','R32','E','F','M1'] as const).map(id=>{
         const ref=id==='R41'||id==='R32'?id:null,options=ref?referencesFor(p.id,ref):[],source=ref?matchingReference(p.id,ref,p.survey.coords[id]):undefined;
         return <fieldset className="coordinate-fields" key={id}><legend>{id==='E'||id==='F'?`${id}′ · Pivote`:id==='M1'?'M1 · Mástil (N/E opcionales)':`${id} · Referencia`}</legend>

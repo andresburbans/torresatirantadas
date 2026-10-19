@@ -123,7 +123,7 @@ export function FieldGuide() {
       <p>K es la adición de alineación lateral que decidiste usar para el control de cabeceo. En esta app se aplica como una suma escalar:</p><p className="guide-equation">D_total = C + X₁ + K</p>
       <p>Pasar de K = 0,10 m a K = 0,20 m aumenta el total 0,10 m. No cambia X₁, H₁, β ni el indicador «se aleja / se acerca», que expresa exclusivamente ΔX = X₁ − X₀ debido al ajuste de excavación. K tampoco es una tolerancia de inclinación autorizada por el plano ni un ángulo calculado de cabeceo del mástil.</p>
       <p>Para conservar la lectura geométrica del borde, la planta y sus coordenadas usan R = C + X₁, sin K. El valor principal de campo incluye K y está identificado como total. Si necesitas las coordenadas de otro punto material de alineación, su dirección y referencia tendrían que definirse aparte; la app no convierte esta adición en un desplazamiento transversal de coordenadas.</p>
-      <p>El origen local está en el mástil y +Y va de F′ hacia E′. Esta tabla muestra la convención inicial del plano: E′ = (0,+e), F′ = (0,−e), T1/T4 desde F′ y T1/T2 al lado −X. Ajustar permite invertir las parejas o el lado transversal si la ficha lo requiere. Con φ desde el eje transversal del cuadrante:</p>
+      <p>El origen local está en el mástil y +Y va de F′ hacia E′. Esta tabla muestra la convención inicial del plano: E′ = (0,+e), F′ = (0,−e), T1/T4 desde F′ y T1/T2 al lado −X. Ajustes permite invertir las parejas o el lado transversal si la ficha lo requiere. Con φ desde el eje transversal del cuadrante:</p>
       <div className="guide-table"><table><thead><tr><th>Tirante</th><th>X local</th><th>Y local</th><th>Pivote</th></tr></thead><tbody><tr><td>T1</td><td>−R cos φ</td><td>−e − R sen φ</td><td>F′</td></tr><tr><td>T2</td><td>−R cos φ</td><td>+e + R sen φ</td><td>E′</td></tr><tr><td>T3</td><td>+R cos φ</td><td>+e + R sen φ</td><td>E′</td></tr><tr><td>T4</td><td>+R cos φ</td><td>−e − R sen φ</td><td>F′</td></tr></tbody></table></div>
       <p>La planta representa el sistema local. Si ingresas N/E reales de pivotes y amarres, la app también calcula la orientación de cuadrícula y las coordenadas del borde en ese sistema. No se aplica conversión de datum, huso ni norte verdadero: todos los datos deben usar el mismo sistema y metros.</p>
     </div></details>
@@ -134,7 +134,7 @@ export function FieldGuide() {
     </div></details>
 
     <details><summary>12 · Cero en R41 o R32 y giro horario</summary><div className="guide-content">
-      <p>En Ajustar elige qué pareja se arma en E′ o F′ y el lado transversal de T1/T2. La convención inicial mantiene el plano anterior; tus notas contenían ambas correspondencias y por eso queda configurable. La planta y la tabla de giros de Ajustar permiten revisar la elección.</p>
+      <p>En Ajustes elige qué pareja se arma en E′ o F′ y el lado transversal de T1/T2. La convención inicial mantiene el plano anterior; tus notas contenían ambas correspondencias y por eso queda configurable. La planta y la tabla de giros de Ajustes permiten revisar la elección.</p>
       <p><strong>Por coordenadas:</strong> el azimut del eje se obtiene de F′ hacia E′. La dirección de cada tirante incorpora su φ y cuadrante. El azimut del cero se calcula desde el pivote ocupado hasta R41 o R32:</p>
       <p className="guide-equation">Hz = normalizar a [0°, 360°) (azimut al tirante − azimut al amarre)</p>
       <p>La visual real puede estar desviada del eje. No basta con sumar 180° si los amarres no quedan exactamente en direcciones opuestas desde la estación.</p>
@@ -143,7 +143,7 @@ export function FieldGuide() {
     </div></details>
 
     <details><summary>13 · Nivelación de las cinco excavaciones</summary><div className="guide-content">
-      <p>La estación total y el nivel tienen referencias independientes. Puedes poner 0° de estación hacia R41 y tomar la vista (+) del nivel en R32. En Ajustar ingresa la referencia del nivel, su Z, la lectura (+) y los cinco sellos de diseño.</p>
+      <p>La estación total y el nivel tienen referencias independientes. Puedes poner 0° de estación hacia R41 y tomar la vista (+) del nivel en R32. En Ajustes ingresa la referencia del nivel, su Z, la lectura (+) y los cinco sellos de diseño.</p>
       <p className="guide-equation">HI = Z de referencia + vista (+)</p>
       <p className="guide-equation">Mira al sello = HI − Z del sello efectivo</p>
       <p>HI es la cota del plano de colimación, no la altura física del aparato sobre el terreno. Si mueves el nivel necesitas una nueva vista (+). Referencia en cota 100,000 y vista (+) de 1,500 dan HI = 101,500. Para sello en 98,000, la mira objetivo es 3,500 m.</p>
@@ -152,7 +152,7 @@ export function FieldGuide() {
       <p>Si la mira al sello es 3,500 y lees 2,500, falta bajar 1,000 m. Si lees 4,000, estás 0,500 m bajo el sello y aparece «Exceso de excavación». Una mira objetivo negativa indica que el sello está sobre el plano de colimación y requiere otra posición del nivel para una mira vertical normal.</p>
       <p>Cada tirante conserva su sello de diseño. Cambiar la profundidad traslada la misma viga y calcula el sello efectivo con β; ese sello efectivo se usa para la mira objetivo. K y el cero horizontal no cambian las cotas ni HI. La nivelación puede calcularse aunque aún falte C, porque C no interviene en la geometría vertical.</p>
       <p>M1 tiene sello propio y otra cota objetivo opcional, sin fórmulas de tirantes. Sus N/E pueden ingresarse o dejarse ambas vacías para usar el punto medio E′–F′; la suposición queda indicada. La Z de coordenadas no sustituye al sello.</p>
-      <p>Ajustar guarda al escribir y al cerrar con Guardar, ×, Escape o tocando fuera. Los datos incompletos se conservan y las salidas que los necesitan muestran «—». Exportar torre guarda las cinco fichas; importar un caso antiguo recupera su tirante activo y deja las C desconocidas de los demás pendientes.</p>
+      <p>Ajustes guarda al escribir y al cerrar con Guardar, ×, Escape o tocando fuera. Los datos incompletos se conservan y las salidas que los necesitan muestran «—». Exportar torre guarda las cinco fichas; importar un caso antiguo recupera su tirante activo y deja las C desconocidas de los demás pendientes.</p>
     </div></details>
 
     <details><summary>14 · Instalar, trabajar sin conexión y recibir actualizaciones</summary><div className="guide-content">

@@ -1,0 +1,7 @@
+{
+  "fallbackVersion": "2026-10-19.2",
+  "changes": [
+    "«Ajustar» ahora se llama «Ajustes» en los botones, el panel y la ayuda.",
+    "Se agregó este resumen de novedades: aparece una vez al día durante una semana y permite marcar «No volver a mostrar»."
+  ]
+}
