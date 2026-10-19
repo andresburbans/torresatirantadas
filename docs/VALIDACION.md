@@ -4,11 +4,11 @@ Comprobado en el entorno local del proyecto:
 
 - `npm run build`: exportación estática correcta; todas las rutas son estáticas.
 - TypeScript estricto: compilación correcta.
-- `npm test`: 15 pruebas correctas. Incluyen 27 transiciones entre los suelos 3 y 4 y las nueve pendientes de cada familia.
+- `npm test`: 26 pruebas correctas. Incluyen 27 transiciones entre los suelos 3 y 4 y las nueve pendientes de cada familia.
 - Las diferencias frente a las X tabuladas son inferiores a 1,1 mm, considerando su redondeo.
 - Navegador de escritorio: perfil, planta, carga de G6KL, tabla y exportación de caso JSON verificados.
 - Diseño prioritario para smartphone: verificado en anchos de 360, 393 y 430 px; revisión adicional en 768 px y laptop de 1366 px. Sin desbordamiento horizontal de la página o del dibujo.
-- Controles móviles de al menos 44 × 44 px, campos de 16 px o más, anclaje adaptado al ancho y barra inferior con C + X₁ + K / X₁.
+- Controles móviles de al menos 44 × 44 px, campos de 16 px o más, anclaje adaptado al ancho y barra inferior con total del punto y mira al sello.
 - Acceso «Ajustar» y botones de profundidad comprobados: el resultado principal y la barra inferior se actualizan juntos.
 - K editable, valor inicial 0,10 m: verificado con 0, 0,10 y 0,20 m, coma decimal, persistencia tras recarga, conservación al cargar referencias y migración de sesiones anteriores. Cambiar K solo cambia el total, manteniendo X₁, H₁, ΔX y coordenadas del borde.
 - Cabecera reducida a icono, nombre, instalar y ayuda. Resumen emergente de la app comprobado en móvil; el estado offline se consulta dentro de la ayuda.
@@ -27,3 +27,24 @@ La prueba de teléfono corresponde al tamaño de pantalla emulado en navegador.
 Capturas: `docs/screenshots/mobile-393.png` y `docs/screenshots/desktop.png`. Cambio de K: `docs/screenshots/mobile-k.png`. Ayuda ampliada: `docs/screenshots/guia-campo-mobile.png`.
 
 Captura de actualización: `docs/screenshots/actualizacion-pwa.png`.
+
+## Versión 2 · torre con cinco puntos
+
+- Motor de anclaje anterior conservado y sus pruebas intactas.
+- Modelo de cinco fichas: cambio T1/T2 conserva C, objetivo y lectura propios; M1 conserva sello y objetivo independientes.
+- φ: T2/T4 heredan T1, una edición en T2 solo modifica T2, y la casilla de herencia lo vuelve a vincular.
+- Nivel: referencia 100,000 m + vista (+) 1,500 m → HI 101,500 m. M1 con sello 98,000 m → mira 3,500 m. Lectura actual 2,500 m → falta 1,000 m.
+- Cinco cotas de prueba ingresadas desde Ajustar. Sello de T1 de diseño 96,500 m y ajuste H₁ = 4,000 m → mira efectiva 5,530 m, mientras se conserva el sello de diseño.
+- En la convención editable T1/T4 en E′ y T1 al lado +X, φ = 35°27′: cero R41 → T1 54°33′; cero R32 → T1 234°33′. Cambiar el cero no cambia HI ni la mira objetivo.
+- Coordenadas sintéticas con R41 fuera de eje: giro de T1 31°21′58,39″, consistente con la visual desde E′, no desde el centro de torre.
+- Guardado con ×, Guardar y recarga comprobado. Los valores incompletos permanecen editables.
+- Exportación e importación esquema 2 comprobadas con cinco puntos y referencias; se restaura C tras modificarla y las fichas conservan sus objetivos propios.
+- Importación y migración de esquema 1 cubiertas por pruebas: conserva el caso activo y no inventa C de los otros tirantes; usa la tabla correcta para las otras referencias de la familia.
+
+Las coordenadas de prueba son sintéticas. La configuración inicial conserva F′ para T1/T4, E′ para T2/T3 y el lado de los planos; ambas opciones pueden editarse. Se usa por defecto el modo por coordenadas y se muestran resultados pendientes hasta completarlas. La convención debe comprobarse con la ficha de obra.
+
+- Compilación final estática y TypeScript correctos. La guía tiene 15 apartados y permanece disponible offline.
+- Revisión responsive en 360, 393, 430 y 1366 px: sin desbordamiento de página ni de las tarjetas, incluidas cotas de cuatro dígitos (2253,000 m). Popup Ajustar sin desbordamiento horizontal.
+- Cambiar la referencia del nivel vacía vista (+); HI queda pendiente hasta introducir la nueva lectura. Cambiar el cero de la estación no altera esa vista.
+- Prueba final con servidor detenido y conexión HTTP fallida: recarga desde caché, distancia 28,779 m, giro 31°21′58,39″ y mira 5,530 m. M1 recupera mira 3,500 m y falta de excavación 1,000 m. T2 conserva H₁ = 3,80 m y lectura 2,00 m. Diagramas ocultos conservados tras recarga.
+- Capturas actuales: `docs/screenshots/torre-mobile.png`, `docs/screenshots/mastil-mobile.png` y `docs/screenshots/ajustar-mobile.png`. Los datos mostrados son un ejemplo DEMO con coordenadas sintéticas.

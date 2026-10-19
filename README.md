@@ -84,25 +84,26 @@ Compress-Archive -Path .\out\* -DestinationPath .\cloudflare-pages.zip -Force
 
 El ZIP es un artefacto generado y no se incluye en Git. Para despliegue automático desde este repositorio, usar el flujo Git descrito arriba.
 
-## Uso en terreno
+## Uso en terreno · cinco puntos por torre
 
-La interfaz prioriza smartphones: anclaje adaptado al ancho de pantalla, botones táctiles de al menos 44 px y entradas numéricas de 16 px o más. La barra inferior muestra el total C + X₁ + K y la proyección X₁ durante el desplazamiento; «Ajustar» lleva a los controles de campo. Se oculta al editar un campo para dejar espacio al teclado. Las áreas seguras de iOS se respetan mediante `viewport-fit=cover` y `safe-area-inset`.
+La versión 2 guarda **T1, T2, T3, T4 y M1** como fichas independientes. El selector recupera su resultado antes de los diagramas. «Mostrar/Ocultar diagramas» conserva la preferencia. El diseño sigue priorizando smartphones de 360–430 px, controles de 44 px, entradas de 16 px o más y áreas seguras iOS.
 
-Perfil, anclaje y planta caben en el ancho móvil. La planta muestra sus coordenadas en casillas legibles debajo del dibujo. En laptop se conserva el dibujo con resultados laterales. La geometría usa el borde de la viga. El resultado principal suma la constante K de alineación lateral: C + X₁ + K. K es editable en Datos de proyecto, vale 0,10 m por defecto y se conserva al cargar una referencia. X₁ y el indicador «se aleja / se acerca» mantienen su cálculo. La planta conserva las coordenadas del borde con distancia C + X₁.
+1. Abrir con conexión desde el dominio que se usará en campo y esperar «Disponible sin conexión» en (?). Instalar desde Chrome/Edge o desde Safari → Compartir → Añadir a pantalla de inicio.
+2. Abrir **Ajustar** y cargar torre, suelo S3/S4, fila α, β común, e y K. Cambiar la tabla carga X₀/H₀ de la familia correcta en los cuatro tirantes; conserva los objetivos personalizados. También puede aplicarse una referencia a un solo tirante desde su ficha.
+3. Introducir las cinco cotas de sello de diseño, la referencia del nivel (R41/R32), su Z y la vista (+). HI = Z + vista (+). Si se mueve el nivel, renovar esa lectura.
+4. Introducir C y φ propios de cada tirante. T2–T4 heredan φ de T1 hasta que se editan individualmente; se pueden volver a vincular.
+5. Configurar el armado y el cero de la estación. El modo inicial **por coordenadas** necesita N/E de E′, F′ y del amarre elegido. El modo **por eje** supone R41 hacia F′→E′ y R32 en sentido opuesto, y lo indica junto al resultado.
+6. Seleccionar el punto y cambiar profundidad, proyección o sello. En T1–T4 el resultado principal es C + X₁ + K; se muestran Hz horario, mira al sello y sello efectivo. M1 muestra primero su mira y su cota propia.
+7. La vista actual de mira sobre terreno/fondo es opcional: diferencia positiva = falta excavar; negativa = exceso de excavación.
+8. **Exportar torre** conserva las cinco fichas, referencias y resultados en un JSON. **Importar torre o caso** admite esa torre y los antiguos casos individuales. Se conserva el tirante antiguo sin inventar C para los otros puntos.
 
-1. Abrir la app con conexión desde **el dominio que se usará en campo**.
-2. Abrir la ayuda **(?)** y esperar la indicación **Disponible sin conexión**. Se muestra después de guardar todos los archivos de la versión.
-3. Instalar desde Chrome/Edge o, en Safari para iOS, Compartir → Añadir a pantalla de inicio.
-4. Probar una apertura y un cambio de profundidad en modo avión antes de salir.
-5. Completar C, β, e y φ del tirante específico. Los valores iniciales son un ejemplo T574, no una asignación automática por tipo de torre.
-6. Seleccionar torre, suelo y α de referencia y pulsar **Cargar referencia** si se quiere usar la Tabla 1. Esto reemplaza X₀, H₀, α y β; conserva C, e, φ y el objetivo.
-7. Elegir datum de profundidad y calcular desde H₁, X₁ o la nueva cota de sello.
+Ajustar guarda al escribir. Guardar, ×, Escape y tocar fuera guardan y cierran. Los campos incompletos se conservan; las salidas que los necesitan permanecen en «—». La sesión antigua se migra a una clave nueva de almacenamiento, manteniendo intacta la copia anterior.
 
-La última sesión se guarda localmente. **Exportar caso** guarda un JSON con entradas, resultados y referencia; **Importar caso** lo recupera. El dibujo se descarga como SVG.
+La convención inicial de los planos es **F′ para T1/T4, E′ para T2/T3; T1/T2 a −X**. Las notas del usuario intercambiaban E′/F′, por eso la pareja y el lado transversal son editables. +Y va de F′ hacia E′ y +X a su derecha; esos ejes no se presumen norte/este geográficos. Se deben comprobar con la ficha real. Ver [docs/TORRE-CAMPO.md](docs/TORRE-CAMPO.md).
 
-Los datos de cada tirante no se guardan como cuatro fichas independientes: el selector T1–T4 identifica el caso activo y el cuadrante de la planta. Para conservar varios tirantes, exportar un archivo por caso. La planta refleja una geometría simétrica ilustrativa a partir del C y φ activos, no presume que los cuatro C sean iguales en la torre real.
+La planta utiliza los datos independientes de cada tirante. Sus coordenadas corresponden al borde C + X₁, sin K. Las N/E reales deben pertenecer al mismo sistema y unidad; no se transforman datum ni husos. M1 usa sus N/E o, si ambas están vacías, el punto medio E′–F′ expresamente identificado.
 
-El modo offline no depende de que el sistema operativo conceda almacenamiento permanente. Borrar los datos del sitio, la navegación privada o la limpieza de almacenamiento del dispositivo pueden eliminar la caché o la sesión. Conservar los casos exportados.
+Probar apertura y cálculo en modo avión antes de salir. Borrar datos del sitio, usar navegación privada o una limpieza del almacenamiento pueden eliminar caché y sesión; conservar la exportación JSON. La instalación en un dispositivo iOS/Android físico no se ha verificado desde este entorno.
 
 ## Actualizaciones
 
@@ -112,7 +113,7 @@ No hay analítica, peticiones de cálculo, CDNs de interfaz ni subida de los cas
 
 ## Guía de campo
 
-En **(?) → Ver fórmulas y referencias** hay una guía de 13 apartados, disponible offline. Explica el mástil y los cuatro tirantes, las clases de suelo 3/4 y los parámetros de la Tabla 2 de GI6KL, las diferencias por torre, los ángulos y sus unidades, otras pendientes además de 5°, todos los campos, las fórmulas, cotas de sello, ejemplos a 5° y 10°, K, coordenadas y actualización PWA. Distingue los datos de los planos de las hipótesis geométricas y de las decisiones de diseño de obra.
+En **(?) → Ver fórmulas y referencias** hay una guía de 15 apartados, disponible offline. Explica el mástil y los cuatro tirantes, las clases de suelo 3/4 y los parámetros de la Tabla 2 de GI6KL, las diferencias por torre, los ángulos y sus unidades, otras pendientes además de 5°, todos los campos, las fórmulas, cotas de sello, ejemplos a 5° y 10°, K, coordenadas y actualización PWA. Distingue los datos de los planos de las hipótesis geométricas y de las decisiones de diseño de obra.
 
 ## Geometría y planos
 
@@ -124,7 +125,7 @@ Las correcciones suponen C y β fijos, pendiente constante si corresponde y el m
 
 - `src/app`: interfaz y estilos.
 - `src/components/diagram.tsx`: perfil, anclaje y planta SVG.
-- `src/lib`: geometría tipada y tablas de seis láminas.
+- `src/lib`: geometría de anclaje, modelo de torre, orientación, nivelación y tablas de seis láminas.
 - `scripts/build-sw.mjs`: inventario de archivos y caché versionada.
 - `public`: manifiesto, iconos y cabeceras para Pages.
 - `tests`: comprobación geométrica y contrato de caché offline.

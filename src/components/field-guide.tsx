@@ -11,8 +11,8 @@ export function FieldGuide() {
       <p>Los cuatro tirantes unen la parte superior de la torre con sus anclajes. Su disposición permite transmitir esfuerzos hacia las fundaciones y contribuir a la estabilidad del mástil. Para topografía, cada tirante es un caso concreto con su dirección horizontal, su inclinación vertical, su afloramiento y su cota de terreno. La app estudia esa geometría; no calcula tensiones ni reparto de cargas.</p>
       <p><strong>Centro del mástil y pivote de replanteo son referencias distintas.</strong> E′ y F′ están desplazados respecto del mástil. La entrada e es la distancia desde el mástil a cada pivote: si e = 3,30 m, la separación E′–F′ es 6,60 m; si e = 3,40 m, es 6,80 m. Para una distancia que ya parte de E′ o F′ no se vuelve a sumar e.</p>
       <p>Desde el pivote sale la distancia C hasta el punto de afloramiento o nivelación identificado en el plano. Después viene X₁, que llega al borde próximo de la viga. La distancia geométrica es C + X₁. Para tu control de alineación lateral, el resultado principal añade K y muestra <strong>C + X₁ + K</strong>.</p>
-      <p><strong>T1, T2, T3 y T4 no implican cuatro distancias C iguales.</strong> La captura de T574 muestra valores distintos. Seleccionar un tirante en esta app identifica el caso activo y el cuadrante del dibujo; no recupera automáticamente una ficha independiente. Ingresa sus propios datos y exporta un caso por tirante para conservarlos.</p>
-      <p>La planta ilustra una disposición simétrica usando el caso activo. No toma ese dibujo como una comprobación de que los cuatro anclajes reales sean simétricos o tengan las mismas cotas.</p>
+      <p><strong>T1, T2, T3 y T4 no implican cuatro distancias C iguales.</strong> La captura de T574 muestra valores distintos. Cada tirante tiene ahora una ficha independiente con C, objetivo, pendiente, sello, φ y vista actual. M1 tiene su propia nivelación. El selector recupera los datos del punto y «Exportar torre» conserva las cinco fichas en un archivo.</p>
+      <p>La planta usa la C y el φ propios de cada tirante. Los puntos sin datos válidos no se dibujan. Puedes ocultar todos los diagramas para dejar primero las cifras de replanteo y nivelación.</p>
     </div></details>
 
     <details><summary>02 · Qué significan suelo tipo 3 y suelo tipo 4</summary><div className="guide-content">
@@ -74,7 +74,7 @@ export function FieldGuide() {
         <dt>H₁ o X₁ · Objetivo de campo</dt><dd>La entrada cambia con el modo. En «Profundidad → X» se introduce H₁; en «X → Profundidad», X₁ sola, sin C ni K. La otra magnitud se calcula.</dd>
         <dt>β · Ángulo vertical</dt><dd>Ángulo sexagesimal de la línea del tirante respecto de la horizontal. Usa el correspondiente a la torre y a su referencia; tres casillas para grados, minutos y segundos.</dd>
         <dt>α · Pendiente del terreno</dt><dd>Grados decimales con el signo descrito antes. Interviene cuando H se mide desde el terreno local; en datum fijo no interviene en el incremento ΔX = ΔH / tan β.</dd>
-        <dt>Zt₀ · Cota de terreno de referencia</dt><dd>Elevación en el borde de viga original, medida desde el datum altimétrico de obra. Es opcional para un ajuste por profundidad; es necesaria si ingresas una nueva cota de sello.</dd>
+        <dt>Zt₀ · Cota de terreno de referencia</dt><dd>Elevación del borde original. Se obtiene como sello de diseño + H₀ cuando has ingresado ese sello; los casos antiguos conservan su referencia altimétrica. Permite convertir el ajuste a una nueva cota de sello.</dd>
         <dt>Zs₁ · Nueva cota de sello</dt><dd>Elevación objetivo del fondo, no profundidad positiva de excavación. Si el terreno está en cota 100,00 y el sello en 96,00, la diferencia vertical es 4,00 m.</dd>
         <dt>K · Alineación lateral</dt><dd>Adición de campo para el control de cabeceo, inicialmente 0,10 m. Puedes usar 0,20 m, cero u otro valor no negativo. No es una dimensión tomada de la Tabla 1.</dd>
         <dt>φ · Replanteo en planta</dt><dd>Ángulo horizontal desde ±X. Las coordenadas son locales al mástil; para llevarlas a la red topográfica hacen falta el origen y la orientación reales de la torre.</dd>
@@ -123,9 +123,9 @@ export function FieldGuide() {
       <p>K es la adición de alineación lateral que decidiste usar para el control de cabeceo. En esta app se aplica como una suma escalar:</p><p className="guide-equation">D_total = C + X₁ + K</p>
       <p>Pasar de K = 0,10 m a K = 0,20 m aumenta el total 0,10 m. No cambia X₁, H₁, β ni el indicador «se aleja / se acerca», que expresa exclusivamente ΔX = X₁ − X₀ debido al ajuste de excavación. K tampoco es una tolerancia de inclinación autorizada por el plano ni un ángulo calculado de cabeceo del mástil.</p>
       <p>Para conservar la lectura geométrica del borde, la planta y sus coordenadas usan R = C + X₁, sin K. El valor principal de campo incluye K y está identificado como total. Si necesitas las coordenadas de otro punto material de alineación, su dirección y referencia tendrían que definirse aparte; la app no convierte esta adición en un desplazamiento transversal de coordenadas.</p>
-      <p>El origen local está en el mástil. El eje X es transversal y Y longitudinal. E′ = (0,+e) y F′ = (0,−e). Con φ medido desde el eje transversal del cuadrante:</p>
+      <p>El origen local está en el mástil y +Y va de F′ hacia E′. Esta tabla muestra la convención inicial del plano: E′ = (0,+e), F′ = (0,−e), T1/T4 desde F′ y T1/T2 al lado −X. Ajustar permite invertir las parejas o el lado transversal si la ficha lo requiere. Con φ desde el eje transversal del cuadrante:</p>
       <div className="guide-table"><table><thead><tr><th>Tirante</th><th>X local</th><th>Y local</th><th>Pivote</th></tr></thead><tbody><tr><td>T1</td><td>−R cos φ</td><td>−e − R sen φ</td><td>F′</td></tr><tr><td>T2</td><td>−R cos φ</td><td>+e + R sen φ</td><td>E′</td></tr><tr><td>T3</td><td>+R cos φ</td><td>+e + R sen φ</td><td>E′</td></tr><tr><td>T4</td><td>+R cos φ</td><td>−e − R sen φ</td><td>F′</td></tr></tbody></table></div>
-      <p>Estas coordenadas no son UTM ni entregan un azimut geográfico. Para replantear con la estación, aplica la orientación y el origen establecidos en obra, y verifica qué pivote corresponde a cada tirante según la ficha real. La ficha de cada tirante prevalece sobre la simetría esquemática del dibujo.</p>
+      <p>La planta representa el sistema local. Si ingresas N/E reales de pivotes y amarres, la app también calcula la orientación de cuadrícula y las coordenadas del borde en ese sistema. No se aplica conversión de datum, huso ni norte verdadero: todos los datos deben usar el mismo sistema y metros.</p>
     </div></details>
 
     <details><summary>11 · Leer el plano sin mezclar referencias</summary><div className="guide-content">
@@ -133,10 +133,32 @@ export function FieldGuide() {
       <p>Las notas 2 y 15 de las láminas remiten al diseño de la torre y de los tirantes para su localización; el esquema de fundación no reemplaza esa ficha específica. La app conserva la geometría de una referencia conocida. Una diferencia entre suelo encontrado y suelo de diseño necesita la decisión correspondiente antes de usar una nueva profundidad como instrucción de obra.</p>
     </div></details>
 
-    <details><summary>12 · Instalar, trabajar sin conexión y recibir actualizaciones</summary><div className="guide-content">
+    <details><summary>12 · Cero en R41 o R32 y giro horario</summary><div className="guide-content">
+      <p>En Ajustar elige qué pareja se arma en E′ o F′ y el lado transversal de T1/T2. La convención inicial mantiene el plano anterior; tus notas contenían ambas correspondencias y por eso queda configurable. La planta y la tabla de giros de Ajustar permiten revisar la elección.</p>
+      <p><strong>Por coordenadas:</strong> el azimut del eje se obtiene de F′ hacia E′. La dirección de cada tirante incorpora su φ y cuadrante. El azimut del cero se calcula desde el pivote ocupado hasta R41 o R32:</p>
+      <p className="guide-equation">Hz = normalizar a [0°, 360°) (azimut al tirante − azimut al amarre)</p>
+      <p>La visual real puede estar desviada del eje. No basta con sumar 180° si los amarres no quedan exactamente en direcciones opuestas desde la estación.</p>
+      <p><strong>Por eje:</strong> supone R41 hacia F′→E′ y R32 en la dirección opuesta. Exige verificar la alineación. Con T1/T4 en E′ y T1 al lado +X, el ejemplo de tus notas es: cero en R41, T1 = 90° − φ y T4 = 270° + φ. Cero en R32, T1 = 270° − φ y T4 = 90° + φ. Para φ = 35°27′, T1 pasa de 54°33′ a 234°33′. El signo de φ no se cambia arbitrariamente al invertir el cero.</p>
+      <p>T2–T4 heredan φ de T1 mientras estén vinculados. Editar un φ individual lo separa; marcar «Usar φ de T1» recupera la herencia. β, e y K son comunes. C, los sellos y los objetivos de cada anclaje son independientes.</p>
+    </div></details>
+
+    <details><summary>13 · Nivelación de las cinco excavaciones</summary><div className="guide-content">
+      <p>La estación total y el nivel tienen referencias independientes. Puedes poner 0° de estación hacia R41 y tomar la vista (+) del nivel en R32. En Ajustar ingresa la referencia del nivel, su Z, la lectura (+) y los cinco sellos de diseño.</p>
+      <p className="guide-equation">HI = Z de referencia + vista (+)</p>
+      <p className="guide-equation">Mira al sello = HI − Z del sello efectivo</p>
+      <p>HI es la cota del plano de colimación, no la altura física del aparato sobre el terreno. Si mueves el nivel necesitas una nueva vista (+). Referencia en cota 100,000 y vista (+) de 1,500 dan HI = 101,500. Para sello en 98,000, la mira objetivo es 3,500 m.</p>
+      <p>Con una vista actual sobre terreno o fondo de excavación:</p>
+      <p className="guide-equation">Cota actual = HI − mira actual<br/>Falta excavar = mira al sello − mira actual</p>
+      <p>Si la mira al sello es 3,500 y lees 2,500, falta bajar 1,000 m. Si lees 4,000, estás 0,500 m bajo el sello y aparece «Exceso de excavación». Una mira objetivo negativa indica que el sello está sobre el plano de colimación y requiere otra posición del nivel para una mira vertical normal.</p>
+      <p>Cada tirante conserva su sello de diseño. Cambiar la profundidad traslada la misma viga y calcula el sello efectivo con β; ese sello efectivo se usa para la mira objetivo. K y el cero horizontal no cambian las cotas ni HI. La nivelación puede calcularse aunque aún falte C, porque C no interviene en la geometría vertical.</p>
+      <p>M1 tiene sello propio y otra cota objetivo opcional, sin fórmulas de tirantes. Sus N/E pueden ingresarse o dejarse ambas vacías para usar el punto medio E′–F′; la suposición queda indicada. La Z de coordenadas no sustituye al sello.</p>
+      <p>Ajustar guarda al escribir y al cerrar con Guardar, ×, Escape o tocando fuera. Los datos incompletos se conservan y las salidas que los necesitan muestran «—». Exportar torre guarda las cinco fichas; importar un caso antiguo recupera su tirante activo y deja las C desconocidas de los demás pendientes.</p>
+    </div></details>
+
+    <details><summary>14 · Instalar, trabajar sin conexión y recibir actualizaciones</summary><div className="guide-content">
       <p>La app es una PWA: dispone de manifiesto de instalación, iconos y un service worker que guarda el HTML, JavaScript, estilos, tablas, dibujos y esta guía. Los cálculos se realizan en el dispositivo y no necesitan una API ni enviar datos a un servidor.</p>
       <ol><li>Ábrela con conexión y desde el dominio que vayas a usar en campo.</li><li>En la ayuda (?) espera «Disponible sin conexión». La indicación aparece cuando terminó de guardarse la versión completa; instalar el icono por sí solo no garantiza que haya finalizado esa descarga.</li><li>En Chrome o Edge usa «Instalar aplicación». En iPhone, abre en Safari y usa Compartir → Añadir a pantalla de inicio.</li><li>Antes de salir, prueba el modo avión: cierra y abre la app, cambia una profundidad y comprueba el resultado. Exporta los casos que necesites conservar.</li></ol>
-      <p>La última sesión se guarda en este dispositivo. Exportar un caso genera un JSON con entradas, resultados y referencia; importarlo vuelve a calcular con esos datos. Para cuatro tirantes, conserva cuatro archivos identificados. Borrar datos del sitio, usar navegación privada o una limpieza del almacenamiento del dispositivo puede eliminar la sesión y la caché.</p>
+      <p>La última torre se guarda en este dispositivo. Exportar torre genera un JSON con las cinco fichas, referencias, constantes y resultados; importarlo vuelve a calcular con esos datos. También puedes importar los antiguos casos individuales. Borrar datos del sitio, usar navegación privada o una limpieza del almacenamiento del dispositivo puede eliminar la sesión y la caché.</p>
       <h3>Qué ocurre al publicarse otra versión</h3>
       <p>Con conexión, la app comprueba actualizaciones al abrir, al volver a estar visible, al recuperar conexión y cada 15 minutos mientras está visible. Si encuentra un nuevo deploy, descarga sus archivos en una caché separada. Si la descarga falla, mantiene la versión anterior que ya funcionaba sin conexión.</p>
       <p>Cuando la siguiente versión termina de descargarse, se activa y la app se recarga automáticamente, conservando los datos de la última sesión. <strong>No necesitas Ctrl + F5, borrar la caché ni cerrar todas las pestañas.</strong> Las ventanas abiertas también pasan a la nueva versión. Con conexión, una recarga normal puede mostrar brevemente la versión guardada mientras descarga la nueva; al completar la descarga, la sustituye automáticamente. Sin conexión, sigue funcionando la última versión completa guardada.</p>
@@ -144,7 +166,7 @@ export function FieldGuide() {
       <p>El dominio pages.dev y un dominio personalizado tienen almacenamientos distintos. Si empiezas a usar lineastirantes.rumbo3d.com, ábrelo primero con conexión, espera su descarga e importa allí los JSON que necesites; la caché de pages.dev no se traslada automáticamente.</p>
     </div></details>
 
-    <details><summary>13 · De dónde salen estos datos</summary><div className="guide-content">
+    <details><summary>15 · De dónde salen estos datos</summary><div className="guide-content">
       <p>El catálogo transcribe la Tabla 1 de seis láminas entregadas para esta obra. Los parámetros geotécnicos explicados arriba proceden de la Tabla 2 de GI6KL. Las referencias al papel de los especialistas y al diseño específico se apoyan en las notas de esas láminas; no se han convertido en reglas de asignación automática de suelo.</p>
       <ul>{(['GI6KL','G6KL','GR6KL'] as const).map(tower=><li key={tower}><strong>{tower}:</strong> {CATALOG[tower]['3'].sheet} y {CATALOG[tower]['4'].sheet}. Revisión {CATALOG[tower]['3'].revision}.</li>)}</ul>
       <p>La ficha de replanteo T574 aporta el ejemplo C1 = 26,219 m, φ = 35°27′00″ y β = 57°07′01″. Las tablas de fundación aportan sus β decimales y los pares H/X. El valor inicial de e y la constante K proceden de la práctica de campo indicada por el usuario.</p>

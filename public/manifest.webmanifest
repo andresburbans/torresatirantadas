@@ -1,6 +1,6 @@
 {
   "id": "/", "name": "Líneas & Tirantes · RUMBO3D", "short_name": "Tirantes",
-  "description": "Cálculo y replanteo de tirantes sin conexión",
+  "description": "Replanteo y nivelación de cuatro tirantes y mástil sin conexión",
   "lang": "es-CL", "start_url": "/", "scope": "/", "display": "standalone",
   "background_color": "#f5f5f1", "theme_color": "#202322",
   "icons": [

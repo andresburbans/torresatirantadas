@@ -118,7 +118,7 @@ Eje X transversal, Y longitudinal; origen en el mástil. E′ = (0,+e), F′ = (
 | T3 | +R cos φ | +e + R sen φ | E′ |
 | T4 | +R cos φ | −e − R sen φ | F′ |
 
-Se ilustra la simetría con los datos del caso activo. Para otros tirantes, ingresar sus propios C y φ. No se calculan coordenadas UTM ni azimut geográfico.
+La tabla describe la convención inicial. La versión 2 usa C y φ independientes para cada tirante y permite invertir las parejas y el lado transversal. El modo por coordenadas calcula giros de cuadrícula y N/E del borde en el sistema ingresado, sin transformar datum ni huso. Ver TORRE-CAMPO.md para orientación y nivelación.
 
 ## Fuentes locales revisadas
 
