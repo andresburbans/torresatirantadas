@@ -1,7 +1,9 @@
 {
-  "fallbackVersion": "2026-10-19.2",
+  "fallbackVersion": "2026-10-19.3",
   "changes": [
-    "«Ajustar» ahora se llama «Ajustes» en los botones, el panel y la ayuda.",
-    "Se agregó este resumen de novedades: aparece una vez al día durante una semana y permite marcar «No volver a mostrar»."
+    "Replanteo y Nivelación ahora tienen pestañas independientes, también dentro de Ajustes.",
+    "La barra inferior reúne Torre, Punto de trabajo y el único botón de Ajustes. La torre se cambia desde el catálogo de Ajustes.",
+    "Replanteo permite elegir la posición E′ o F′ y el cero R41/R32. El ajuste de terreno se puede ocultar.",
+    "Nivelación indica falta o exceso de excavación con signo y flecha. Elegir suelo carga su profundidad y X tabuladas."
   ]
 }

@@ -134,7 +134,8 @@ export function FieldGuide() {
     </div></details>
 
     <details><summary>12 · Cero en R41 o R32 y giro horario</summary><div className="guide-content">
-      <p>En Ajustes elige qué pareja se arma en E′ o F′ y el lado transversal de T1/T2. La convención inicial mantiene el plano anterior; tus notas contenían ambas correspondencias y por eso queda configurable. La planta y la tabla de giros de Ajustes permiten revisar la elección.</p>
+      <p>En Replanteo selecciona la posición real de la estación, E′ o F′, y el amarre puesto a 0°. Cambiar de pivote no cambia las coordenadas del borde de diseño: se vuelve a calcular la dirección y la distancia desde el pivote ocupado. Si ocupas el pivote de diseño del tirante, la distancia es C + X₁ + K. Desde el otro pivote se muestra la distancia horizontal al mismo borde + K. El modo por eje necesita e y C para ese traslado; por coordenadas utiliza las N/E reales.</p>
+      <p>En Ajustes → Replanteo elige qué pareja se arma en E′ o F′ y el lado transversal de T1/T2. La convención inicial mantiene el plano anterior; tus notas contenían ambas correspondencias y por eso queda configurable. La planta y la tabla de giros de Ajustes permiten revisar la elección.</p>
       <p><strong>Por coordenadas:</strong> el azimut del eje se obtiene de F′ hacia E′. La dirección de cada tirante incorpora su φ y cuadrante. El azimut del cero se calcula desde el pivote ocupado hasta R41 o R32:</p>
       <p className="guide-equation">Hz = normalizar a [0°, 360°) (azimut al tirante − azimut al amarre)</p>
       <p>La visual real puede estar desviada del eje. No basta con sumar 180° si los amarres no quedan exactamente en direcciones opuestas desde la estación.</p>
@@ -152,6 +153,8 @@ export function FieldGuide() {
       <p>Si la mira al sello es 3,500 y lees 2,500, falta bajar 1,000 m. Si lees 4,000, estás 0,500 m bajo el sello y aparece «Exceso de excavación». Una mira objetivo negativa indica que el sello está sobre el plano de colimación y requiere otra posición del nivel para una mira vertical normal.</p>
       <p>Cada tirante conserva su sello de diseño. Cambiar la profundidad traslada la misma viga y calcula el sello efectivo con β; ese sello efectivo se usa para la mira objetivo. K y el cero horizontal no cambian las cotas ni HI. La nivelación puede calcularse aunque aún falte C, porque C no interviene en la geometría vertical.</p>
       <p>M1 tiene sello propio y otra cota objetivo opcional, sin fórmulas de tirantes. Sus N/E pueden ingresarse o dejarse ambas vacías para usar el punto medio E′–F′; la suposición queda indicada. La Z de coordenadas no sustituye al sello.</p>
+      <p>La pantalla se divide en Replanteo y Nivelación. La barra inferior contiene la torre de solo lectura, el punto T1–T4/M1 y el único botón de Ajustes. La torre se selecciona dentro de Torre y referencias. El ajuste de terreno y los diagramas se pueden ocultar en Replanteo sin borrar sus valores. Los archivos para importar/exportar están dentro de Ajustes → Archivos de torre.</p>
+      <p>Nivelación muestra mira al sello, HI, sello efectivo y vista actual. Falta excavar se indica como +valor m ↓; exceso de excavación como −valor m ↑. Si la diferencia redondea a cero se indica En sello, sin flecha.</p>
       <p>Ajustes guarda al escribir y al cerrar con Guardar, ×, Escape o tocando fuera. Los datos incompletos se conservan y las salidas que los necesitan muestran «—». Exportar torre guarda las cinco fichas; importar un caso antiguo recupera su tirante activo y deja las C desconocidas de los demás pendientes.</p>
     </div></details>
 

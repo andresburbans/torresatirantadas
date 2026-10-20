@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULTS, calculate, dms } from '../src/lib/geometry';
-import { applyPreset, azimuth, hzDms, inputFor, leveling, newTower, normalize, orientation, phiFor, readTower, resultFor, sealFor, setPhi, GUYS, POINTS } from '../src/lib/tower';
+import { applyPreset, azimuth, excavationControl, hzDms, inputFor, leveling, newTower, normalize, occupiedPivotFor, orientation, phiFor, readTower, resultFor, sealFor, selectSoil, setPhi, GUYS, POINTS } from '../src/lib/tower';
 const close=(a:number,b:number)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
 function coordinateTower(){
  const p=newTower();p.survey.coords.E={n:'1006.6',e:'1000',z:''};p.survey.coords.F={n:'1000',e:'1000',z:''};
@@ -77,4 +77,64 @@ test('M1 uses explicit coordinates or the labeled pivot midpoint, and angles rou
  p.survey.coords.M1={n:'1003',e:'1001',z:''};close(orientation(p,'M1').range!,Math.hypot(3.6,1));
  assert.equal(azimuth({n:0,e:0},{n:0,e:0}),null);assert.equal(dms(hzDms(359.999999999)),0);
  assert.equal(POINTS.length,5);
+});
+
+test('changing occupied E/F preserves the designed edge and computes range and clockwise Hz from the actual station',()=>{
+ const p=coordinateTower();for(const id of GUYS)p.guys[id].c='26.219';
+ p.survey.coords.R41={n:'1090',e:'1040',z:'100'};
+ for(const id of GUYS){
+  const original=orientation(p,id);const edge=original.edge!;
+  for(const occupied of ['E','F'] as const){
+   const moved={...p,survey:{...p.survey,occupied}},actual=orientation(moved,id),station=p.survey.coords[occupied];
+   assert.deepEqual(actual.edge,edge);
+   close(actual.range!,Math.hypot(edge.n-Number(station.n),edge.e-Number(station.e))+Number(p.k));
+   for(const zero of ['R41','R32'] as const){
+    const result=orientation({...moved,survey:{...moved.survey,zero}},id),ref=p.survey.coords[zero];
+    close(result.hz!,normalize(azimuth({n:Number(station.n),e:Number(station.e)},edge)!-azimuth({n:Number(station.n),e:Number(station.e)},{n:Number(ref.n),e:Number(ref.e)})!));
+   }
+  }
+ }
+});
+test('aligned axis and coordinate modes agree from either occupied pivot; missing C cannot yield an opposite-pivot shot',()=>{
+ const p=coordinateTower();for(const id of GUYS)p.guys[id].c='25';
+ for(const occupied of ['E','F'] as const)for(const id of GUYS){
+  const q={...p,survey:{...p.survey,occupied}},coord=orientation(q,id),axis=orientation({...q,survey:{...q.survey,mode:'axis'}},id);
+  close(axis.hz!,coord.hz!);close(axis.range!,coord.range!);
+ }
+ p.survey.mode='axis';p.survey.occupied='E';p.guys['1'].c='';
+ assert.equal(orientation(p,'1').hz,null);assert.equal(orientation(p,'1').range,null);
+ p.survey.occupied='F';assert.notEqual(orientation(p,'1').hz,null);
+});
+test('missing backsight coordinates block Hz without hiding an independently known edge distance',()=>{
+ const p=coordinateTower();p.survey.occupied='E';p.survey.coords.R41={n:'',e:'',z:'100'};
+ const o=orientation(p,'1');assert.equal(o.hz,null);assert.ok(o.range!>0);assert.ok(o.edge);
+ p.survey.coords.R41={n:'1100',e:'1000',z:'100'};
+ assert.equal(orientation(p,'M1').station,'E');close(orientation(p,'M1').range!,3.3);
+ p.survey.occupied='F';close(orientation(p,'M1').range!,3.3);
+});
+test('soil selection loads approved GI6KL alpha-5 depth and X for design and field target, leaving subsequent edits available',()=>{
+ const p=newTower();p.guys['1'].target='4.2';p.guys['1'].mode='x';p.guys['2'].sealDesign='100';
+ const s4=selectSoil(p,'4');
+ for(const id of GUYS){assert.equal(s4.guys[id].h0,'4');assert.equal(s4.guys[id].x0,'2.46');assert.equal(s4.guys[id].target,'4');assert.equal(s4.guys[id].mode,'depth');}
+ const s3=selectSoil(s4,'3');for(const id of GUYS){assert.equal(s3.guys[id].h0,'3.5');assert.equal(s3.guys[id].target,'3.5');assert.equal(s3.guys[id].x0,'2.117');}
+ assert.equal(s3.guys['2'].sealDesign,'100');assert.equal(s3.guys['1'].c,p.guys['1'].c);
+ s3.guys['1'].target='3.7';assert.equal(inputFor(s3,'1').target,'3.7');
+ const only=selectSoil(s4,'3','2');assert.equal(only.guys['1'].target,'4');assert.equal(only.guys['2'].target,'3.5');
+ const other=selectSoil({...p,tower:'G6KL'},'3');assert.equal(other.guys['1'].h0,'3');assert.equal(other.guys['1'].x0,'1.822');
+});
+test('legacy schema-2 sessions gain hidden terrain and work tabs without overwriting custom measurements',()=>{
+ const old=JSON.parse(JSON.stringify(newTower()));delete old.workflow;delete old.terrainVisible;delete old.survey.occupied;
+ old.guys['1'].target='4.2';old.guys['3'].staffCurrent='2.3';
+ const restored=readTower(old)!;assert.equal(restored.workflow,'stakeout');assert.equal(restored.terrainVisible,false);assert.equal(restored.survey.occupied,'auto');
+ assert.equal(restored.guys['1'].target,'4.2');assert.equal(restored.guys['3'].staffCurrent,'2.3');
+ assert.equal(occupiedPivotFor(restored,'1'),'F');assert.equal(occupiedPivotFor(restored,'2'),'E');
+ restored.workflow='level';restored.terrainVisible=true;restored.survey.occupied='F';assert.deepEqual(readTower(JSON.parse(JSON.stringify(restored))),restored);
+ assert.equal(readTower({...restored,workflow:'bad'}),null);assert.equal(readTower({...restored,survey:{...restored.survey,occupied:'bad'}}),null);
+ assert.equal(readTower({...restored,workflow:{toString:()=> 'level'}}),null);
+});
+test('excavation signs and arrows distinguish cut, excess, seal tolerance and incomplete data',()=>{
+ assert.deepEqual(excavationControl(1,true),{label:'Falta excavar',sign:'+',direction:'down',value:1});
+ assert.deepEqual(excavationControl(-.3,true),{label:'Exceso de excavación',sign:'−',direction:'up',value:.3});
+ for(const value of [0,.0004,-.0004]){assert.equal(excavationControl(value,true).label,'En sello');assert.equal(excavationControl(value,true).direction,null);}
+ for(const value of [null,NaN,1])assert.equal(excavationControl(value,false).value,null);
 });

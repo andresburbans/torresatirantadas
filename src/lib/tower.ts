@@ -14,23 +14,23 @@ export type GuyData = Pick<Inputs,'c'|'x0'|'h0'|'target'|'mode'|'datum'|'alpha'|
 export type TowerProject = {
   schema:2; id:string; tower:Tower; soil:Soil; referenceAlpha:string;
   pivot:string; k:string; beta:DMS;
-  selected:PointId; diagramsVisible:boolean;
+  selected:PointId; diagramsVisible:boolean; terrainVisible:boolean; workflow:'stakeout'|'level';
   guys:Record<GuyId,GuyData>;
   mast:{sealDesign:string;sealTarget:string;staffCurrent:string};
-  survey:{mode:'coordinates'|'axis'; mapping:'F14'|'E14'; side:'standard'|'mirrored'; zero:RefId; levelRef:RefId; backsight:string; mastStation:PivotId;
+  survey:{mode:'coordinates'|'axis'; mapping:'F14'|'E14'; side:'standard'|'mirrored'; zero:RefId; levelRef:RefId; backsight:string; mastStation:PivotId; occupied:'auto'|PivotId;
     coords:Record<RefId|PivotId|'M1',Coord>};
 };
 const blankCoord=():Coord=>({n:'',e:'',z:''});
 const zeroAngle:DMS={deg:'0',min:'0',sec:'0'};
 export function newTower():TowerProject {
   const guys=Object.fromEntries(GUYS.map(id=>[id,{
-    c:id==='1'?DEFAULTS.c:'',x0:DEFAULTS.x0,h0:DEFAULTS.h0,target:id==='1'?DEFAULTS.target:DEFAULTS.h0,
+    c:id==='1'?DEFAULTS.c:'',x0:DEFAULTS.x0,h0:DEFAULTS.h0,target:DEFAULTS.h0,
     mode:'depth',datum:'terrain',alpha:DEFAULTS.alpha,groundElevation:'',phi:{...DEFAULTS.phi},soil:'3',
     phiLinked:id!=='1',sealDesign:'',staffCurrent:'',
   }])) as Record<GuyId,GuyData>;
   return {schema:2,id:DEFAULTS.id,tower:DEFAULTS.tower,soil:'3',referenceAlpha:'5',pivot:DEFAULTS.pivot,k:DEFAULTS.k,beta:{...DEFAULTS.beta},
-    selected:'1',diagramsVisible:false,guys,mast:{sealDesign:'',sealTarget:'',staffCurrent:''},
-    survey:{mode:'coordinates',mapping:'F14',side:'standard',zero:'R41',levelRef:'R41',backsight:'',mastStation:'E',
+    selected:'1',diagramsVisible:false,terrainVisible:false,workflow:'stakeout',guys,mast:{sealDesign:'',sealTarget:'',staffCurrent:''},
+    survey:{mode:'coordinates',mapping:'F14',side:'standard',zero:'R41',levelRef:'R41',backsight:'',mastStation:'E',occupied:'auto',
       coords:{R41:blankCoord(),R32:blankCoord(),E:blankCoord(),F:blankCoord(),M1:blankCoord()}}};
 }
 export function phiFor(p:TowerProject,id:GuyId):DMS {return id!=='1'&&p.guys[id].phiLinked?p.guys['1'].phi:p.guys[id].phi;}
@@ -61,6 +61,13 @@ export function pivotFor(p:TowerProject,id:PointId):PivotId {
   const pair14=id==='1'||id==='4';
   return pair14?(p.survey.mapping==='F14'?'F':'E'):(p.survey.mapping==='F14'?'E':'F');
 }
+export function occupiedPivotFor(p:TowerProject,id:PointId):PivotId {return p.survey.occupied==='E'||p.survey.occupied==='F'?p.survey.occupied:pivotFor(p,id);}
+/** Explicit soil selection starts at the approved reference; later field adjustments remain possible. */
+export function selectSoil(p:TowerProject,soil:Soil,only?:GuyId):TowerProject {
+  const next=applyPreset(p,p.tower,soil,p.referenceAlpha,only),guys={...next.guys};
+  for(const id of only?[only]:GUYS)guys[id]={...guys[id],mode:'depth',target:guys[id].h0};
+  return {...next,guys};
+}
 export const normalize=(degrees:number)=>((degrees%360)+360)%360;
 export function hzDms(degrees:number):DMS {
   const rounded=(Math.round(normalize(degrees)*360000)%129600000)/360000;
@@ -83,21 +90,29 @@ export function localBearing(p:TowerProject,id:GuyId):number|null {
   return east?(north?90-phi:90+phi):(north?270+phi:270-phi);
 }
 export function orientation(p:TowerProject,id:PointId){
-  const station=pivotFor(p,id),errors:string[]=[];
+  const designStation=pivotFor(p,id),station=occupiedPivotFor(p,id),errors:string[]=[];
   let targetAz:number|null=null,zeroAz:number|null=null,edge:{n:number;e:number}|null=null,range:number|null=null;
   if(p.survey.mode==='axis'){
     if(id==='M1')errors.push('Para orientar M1, usa coordenadas de pivotes y mástil.');
-    else targetAz=localBearing(p,id);
+    else {
+      const local=localBearing(p,id),r=resultFor(p,id),e=number(p.pivot);
+      if(station===designStation){targetAz=local;if(r.valid)range=r.distanceTotal;}
+      else if(local!==null&&r.valid&&Number.isFinite(e)&&e>=0){
+        const rad=local*Math.PI/180,x=r.distance*Math.sin(rad),y=(designStation==='E'?e:-e)+r.distance*Math.cos(rad)-(station==='E'?e:-e);
+        targetAz=azimuth({n:0,e:0},{n:y,e:x});range=Math.hypot(x,y)+number(p.k);
+      }else errors.push('Completa C, e y el ajuste del tirante para medir desde el otro pivote.');
+    }
     zeroAz=p.survey.zero==='R41'?0:180;
   }else{
     const e=coordinates(p.survey.coords.E),f=coordinates(p.survey.coords.F),ref=coordinates(p.survey.coords[p.survey.zero]);
     const occupied=station==='E'?e:f;
-    if(!e||!f||!ref)errors.push('Completa N/E de E′, F′ y de la referencia elegida en Ajustes.');
+    if(!ref)errors.push('Completa N/E de la referencia elegida en Ajustes.');
+    if(!e||!f)errors.push('Completa N/E de E′ y F′ en Ajustes.');
     else {
       const axis=azimuth(f,e);
-      zeroAz=azimuth(occupied!,ref);
+      zeroAz=ref?azimuth(occupied!,ref):null;
       if(axis===null)errors.push('E′ y F′ no pueden coincidir.');
-      if(zeroAz===null)errors.push('El punto de amarre no puede coincidir con la estación.');
+      if(ref&&zeroAz===null)errors.push('El punto de amarre no puede coincidir con la estación.');
       if(id==='M1'){
         const m=p.survey.coords.M1;
         const hasM=m.n.trim()!==''||m.e.trim()!=='';
@@ -107,16 +122,22 @@ export function orientation(p:TowerProject,id:PointId){
       }else{
         const local=localBearing(p,id),r=resultFor(p,id);
         if(axis!==null&&local!==null){
-          targetAz=normalize(axis+local);
-          if(r.valid){const rad=targetAz*Math.PI/180;edge={n:occupied!.n+r.distance*Math.cos(rad),e:occupied!.e+r.distance*Math.sin(rad)};range=r.distanceTotal;}
+          const designAz=normalize(axis+local),designPivot=designStation==='E'?e:f;
+          if(station===designStation)targetAz=designAz;
+          if(r.valid){const rad=designAz*Math.PI/180;edge={n:designPivot.n+r.distance*Math.cos(rad),e:designPivot.e+r.distance*Math.sin(rad)};range=Math.hypot(edge.n-occupied!.n,edge.e-occupied!.e)+number(p.k);targetAz=azimuth(occupied!,edge);}
         }
       }
     }
   }
   if(targetAz===null&&errors.length===0)errors.push('Revisa φ o la posición del punto para calcular su dirección.');
   const hz=targetAz!==null&&zeroAz!==null&&errors.length===0?normalize(targetAz-zeroAz):null;
-  return {station,hz,angle:hz===null?null:hzDms(hz),targetAz,zeroAz,edge,range,errors,
+  return {station,designStation,hz,angle:hz===null?null:hzDms(hz),targetAz,zeroAz,edge,range,errors,
     convention:p.survey.mode==='axis'?'Por eje: R41 hacia E′; R32 hacia F′. Confirma que los amarres estén alineados.':'Por coordenadas N/E: giro horario desde la visual real al amarre.'};
+}
+export function excavationControl(remaining:number|null,valid:boolean){
+  if(!valid||remaining===null||!Number.isFinite(remaining))return {label:'Control de excavación',sign:'',direction:null,value:null} as const;
+  if(Math.abs(remaining)<.0005)return {label:'En sello',sign:'',direction:null,value:0} as const;
+  return remaining>0?{label:'Falta excavar',sign:'+',direction:'down',value:remaining} as const:{label:'Exceso de excavación',sign:'−',direction:'up',value:Math.abs(remaining)} as const;
 }
 export function sealFor(p:TowerProject,id:PointId):number|null {
   if(id==='M1'){
@@ -173,6 +194,7 @@ export function readTower(value:unknown):TowerProject|null {
   for(const id of GUYS){const g=guys[id];if(!record(g)||!['c','x0','h0','target','alpha','groundElevation','sealDesign','staffCurrent'].every(k=>typeof g[k]==='string')||!isDms(g.phi)||typeof g.phiLinked!=='boolean'||!['3','4'].includes(String(g.soil))||!['fixed','terrain'].includes(String(g.datum))||!['depth','x','seal'].includes(String(g.mode)))return null;}
   if(!['sealDesign','sealTarget','staffCurrent'].every(k=>typeof mast[k]==='string')||!['coordinates','axis'].includes(String(s.mode))||!['F14','E14'].includes(String(s.mapping))||!['standard','mirrored'].includes(String(s.side))||!['R41','R32'].includes(String(s.zero))||!['R41','R32'].includes(String(s.levelRef))||!['E','F'].includes(String(s.mastStation))||typeof s.backsight!=='string'||!record(s.coords))return null;
   for(const key of ['E','F','R41','R32','M1']){const c=s.coords[key];if(!record(c)||!['n','e','z'].every(k=>typeof c[k]==='string'))return null;}
-  // Only the validated schema is used by consumers; copying isolates imported objects.
-  return structuredClone(v) as TowerProject;
+  if(v.workflow!==undefined&&v.workflow!=='stakeout'&&v.workflow!=='level'||v.terrainVisible!==undefined&&typeof v.terrainVisible!=='boolean'||s.occupied!==undefined&&s.occupied!=='auto'&&s.occupied!=='E'&&s.occupied!=='F')return null;
+  // Migrate existing schema-2 sessions without dropping measurements or custom depths.
+  return structuredClone({...v,workflow:v.workflow??'stakeout',terrainVisible:v.terrainVisible??false,survey:{...s,occupied:s.occupied??'auto'}}) as TowerProject;
 }
