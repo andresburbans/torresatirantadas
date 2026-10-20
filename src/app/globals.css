@@ -326,3 +326,9 @@ body{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .scale-result>small{font-size:11px;color:#666}
 .scale-summary{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;padding:12px 0;border-bottom:1px solid var(--border);font-size:11px;color:#666}
 .scale-summary strong{font-family:var(--mono);font-size:15px;color:#222;letter-spacing:-.02em}
+
+.release-version{display:inline-block;margin-top:8px;padding:6px 9px;border:1px solid var(--border);border-radius:5px;font:12px var(--mono);color:#555;background:#f5f5f5}
+.app-credit{font-size:11px;line-height:1.7;color:#777}
+.release-notice .app-credit{margin:18px 0 0;text-align:center}
+footer{flex-wrap:wrap}
+footer .app-credit{flex-basis:100%;width:100%;order:4;margin:0;text-align:center}

@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import notes from '@/data/release-notes.json';
+import { APP_CREDIT, APP_VERSION } from '@/lib/app-info';
 import { localDay, RELEASE_NOTICE_STORAGE, releaseNoticeState, shouldShowRelease, type ReleaseNoticeState } from '@/lib/release-notice';
 
 const version=process.env.NEXT_PUBLIC_RELEASE_ID||notes.fallbackVersion;
@@ -43,8 +44,10 @@ export function ReleaseNotice({paused}:{paused:boolean}){
   return <div className="modal-backdrop" onClick={()=>setOpen(false)}><section className="modal release-notice" data-release-dialog role="dialog" aria-modal="true" aria-labelledby="release-title" onClick={e=>e.stopPropagation()}>
     <button ref={closeButton} className="modal-close icon-button" aria-label="Cerrar novedades" onClick={()=>setOpen(false)}><X size={20}/></button>
     <h2 id="release-title">Nueva versión</h2>
+    <span className="release-version" data-testid="release-version">Versión {APP_VERSION}</span>
     <ul className="release-changes">{notes.changes.map(text=><li key={text}>{text}</li>)}</ul>
     <label className="inherit-check"><input type="checkbox" checked={muted} onChange={e=>{setMuted(e.target.checked);if(state.current)save({...state.current,muted:e.target.checked});}}/>No volver a mostrar</label>
     <button className="button primary" onClick={()=>setOpen(false)}>Entendido</button>
+    <p className="app-credit">{APP_CREDIT}</p>
   </section></div>;
 }

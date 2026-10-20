@@ -10,6 +10,7 @@ import { FieldGuide } from '@/components/field-guide';
 import { Field, Angle, Select } from '@/components/form-controls';
 import { TowerSettings } from '@/components/tower-settings';
 import { SurveyPlan } from '@/components/survey-plan';
+import { APP_CREDIT, APP_VERSION } from '@/lib/app-info';
 import { ReleaseNotice } from '@/components/release-notice';
 import { WorkflowTabs, type Workflow } from '@/components/workflow-tabs';
 import { LevelResults, StakeoutResults } from '@/components/work-results';
@@ -81,7 +82,7 @@ export default function Home(){
       <LevelResults project={p} change={setP} configure={()=>openSettings('level')}/>
       {isMast?<details className="point-data"><summary>Cotas del mástil</summary><section><h2>Nivelación · M1</h2><p className="point-note">El mástil usa su propio sello. Las distancias C/X y β corresponden a tirantes y no se aplican a M1.</p><div className="point-grid"><Field id="mast-design" label="Cota de sello de diseño" value={p.mast.sealDesign} onChange={v=>setP(q=>({...q,mast:{...q.mast,sealDesign:v}}))}/><Field id="mast-target" label="Nueva cota de sello (opcional)" value={p.mast.sealTarget} onChange={v=>setP(q=>({...q,mast:{...q.mast,sealTarget:v}}))} hint="Vacía: se usa el sello de diseño"/></div></section></details>:null}
       </div>
-      <footer><span>RUMBO3D / LÍNEAS &amp; TIRANTES</span><p>Geometría y nivelación de apoyo al replanteo · cinco puntos por torre</p><span>v2.0 · PWA</span></footer>
+      <footer><span>RUMBO3D / LÍNEAS &amp; TIRANTES</span><p>Geometría y nivelación de apoyo al replanteo · cinco puntos por torre</p><span data-testid="footer-version">v{APP_VERSION} · PWA</span><p className="app-credit">{APP_CREDIT}</p></footer>
     </main>:<main className="tower-app"><p className="point-note" role="status">Recuperando la torre guardada…</p></main>}
     {ready&&<section className="workbar" aria-label="Torre y punto de trabajo"><div className="workbar-tower"><span className="tiny-label">TORRE</span><strong title={p.id} aria-label="Torre seleccionada">{p.id||'Sin ID'}</strong></div><Select id="point-select" label="Punto de trabajo" value={p.selected} onChange={selected=>setP(q=>({...q,selected:selected as PointId}))}>{POINTS.map(id=><option key={id} value={id}>{pointName(id)}</option>)}</Select><button ref={settingsButton} className="button primary" onClick={()=>openSettings()}><SlidersHorizontal size={17}/><span>Ajustes</span></button></section>}
     {notice&&<div className="toast" role="status"><span>{notice}</span><button aria-label="Cerrar aviso" onClick={()=>setNotice('')}><X size={15}/></button></div>}

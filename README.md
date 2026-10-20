@@ -121,6 +121,8 @@ Probar apertura y cálculo en modo avión antes de salir. Borrar datos del sitio
 
 ## Actualizaciones
 
+La versión visible sigue `mayor.menor.parche` (actualmente 2.0.1) y se toma de `package.json` para el aviso y el pie. Incrementar parche para correcciones y cambios pequeños, menor para nuevas funciones y mayor para cambios incompatibles. Mantener `package-lock.json` sincronizado. El crédito de autor se comparte desde `src/lib/app-info.ts`.
+
 Cada commit compilado por Pages utiliza `CF_PAGES_COMMIT_SHA` como identificador de versión (en local, `git rev-parse HEAD`). **Nueva versión** presenta las altas, bajas o cambios descritos en `src/data/release-notes.json`. Al preparar un commit para publicar, actualizar ese resumen en español para que corresponda al cambio publicado. No se consultan GitHub ni servicios externos desde el dispositivo.
 
 El aviso aparece una vez por fecha local durante siete fechas, contadas desde el primer uso de esa versión. Cerrar con ×, Escape, fuera del cuadro o Entendido no lo repite ese día. «No volver a mostrar» lo oculta para ese commit; un commit distinto inicia su propio aviso. La preferencia se guarda aparte de los datos de torre y funciona offline. Se comprueba también al regresar a la app y al cambiar de día con ella abierta. Si el navegador impide guardar preferencias, se conservan durante esa visita, pero no se garantiza recordarlas tras cerrar o recargar.

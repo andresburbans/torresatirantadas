@@ -1,8 +1,7 @@
 {
-  "fallbackVersion": "2026-10-19.5",
+  "fallbackVersion": "2026-10-20.1",
   "changes": [
-    "Se agregó el factor de escala R41–R32: distancia horizontal medida con estación dividida por distancia teórica planimétrica de las coordenadas N/E.",
-    "Ajustes permite ingresar la distancia medida y consultar la teórica. El factor también aparece en Replanteo cuando los datos están completos.",
-    "El factor es informativo para la estación total: no modifica C + X₁ + K ni los demás cálculos o medidas."
+    "Se agregó la versión 2.0.1 al aviso de novedades y al pie de la app, con numeración mayor.menor.parche.",
+    "Se agregó el crédito «Creada por Andrés Burbano (c) 2026» en el aviso de novedades y al final de la app."
   ]
 }

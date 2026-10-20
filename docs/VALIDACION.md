@@ -111,3 +111,11 @@ Las coordenadas de prueba son sintéticas. La configuración inicial conserva F�
 - Disponible sin conexión confirmado en la ayuda. Con servidor de prueba detenido y HTTP inaccesible, recarga recupera factor, torre y datos. Cambiar offline la medición a 53,170 m recalcula 0,999632682, manteniendo 28,436 m y 54°33′.
 - Sin desbordamiento horizontal a 360, 393, 430 y 1366 px de viewport. Capturas: `docs/screenshots/escala-ajustes-mobile.png` y `docs/screenshots/escala-replanteo-mobile.png`.
 - Total: 49 pruebas correctas, TypeScript y compilación estática correctos, 30 recursos de precarga PWA.
+
+## Versión visible y crédito · 20 octubre 2026
+
+- Versión visible 2.0.1 con formato mayor.menor.parche; fuente única `package.json`, importada por `src/lib/app-info.ts`, y lockfile sincronizado. El aviso conserva por separado su identidad de deploy basada en commit: no cambia su frecuencia de una vez al día por siete fechas ni la opción de no mostrar otra vez.
+- Crédito exacto «Creada por Andrés Burbano (c) 2026» en el aviso y al final del footer. El pie muestra también v2.0.1. Novedades actualizadas para este cambio.
+- Revisión visual del aviso a 393 × 852 px y del pie mediante scroll; sin desbordamiento horizontal a 360 y 1366 px. Capturas `version-2-0-1-mobile.png` y `credito-footer-mobile.png` en `docs/screenshots`.
+- 49 pruebas correctas, compilación estática y TypeScript correctos, 30 recursos de precarga PWA. No se modifican cálculos, datos de torre ni mecanismos de caché/actualización.
+- Configuración iOS revisada: manifiesto standalone, metadatos Apple, apple-touch-icon y viewport con safe area presentes. Instalación documentada con Safari → Compartir → Añadir a pantalla de inicio. No se dispone de prueba en Safari/iPhone físico en este entorno.
