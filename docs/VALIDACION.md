@@ -119,3 +119,12 @@ Las coordenadas de prueba son sintéticas. La configuración inicial conserva F�
 - Revisión visual del aviso a 393 × 852 px y del pie mediante scroll; sin desbordamiento horizontal a 360 y 1366 px. Capturas `version-2-0-1-mobile.png` y `credito-footer-mobile.png` en `docs/screenshots`.
 - 49 pruebas correctas, compilación estática y TypeScript correctos, 30 recursos de precarga PWA. No se modifican cálculos, datos de torre ni mecanismos de caché/actualización.
 - Configuración iOS revisada: manifiesto standalone, metadatos Apple, apple-touch-icon y viewport con safe area presentes. Instalación documentada con Safari → Compartir → Añadir a pantalla de inicio. No se dispone de prueba en Safari/iPhone físico en este entorno.
+
+## Ayuda de uso · versión 2.0.2
+
+- Resumen de (?) reescrito como guía de trabajo: preparar la torre, seleccionar T1–T4/M1, replantear y controlar la excavación. Conserva el estado sin conexión, el acceso a fórmulas y la explicación del respaldo JSON.
+- Guía técnica revisada para eliminar referencias a la conversación y describir los controles actuales. Se reemplaza la instrucción obsoleta «Cargar referencia» por los pasos de Ajustes → Replanteo y «Aplicar diseño a los 4 tirantes», explicando cuándo se restablece el objetivo.
+- Comparación directa con la guía anterior: 16 apartados, 13 bloques de fórmulas y 5 tablas conservados; fórmulas y tablas idénticas. Motores de cálculo y datos de torre sin cambios.
+- Ayuda revisada a 393 × 852 px; guía accesible sin desbordamiento horizontal a 360 px y presentación de laptop revisada. Captura `docs/screenshots/ayuda-uso-mobile.png`.
+- Con servidor detenido y HTTP inaccesible, recarga recupera la ayuda final y permite abrir «Uso, fórmulas y referencias» desde caché.
+- 49 pruebas correctas, compilación estática y TypeScript correctos, 30 recursos de precarga PWA. Versión y novedades actualizadas a 2.0.2.

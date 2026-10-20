@@ -1,7 +1,7 @@
 {
-  "fallbackVersion": "2026-10-20.1",
+  "fallbackVersion": "2026-10-20.2",
   "changes": [
-    "Se agregó la versión 2.0.1 al aviso de novedades y al pie de la app, con numeración mayor.menor.parche.",
-    "Se agregó el crédito «Creada por Andrés Burbano (c) 2026» en el aviso de novedades y al final de la app."
+    "Se reorganizó la ayuda (?) con pasos claros para preparar la torre, replantear y controlar la excavación.",
+    "Se revisó la redacción de la guía y las instrucciones de diseño e instalación, conservando las fórmulas y referencias."
   ]
 }
