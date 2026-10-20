@@ -99,3 +99,15 @@ Las coordenadas de prueba son sintéticas. La configuración inicial conserva F�
 - Sin desbordamiento de los desplegables a 360, 393 y 1366 px. Planta identifica R32 · Sur arriba (y=24) y R41 · Norte abajo (y=309) en modo Cuadrantes.
 - Con servidor detenido y HTTP inaccesible: recarga mantiene E′/T3/R32 = 54°33′; elegir F′/T1/R32 produce 234°33′ y 28,436 m desde caché.
 - Total: 43 pruebas correctas, TypeScript y compilación estática correctos, 30 recursos PWA. Capturas: `docs/screenshots/angulos-r41-mobile.png` y `docs/screenshots/angulos-r32-mobile.png`.
+
+## Factor informativo R41–R32 · 19 octubre 2026
+
+- Alcance ajustado a la última indicación del usuario: un solo factor `Dmedida / Dteórica`, calculado con N/E de R41/R32 y una observación horizontal. No se agrega transformación de coordenadas, cálculo automático de pivotes ni corrección de otras medidas.
+- Distancia teórica 2D sin Z y sin redondeo intermedio; nueve decimales para mostrar el factor. Se aceptan coma y punto decimal. Distancias vacías, no positivas, referencias incompletas/coincidentes y resultados no finitos impiden presentar una escala válida. No se fuerza un resultado inferior a 1.
+- Se agrega en Ajustes → Replanteo y, si está completo, como resumen discreto en Replanteo. No se expone un segundo factor ni ppm. Guía offline con fórmula, ejemplo y alcance; novedades actualizadas.
+- La medición se guarda con esquema 2 y su JSON. Migración de sesiones antiguas agrega únicamente `baselineDistance: ''`. Cambiar torre o N/E de los amarres vacía la observación; cambiar solo Z conserva la medición de escala y mantiene la invalidación anterior de la vista (+) del nivel.
+- Se comparan los resultados completos de geometría, orientación, nivelación, planta y coordenadas antes/después de distintas observaciones: 4 tirantes y M1, ambos modos de orientación, E′/F′ y ambos ceros. C + X₁ + K y todas las salidas son idénticas. Los motores de geometría, ángulos y nivelación conservan sus fórmulas.
+- Prueba móvil con catálogo T574: Dteórica = 53,189537 m mostrados; Dmedida = 53,180 m → factor 0,999820689. Se mantienen distancia 28,436 m y Hz 54°33′00″. Cambiar Z no elimina el factor; cambiar N/E vacía la lectura medida y retira el factor de la pantalla principal.
+- Disponible sin conexión confirmado en la ayuda. Con servidor de prueba detenido y HTTP inaccesible, recarga recupera factor, torre y datos. Cambiar offline la medición a 53,170 m recalcula 0,999632682, manteniendo 28,436 m y 54°33′.
+- Sin desbordamiento horizontal a 360, 393, 430 y 1366 px de viewport. Capturas: `docs/screenshots/escala-ajustes-mobile.png` y `docs/screenshots/escala-replanteo-mobile.png`.
+- Total: 49 pruebas correctas, TypeScript y compilación estática correctos, 30 recursos de precarga PWA.

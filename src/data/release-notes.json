@@ -1,8 +1,8 @@
 {
-  "fallbackVersion": "2026-10-19.4",
+  "fallbackVersion": "2026-10-19.5",
   "changes": [
-    "Se corrigieron los cuadrantes horarios: R41 es norte y R32 es sur, con T1/T4 desde F′ y T2/T3 desde E′.",
-    "Replanteo ahora tiene dos desplegables: posición E′/F′ y referencia del cero R41/R32. Por defecto se usan F′ y R41.",
-    "Desde E′ con cero en R41, T3 usa 270° − φ. La guía incluye la tabla de los ocho giros."
+    "Se agregó el factor de escala R41–R32: distancia horizontal medida con estación dividida por distancia teórica planimétrica de las coordenadas N/E.",
+    "Ajustes permite ingresar la distancia medida y consultar la teórica. El factor también aparece en Replanteo cuando los datos están completos.",
+    "El factor es informativo para la estación total: no modifica C + X₁ + K ni los demás cálculos o medidas."
   ]
 }

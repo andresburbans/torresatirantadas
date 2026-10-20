@@ -17,7 +17,7 @@ export type TowerProject = {
   selected:PointId; diagramsVisible:boolean; terrainVisible:boolean; workflow:'stakeout'|'level';
   guys:Record<GuyId,GuyData>;
   mast:{sealDesign:string;sealTarget:string;staffCurrent:string};
-  survey:{mode:'coordinates'|'axis'; mapping:'F14'|'E14'; side:'standard'|'mirrored'; zero:RefId; levelRef:RefId; backsight:string; mastStation:PivotId; occupied:'auto'|PivotId; orientationVersion:2;
+  survey:{mode:'coordinates'|'axis'; mapping:'F14'|'E14'; side:'standard'|'mirrored'; zero:RefId; levelRef:RefId; backsight:string; mastStation:PivotId; occupied:'auto'|PivotId; orientationVersion:2; baselineDistance:string;
     coords:Record<RefId|PivotId|'M1',Coord>};
 };
 const blankCoord=():Coord=>({n:'',e:'',z:''});
@@ -30,7 +30,7 @@ export function newTower():TowerProject {
   }])) as Record<GuyId,GuyData>;
   return {schema:2,id:DEFAULTS.id,tower:DEFAULTS.tower,soil:'3',referenceAlpha:'5',pivot:DEFAULTS.pivot,k:DEFAULTS.k,beta:{...DEFAULTS.beta},
     selected:'1',diagramsVisible:false,terrainVisible:false,workflow:'stakeout',guys,mast:{sealDesign:'',sealTarget:'',staffCurrent:''},
-    survey:{mode:'axis',mapping:'F14',side:'standard',zero:'R41',levelRef:'R41',backsight:'',mastStation:'E',occupied:'F',orientationVersion:2,
+    survey:{mode:'axis',mapping:'F14',side:'standard',zero:'R41',levelRef:'R41',backsight:'',mastStation:'E',occupied:'F',orientationVersion:2,baselineDistance:'',
       coords:{R41:blankCoord(),R32:blankCoord(),E:blankCoord(),F:blankCoord(),M1:blankCoord()}}};
 }
 export function phiFor(p:TowerProject,id:GuyId):DMS {return id!=='1'&&p.guys[id].phiLinked?p.guys['1'].phi:p.guys[id].phi;}
@@ -197,7 +197,8 @@ export function readTower(value:unknown):TowerProject|null {
   if(!['sealDesign','sealTarget','staffCurrent'].every(k=>typeof mast[k]==='string')||!['coordinates','axis'].includes(String(s.mode))||!['F14','E14'].includes(String(s.mapping))||!['standard','mirrored'].includes(String(s.side))||!['R41','R32'].includes(String(s.zero))||!['R41','R32'].includes(String(s.levelRef))||!['E','F'].includes(String(s.mastStation))||typeof s.backsight!=='string'||!record(s.coords))return null;
   for(const key of ['E','F','R41','R32','M1']){const c=s.coords[key];if(!record(c)||!['n','e','z'].every(k=>typeof c[k]==='string'))return null;}
   if(v.workflow!==undefined&&v.workflow!=='stakeout'&&v.workflow!=='level'||v.terrainVisible!==undefined&&typeof v.terrainVisible!=='boolean'||s.occupied!==undefined&&s.occupied!=='auto'&&s.occupied!=='E'&&s.occupied!=='F'||s.orientationVersion!==undefined&&s.orientationVersion!==2)return null;
+  if(s.baselineDistance!==undefined&&typeof s.baselineDistance!=='string')return null;
   // Migrate existing schema-2 sessions without dropping measurements or custom depths.
   const orientationDefaults=s.orientationVersion===undefined?{mode:'axis',occupied:'F',zero:'R41'}:{occupied:s.occupied??'F'};
-  return structuredClone({...v,workflow:v.workflow??'stakeout',terrainVisible:v.terrainVisible??false,survey:{...s,...orientationDefaults,orientationVersion:2}}) as TowerProject;
+  return structuredClone({...v,workflow:v.workflow??'stakeout',terrainVisible:v.terrainVisible??false,survey:{...s,...orientationDefaults,orientationVersion:2,baselineDistance:s.baselineDistance??''}}) as TowerProject;
 }

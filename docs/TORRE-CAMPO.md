@@ -66,3 +66,9 @@ Ajustar guarda al escribir y al cerrar de cualquier forma. El arranque espera a 
 ## Verificación
 
 Las pruebas cubren los ocho giros (cuatro tirantes × dos ceros), convenciones invertidas, amarres fuera de eje, puntos coincidentes, redondeo cerca de 360°, las cinco lecturas, profundidad → sello efectivo, exceso de excavación, datos inválidos, herencia y migración de ambas familias de referencia. Se mantienen las pruebas geométricas y de actualización offline anteriores.
+
+## Escala informativa entre amarres
+
+`Dteórica = hypot(N41 − N32, E41 − E32)`; `factor = Dmedida / Dteórica` según la convención solicitada. La observación es horizontal, en metros. No se usa Z. Se reporta un solo valor con nueve decimales en Ajustes y Replanteo. Nunca alimenta las funciones de geometría, orientación, cotas o nivelación; tampoco cambia automáticamente las coordenadas de pivotes/mástil.
+
+Cambiar torre o N/E de R41/R32 invalida únicamente la medición de escala. El comportamiento anterior de la vista (+) al cambiar la cota de su referencia se conserva. Al migrar proyectos se añade un campo vacío sin alterar las medidas existentes.

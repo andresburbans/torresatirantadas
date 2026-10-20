@@ -131,7 +131,7 @@ No hay analítica, peticiones de cálculo, CDNs de interfaz ni subida de los cas
 
 ## Guía de campo
 
-En **(?) → Ver fórmulas y referencias** hay una guía de 15 apartados, disponible offline. Explica el mástil y los cuatro tirantes, las clases de suelo 3/4 y los parámetros de la Tabla 2 de GI6KL, las diferencias por torre, los ángulos y sus unidades, otras pendientes además de 5°, todos los campos, las fórmulas, cotas de sello, ejemplos a 5° y 10°, K, coordenadas y actualización PWA. Distingue los datos de los planos de las hipótesis geométricas y de las decisiones de diseño de obra.
+En **(?) → Ver fórmulas y referencias** hay una guía de 16 apartados, disponible offline. Explica el mástil y los cuatro tirantes, las clases de suelo 3/4 y los parámetros de la Tabla 2 de GI6KL, las diferencias por torre, los ángulos y sus unidades, otras pendientes además de 5°, todos los campos, las fórmulas, cotas de sello, ejemplos a 5° y 10°, K, coordenadas y actualización PWA. Distingue los datos de los planos de las hipótesis geométricas y de las decisiones de diseño de obra.
 
 ## Geometría y planos
 
@@ -150,3 +150,9 @@ Las correcciones suponen C y β fijos, pendiente constante si corresponde y el m
 - `out`: exportación estática generada.
 
 TypeScript se compila a JavaScript para el navegador. La lógica se escribe y verifica en TypeScript; no es necesario mantener una segunda versión manual en JavaScript. Los scripts de construcción y la plantilla del service worker son JavaScript de infraestructura.
+
+## Factor de escala R41–R32
+
+Ajustes → Replanteo permite ingresar la distancia horizontal medida con estación. `src/lib/survey.ts` calcula la teórica 2D de N/E, sin Z, y muestra **factor = medida / teórica** con nueve decimales. También aparece un resumen en Replanteo si está completo. Es exclusivamente informativo para transcribir a la estación: no se aplica a C + X₁ + K ni a ningún otro cálculo. No altera E′, F′ o M1.
+
+La observación se guarda/exporta con la torre. Cambiar torre o N/E de R41/R32 la vacía; cambiar Z conserva el dato. Las sesiones antiguas se recuperan con ese campo vacío, conservando sus cálculos.

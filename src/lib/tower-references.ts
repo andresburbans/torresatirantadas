@@ -1,5 +1,6 @@
 import data from '../data/tower-references.json';
 import type { Coord, RefId, TowerProject } from './tower';
+import { updateSurveyCoordinate } from './survey';
 
 export type TowerReference={id:string;tower:string;ref:RefId|null;n:string;e:string;z:string;description:string;date:string};
 /** Original descriptions and decimal strings are retained, including unidentified points. */
@@ -22,8 +23,9 @@ export function matchingReference(tower:string,ref:RefId,coord:Coord){
 }
 function replaceReference(p:TowerProject,ref:RefId,row?:TowerReference):TowerProject {
   const coord:Coord=row?{n:row.n,e:row.e,z:row.z}:{n:'',e:'',z:''};
-  return {...p,survey:{...p.survey,coords:{...p.survey.coords,[ref]:coord},
-    backsight:p.survey.levelRef===ref&&p.survey.coords[ref].z!==coord.z?'':p.survey.backsight}};
+  let next=p;
+  for(const axis of ['n','e','z'] as const)next=updateSurveyCoordinate(next,ref,axis,coord[axis]);
+  return next;
 }
 /** Only a uniquely identified RF is automatic. Missing/ambiguous RFs never inherit another tower's data. */
 export function loadTowerReferences(p:TowerProject,tower:string):TowerProject {
@@ -35,7 +37,7 @@ export function loadTowerReferences(p:TowerProject,tower:string):TowerProject {
     next=replaceReference(next,ref,rows.length===1?rows[0]:undefined);
   }
   // A different tower requires a fresh observation even if two benchmark elevations match.
-  if(normalizeTowerId(p.id)!==id)next={...next,survey:{...next.survey,backsight:''}};
+  if(normalizeTowerId(p.id)!==id)next={...next,survey:{...next.survey,backsight:'',baselineDistance:''}};
   return next;
 }
 export function selectTowerReference(p:TowerProject,ref:RefId,sourceId:string):TowerProject {

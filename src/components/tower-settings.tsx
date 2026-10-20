@@ -3,6 +3,8 @@ import { Lock, LockOpen, Search } from 'lucide-react';
 import { ALPHAS, CATALOG, type Soil, type Tower } from '@/lib/catalog';
 import { angleLabel, format } from '@/lib/geometry';
 import { applyPreset, GUYS, POINTS, leveling, orientation, phiFor, pivotFor, selectSoil, setPhi, type Coord, type PointId, type TowerProject } from '@/lib/tower';
+import { updateSurveyCoordinate } from '@/lib/survey';
+import { ScaleSettings } from './scale-settings';
 import { Angle, Field, Select } from './form-controls';
 import type { Workflow } from './workflow-tabs';
 import { loadTowerReferences, matchingReference, referencesFor, REFERENCE_TOWERS, searchTowers, selectTowerReference } from '@/lib/tower-references';
@@ -13,7 +15,7 @@ export function TowerSettings({project:p,change,tab}:Props){
   const matches=searchTowers(query),rows=referencesFor(p.id),unidentified=rows.filter(r=>r.ref===null);
   function coord(id:keyof TowerProject['survey']['coords'],key:keyof Coord,value:string){
     if(!editable)return;
-    change(v=>({...v,survey:{...v.survey,backsight:id===v.survey.levelRef&&key==='z'&&value!==v.survey.coords[id].z?'':v.survey.backsight,coords:{...v.survey.coords,[id]:{...v.survey.coords[id],[key]:value}}}}));
+    change(v=>updateSurveyCoordinate(v,id,key,value));
   }
   function chooseTower(id:string){change(v=>loadTowerReferences(v,id));setQuery('');setEditable(false);setLoaded(true);}
   function seal(id:PointId,value:string){change(v=>id==='M1'?{...v,mast:{...v.mast,sealDesign:value}}:{...v,guys:{...v.guys,[id]:{...v.guys[id],sealDesign:value}}});}
@@ -41,6 +43,7 @@ export function TowerSettings({project:p,change,tab}:Props){
       <div className="settings-reference">{p.tower} · S{p.soil} · H₀ tabulada {format(CATALOG[p.tower][p.soil].h)} m · Revisa X₀/H₀ de cada ficha antes de replantear.</div>
       <button className="button secondary" onClick={()=>change(q=>selectSoil(q,q.soil))}>Aplicar diseño a los 4 tirantes</button>
       </div></details>
+      <ScaleSettings project={p} change={change}/>
       <details><summary>Coordenadas N / E / Z</summary><div className="settings-section">
       <div className="coordinate-heading"><h3>Coordenadas N / E / Z</h3><button type="button" className="button secondary coordinate-lock" aria-pressed={editable} onClick={()=>setEditable(v=>!v)}>{editable?<LockOpen size={16}/>:<Lock size={16}/>} {editable?'Bloquear coordenadas':'Habilitar edición'}</button></div>
       <p className="setting-note">{editable?'Edición habilitada para todas las coordenadas.':'Bloqueadas: habilita la edición para escribir. La precarga desde el catálogo sigue disponible.'} Se bloquean de nuevo al abrir Ajustes.</p>
