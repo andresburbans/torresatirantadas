@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Lock, LockOpen, Search } from 'lucide-react';
 import { ALPHAS, CATALOG, type Soil, type Tower } from '@/lib/catalog';
 import { angleLabel, format } from '@/lib/geometry';
-import { applyPreset, GUYS, POINTS, leveling, orientation, phiFor, selectSoil, setPhi, type Coord, type PointId, type TowerProject } from '@/lib/tower';
+import { applyPreset, GUYS, POINTS, leveling, orientation, phiFor, pivotFor, selectSoil, setPhi, type Coord, type PointId, type TowerProject } from '@/lib/tower';
 import { Angle, Field, Select } from './form-controls';
 import type { Workflow } from './workflow-tabs';
 import { loadTowerReferences, matchingReference, referencesFor, REFERENCE_TOWERS, searchTowers, selectTowerReference } from '@/lib/tower-references';
@@ -66,15 +66,15 @@ export function TowerSettings({project:p,change,tab}:Props){
     </div></details>
     <details><summary>Armado, cuadrantes y cero de estación</summary><div className="settings-section">
       <div className="settings-grid">
-        <Select id="orientation-mode" label="Cálculo de orientación" value={p.survey.mode} onChange={v=>change(q=>({...q,survey:{...q.survey,mode:v as 'coordinates'|'axis'}}))}><option value="coordinates">Coordenadas reales N/E</option><option value="axis">Por eje · amarres alineados</option></Select>
+        <Select id="orientation-mode" label="Cálculo de orientación" value={p.survey.mode} onChange={v=>change(q=>({...q,survey:{...q.survey,mode:v as 'coordinates'|'axis'}}))}><option value="coordinates">Coordenadas reales N/E</option><option value="axis">Cuadrantes · R41 norte / R32 sur</option></Select>
         <Select id="pivot-mapping" label="Pivotes de armado" value={p.survey.mapping} onChange={v=>change(q=>({...q,survey:{...q.survey,mapping:v as 'F14'|'E14'}}))}><option value="F14">T1/T4 en F′ · T2/T3 en E′</option><option value="E14">T1/T4 en E′ · T2/T3 en F′</option></Select>
         <Select id="transverse-side" label="Numeración transversal" value={p.survey.side} onChange={v=>change(q=>({...q,survey:{...q.survey,side:v as 'standard'|'mirrored'}}))}><option value="standard">T1/T2 a −X · T3/T4 a +X</option><option value="mirrored">T1/T2 a +X · T3/T4 a −X</option></Select>
         <Select id="settings-zero" label="Cero de estación (0°)" value={p.survey.zero} onChange={v=>change(q=>({...q,survey:{...q.survey,zero:v as 'R41'|'R32'}}))}><option>R41</option><option>R32</option></Select>
         <Select id="occupied-station" label="Posición de estación" value={p.survey.occupied} onChange={value=>change(q=>({...q,survey:{...q.survey,occupied:value as 'auto'|'E'|'F'}}))}><option value="auto">Seguir pivote de diseño del punto</option><option value="E">E′</option><option value="F">F′</option></Select>
         <Select id="mast-station" label="Armado para replantear M1" value={p.survey.mastStation} onChange={v=>change(q=>({...q,survey:{...q.survey,mastStation:v as 'E'|'F'}}))}><option value="E">E′</option><option value="F">F′</option></Select>
       </div>
-      <p className="setting-note">Eje local +Y de F′ hacia E′; +X queda a su derecha. «Por eje» supone R41 hacia +Y y R32 hacia −Y desde el pivote. Usa coordenadas si no están perfectamente alineados. La correspondencia inicial es la del plano anterior; tus notas intercambiaban E′/F′, por eso queda editable. Comprueba la numeración en la planta.</p>
-      <div className="guide-table"><table><caption>Giro horario Hz · vista 0° en cada amarre</caption><thead><tr><th>Punto</th><th>Armado</th><th>R41</th><th>R32</th></tr></thead><tbody>{GUYS.map(id=><tr key={id}><td>T{id}</td><td>{orientation(p,id).station}′</td>{(['R41','R32'] as const).map(z=>{const o=orientation({...p,survey:{...p.survey,zero:z}},id);return <td key={z}>{o.angle?angleLabel(o.angle):'—'}</td>;})}</tr>)}</tbody></table></div>
+      <p className="setting-note">Eje local +Y de F′ hacia E′; +X queda a su derecha. En la disposición confirmada, +Y apunta al sur. «Cuadrantes» usa R41 al norte (−Y) y R32 al sur (+Y) desde el pivote. Usa coordenadas si no están perfectamente alineados. La disposición confirmada usa F′ para T1/T4 y E′ para T2/T3; se conserva editable para otras fichas. Comprueba la numeración en la planta.</p>
+      <div className="guide-table"><table><caption>Giro horario Hz · desde el pivote de diseño de cada tirante</caption><thead><tr><th>Punto</th><th>Armado</th><th>R41</th><th>R32</th></tr></thead><tbody>{GUYS.map(id=><tr key={id}><td>T{id}</td><td>{pivotFor(p,id)}′</td>{(['R41','R32'] as const).map(z=>{const o=orientation({...p,survey:{...p.survey,occupied:'auto',zero:z}},id);return <td key={z}>{o.angle?angleLabel(o.angle):'—'}</td>;})}</tr>)}</tbody></table></div>
     </div></details>
     </div>
     <div id="settings-level-panel" role="tabpanel" aria-labelledby="settings-level-tab" hidden={tab!=='level'}>

@@ -293,6 +293,8 @@ button,a,select,summary{touch-action:manipulation}
 }
 @media print{.tower-top,.tower-quick,.diagram-switch,.point-data,.result-diagnostics{display:none}.work-metrics{display:grid;grid-template-columns:1fr 1fr 1fr}.field-results{break-inside:avoid}.field-result-heading .field{display:none}}
 .metric-value.secondary.seal-value{font-size:30px}
+.station-selects{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px 22px;border-bottom:1px solid #ddd}.station-selects .field-label{font-size:12px;line-height:1.6;min-height:20px}.station-selects select{font-size:16px;min-height:46px}
+@media(max-width:800px){.station-selects{padding:12px 15px;gap:12px}.station-selects .field-label{font-size:11px;min-height:36px;display:flex;align-items:flex-end}.station-selects select{padding-left:9px;padding-right:5px}}
 /* Task screens and the single field toolbar. */
 [hidden]{display:none!important}
 body{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}

@@ -4,7 +4,7 @@ import { DEFAULTS, calculate, dms } from '../src/lib/geometry';
 import { applyPreset, azimuth, excavationControl, hzDms, inputFor, leveling, newTower, normalize, occupiedPivotFor, orientation, phiFor, readTower, resultFor, sealFor, selectSoil, setPhi, GUYS, POINTS } from '../src/lib/tower';
 const close=(a:number,b:number)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
 function coordinateTower(){
- const p=newTower();p.survey.coords.E={n:'1006.6',e:'1000',z:''};p.survey.coords.F={n:'1000',e:'1000',z:''};
+ const p=newTower();p.survey.mode='coordinates';p.survey.occupied='auto';p.survey.coords.E={n:'993.4',e:'1000',z:''};p.survey.coords.F={n:'1000',e:'1000',z:''};
  p.survey.coords.R41={n:'1100',e:'1000',z:'100'};p.survey.coords.R32={n:'900',e:'1000',z:'101'};p.survey.backsight='1.5';
  return p;
 }
@@ -35,22 +35,22 @@ test('presets use the correct family/soil pair and retain custom depth targets a
  p=applyPreset(p,'G6KL','3','5');assert.equal(p.guys['2'].h0,'3');assert.equal(p.guys['2'].target,'3');assert.equal(p.guys['1'].x0,'1.822');
 });
 test('clockwise Hz is correct in all four quadrants for both zero references',()=>{
- const p=coordinateTower();const north=[234.55,305.45,54.55,125.45];
+ const p=coordinateTower();const north=[54.55,125.45,234.55,305.45];
  for(const [index,id] of GUYS.entries()){
   close(orientation(p,id).hz!,north[index]);p.survey.zero='R32';close(orientation(p,id).hz!,normalize(north[index]-180));p.survey.zero='R41';
  }
 });
 test('configurable mapping and transverse side reproduce the stated field example without a sign error',()=>{
- const p=newTower();p.survey.mode='axis';p.survey.mapping='E14';p.survey.side='mirrored';
- close(orientation(p,'1').hz!,90-35.45);close(orientation(p,'4').hz!,270+35.45);
- p.survey.zero='R32';close(orientation(p,'1').hz!,270-35.45);close(orientation(p,'4').hz!,90+35.45);
+ const p=newTower();p.survey.mode='axis';p.survey.mapping='E14';p.survey.side='mirrored';p.survey.occupied='auto';
+ close(orientation(p,'1').hz!,270-35.45);close(orientation(p,'4').hz!,90+35.45);
+ p.survey.zero='R32';close(orientation(p,'1').hz!,90-35.45);close(orientation(p,'4').hz!,270+35.45);
 });
 test('coordinate bearings work for oblique and off-axis backsights and preserve the physical edge',()=>{
  const p=coordinateTower();p.guys['1'].c='26.219';p.survey.coords.R41={n:'1090',e:'1040',z:'100'};
- const r=orientation(p,'1');close(r.hz!,normalize(234.55-Math.atan2(40,90)*180/Math.PI));
+ const r=orientation(p,'1');close(r.hz!,normalize(54.55-Math.atan2(40,90)*180/Math.PI));
  const f=p.survey.coords.F;close(Math.hypot(r.edge!.n-Number(f.n),r.edge!.e-Number(f.e)),resultFor(p,'1').distance);
  p.k='0.4';assert.deepEqual(orientation(p,'1').edge,r.edge);
- assert.equal(orientation(newTower(),'1').hz,null);
+ const missing=newTower();missing.survey.mode='coordinates';assert.equal(orientation(missing,'1').hz,null);
  p.survey.coords.E={...p.survey.coords.F};assert.equal(orientation(p,'1').hz,null);
 });
 test('leveling computes five seal rod readings independently of missing C and independent from total station zero',()=>{
@@ -74,7 +74,7 @@ test('invalid level data and seals above collimation are flagged; over-excavatio
 });
 test('M1 uses explicit coordinates or the labeled pivot midpoint, and angles round at 360 degrees',()=>{
  const p=coordinateTower();close(orientation(p,'M1').range!,3.3);
- p.survey.coords.M1={n:'1003',e:'1001',z:''};close(orientation(p,'M1').range!,Math.hypot(3.6,1));
+ p.survey.coords.M1={n:'997',e:'1001',z:''};close(orientation(p,'M1').range!,Math.hypot(3.6,1));
  assert.equal(azimuth({n:0,e:0},{n:0,e:0}),null);assert.equal(dms(hzDms(359.999999999)),0);
  assert.equal(POINTS.length,5);
 });
@@ -99,7 +99,7 @@ test('aligned axis and coordinate modes agree from either occupied pivot; missin
  const p=coordinateTower();for(const id of GUYS)p.guys[id].c='25';
  for(const occupied of ['E','F'] as const)for(const id of GUYS){
   const q={...p,survey:{...p.survey,occupied}},coord=orientation(q,id),axis=orientation({...q,survey:{...q.survey,mode:'axis'}},id);
-  close(axis.hz!,coord.hz!);close(axis.range!,coord.range!);
+  close(axis.hz!,coord.hz!);close(axis.range!,coord.range!);close(axis.targetAz!,coord.targetAz!);close(axis.zeroAz!,coord.zeroAz!);
  }
  p.survey.mode='axis';p.survey.occupied='E';p.guys['1'].c='';
  assert.equal(orientation(p,'1').hz,null);assert.equal(orientation(p,'1').range,null);
@@ -123,11 +123,11 @@ test('soil selection loads approved GI6KL alpha-5 depth and X for design and fie
  const other=selectSoil({...p,tower:'G6KL'},'3');assert.equal(other.guys['1'].h0,'3');assert.equal(other.guys['1'].x0,'1.822');
 });
 test('legacy schema-2 sessions gain hidden terrain and work tabs without overwriting custom measurements',()=>{
- const old=JSON.parse(JSON.stringify(newTower()));delete old.workflow;delete old.terrainVisible;delete old.survey.occupied;
+ const old=JSON.parse(JSON.stringify(newTower()));delete old.workflow;delete old.terrainVisible;delete old.survey.occupied;delete old.survey.orientationVersion;old.survey.mode='coordinates';old.survey.zero='R32';
  old.guys['1'].target='4.2';old.guys['3'].staffCurrent='2.3';
- const restored=readTower(old)!;assert.equal(restored.workflow,'stakeout');assert.equal(restored.terrainVisible,false);assert.equal(restored.survey.occupied,'auto');
+ const restored=readTower(old)!;assert.equal(restored.workflow,'stakeout');assert.equal(restored.terrainVisible,false);assert.equal(restored.survey.occupied,'F');assert.equal(restored.survey.mode,'axis');assert.equal(restored.survey.zero,'R41');assert.equal(restored.survey.orientationVersion,2);
  assert.equal(restored.guys['1'].target,'4.2');assert.equal(restored.guys['3'].staffCurrent,'2.3');
- assert.equal(occupiedPivotFor(restored,'1'),'F');assert.equal(occupiedPivotFor(restored,'2'),'E');
+ assert.equal(occupiedPivotFor(restored,'1'),'F');assert.equal(occupiedPivotFor(restored,'2'),'F');
  restored.workflow='level';restored.terrainVisible=true;restored.survey.occupied='F';assert.deepEqual(readTower(JSON.parse(JSON.stringify(restored))),restored);
  assert.equal(readTower({...restored,workflow:'bad'}),null);assert.equal(readTower({...restored,survey:{...restored.survey,occupied:'bad'}}),null);
  assert.equal(readTower({...restored,workflow:{toString:()=> 'level'}}),null);
@@ -137,4 +137,36 @@ test('excavation signs and arrows distinguish cut, excess, seal tolerance and in
  assert.deepEqual(excavationControl(-.3,true),{label:'Exceso de excavación',sign:'−',direction:'up',value:.3});
  for(const value of [0,.0004,-.0004]){assert.equal(excavationControl(value,true).label,'En sello');assert.equal(excavationControl(value,true).direction,null);}
  for(const value of [null,NaN,1])assert.equal(excavationControl(value,false).value,null);
+});
+
+test('confirmed field quadrants reproduce all eight clockwise shots from F/T1,T4 and E/T2,T3',()=>{
+ const p=newTower();const phi=35.45;
+ const shots=[
+  {station:'F',id:'1',r41:90-phi,r32:270-phi},
+  {station:'F',id:'4',r41:270+phi,r32:90+phi},
+  {station:'E',id:'2',r41:90+phi,r32:270+phi},
+  {station:'E',id:'3',r41:270-phi,r32:90-phi},
+ ] as const;
+ assert.equal(p.survey.occupied,'F');assert.equal(p.survey.zero,'R41');assert.equal(p.survey.mode,'axis');
+ for(const shot of shots){
+  p.survey.occupied=shot.station;
+  for(const zero of ['R41','R32'] as const){p.survey.zero=zero;close(orientation(p,shot.id).hz!,zero==='R41'?shot.r41:shot.r32);}
+ }
+ // The T3 label 270+φ in the sketch would be the wrong quadrant: correct is 234°33′ with R41.
+ p.survey.occupied='E';p.survey.zero='R41';close(orientation(p,'3').hz!,234.55);
+});
+test('quadrants use the selected point own phi and wrap angles consistently at cardinal limits',()=>{
+ let p=newTower();p=setPhi(p,'2',{deg:'30',min:'15',sec:'20'});p.survey.occupied='E';
+ close(orientation(p,'2').hz!,120+15/60+20/3600);
+ p.survey.zero='R32';close(orientation(p,'2').hz!,300+15/60+20/3600);
+ p.survey.occupied='F';p.survey.zero='R41';p=setPhi(p,'1',{deg:'0',min:'0',sec:'0'});
+ close(orientation(p,'1').hz!,90);p.survey.zero='R32';close(orientation(p,'1').hz!,270);
+});
+test('corrected orientation preferences migrate once and later explicit coordinate mode and zero choices persist',()=>{
+ const p=coordinateTower();p.survey.zero='R32';p.survey.occupied='E';p.survey.levelRef='R32';p.guys['1'].target='4.2';
+ const old=JSON.parse(JSON.stringify(p));delete old.survey.orientationVersion;
+ const migrated=readTower(old)!;assert.equal(migrated.survey.mode,'axis');assert.equal(migrated.survey.occupied,'F');assert.equal(migrated.survey.zero,'R41');
+ assert.deepEqual(migrated.survey.coords,p.survey.coords);assert.deepEqual(migrated.guys,p.guys);assert.deepEqual(migrated.mast,p.mast);
+ assert.equal(migrated.survey.levelRef,'R32');assert.equal(migrated.survey.backsight,p.survey.backsight);close(leveling(migrated,'M1').hi!,leveling(p,'M1').hi!);
+ const restored=readTower(JSON.parse(JSON.stringify(p)))!;assert.equal(restored.survey.mode,'coordinates');assert.equal(restored.survey.occupied,'E');assert.equal(restored.survey.zero,'R32');
 });

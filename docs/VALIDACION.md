@@ -79,3 +79,23 @@ Las coordenadas de prueba son sintéticas. La configuración inicial conserva F�
 - Sin desbordamiento a 360, 393, 430 y 1366 px; cotas grandes 2254,500 / 2250,000 m verificadas. Cambiar Z de referencia vacía vista (+), como antes. La vista Nivelación de 393 × 852 px reúne resultados y control de excavación sobre la barra fija.
 - Con servidor detenido y HTTP inaccesible, recarga recupera Nivelación con mira 5,000 m, +1,000 m ↓ y ajuste oculto. Cambiar a Replanteo y ocupar E′ conserva los resultados 32,710 m y 225°03′36,77″ desde la caché.
 - Total: 40 pruebas correctas, TypeScript y compilación estática correctos; 30 recursos en precarga PWA. Capturas de prueba DEMO: `replanteo-tabs-mobile.png`, `nivelacion-tabs-mobile.png`, `nivelacion-exceso-mobile.png`, `ajustes-nivelacion-tabs-mobile.png` en `docs/screenshots`.
+
+## Corrección de cuadrantes · R41 norte / R32 sur
+
+- Croquis confirmado: sur arriba, norte abajo; F′ para T1/T4 y E′ para T2/T3. El eje local +Y = F′→E′ apunta al sur. El error anterior del modo por eje consistía en tratar R41 como si estuviera hacia ese +Y.
+- Se convierte la dirección local a azimut referido al norte antes de restar la visual del cero: R41 = 0°, R32 = 180°. Los ocho giros se comprobaron tanto en pruebas como mediante los desplegables reales con φ = 35°27′00″:
+
+| Armado | Tirante | 0° R41 norte | 0° R32 sur |
+| --- | --- | --- | --- |
+| F′ | T1 | 54°33′00″ | 234°33′00″ |
+| F′ | T4 | 305°27′00″ | 125°27′00″ |
+| E′ | T2 | 125°27′00″ | 305°27′00″ |
+| E′ | T3 | 234°33′00″ | 54°33′00″ |
+
+- En el dibujo, T3/E′/R41 se corrige a 270° − φ. La lógica propuesta para R32 coincide con los cuatro resultados. Tabla de los ocho giros incorporada a la guía; la tabla de Ajustes usa el pivote de diseño de cada tirante.
+- Dos desplegables en Replanteo: F′/E′ y R41 · Norte/R32 · Sur. Valores iniciales F′/R41 y modo Cuadrantes. Recarga tras elegir E′/R32 recupera ambas elecciones y 54°33′ para T3.
+- La migración a `orientationVersion: 2` aplica una sola vez Cuadrantes/F′/R41 a sesiones anteriores. Conserva coordenadas, φ, profundidades, cotas, lecturas y referencia/altura instrumental del nivel. La elección posterior de modo por coordenadas, posición y cero se conserva en nuevas sesiones y exportaciones. Cálculo N/E de amarres fuera de eje sin alterar.
+- Concordancia de Hz, azimutes y distancias entre Cuadrantes y coordenadas alineadas en ambas estaciones. Se mantienen las pruebas de traslado al mismo borde y de coordenadas fuera de eje.
+- Sin desbordamiento de los desplegables a 360, 393 y 1366 px. Planta identifica R32 · Sur arriba (y=24) y R41 · Norte abajo (y=309) en modo Cuadrantes.
+- Con servidor detenido y HTTP inaccesible: recarga mantiene E′/T3/R32 = 54°33′; elegir F′/T1/R32 produce 234°33′ y 28,436 m desde caché.
+- Total: 43 pruebas correctas, TypeScript y compilación estática correctos, 30 recursos PWA. Capturas: `docs/screenshots/angulos-r41-mobile.png` y `docs/screenshots/angulos-r32-mobile.png`.

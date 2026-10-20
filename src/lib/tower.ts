@@ -17,7 +17,7 @@ export type TowerProject = {
   selected:PointId; diagramsVisible:boolean; terrainVisible:boolean; workflow:'stakeout'|'level';
   guys:Record<GuyId,GuyData>;
   mast:{sealDesign:string;sealTarget:string;staffCurrent:string};
-  survey:{mode:'coordinates'|'axis'; mapping:'F14'|'E14'; side:'standard'|'mirrored'; zero:RefId; levelRef:RefId; backsight:string; mastStation:PivotId; occupied:'auto'|PivotId;
+  survey:{mode:'coordinates'|'axis'; mapping:'F14'|'E14'; side:'standard'|'mirrored'; zero:RefId; levelRef:RefId; backsight:string; mastStation:PivotId; occupied:'auto'|PivotId; orientationVersion:2;
     coords:Record<RefId|PivotId|'M1',Coord>};
 };
 const blankCoord=():Coord=>({n:'',e:'',z:''});
@@ -30,7 +30,7 @@ export function newTower():TowerProject {
   }])) as Record<GuyId,GuyData>;
   return {schema:2,id:DEFAULTS.id,tower:DEFAULTS.tower,soil:'3',referenceAlpha:'5',pivot:DEFAULTS.pivot,k:DEFAULTS.k,beta:{...DEFAULTS.beta},
     selected:'1',diagramsVisible:false,terrainVisible:false,workflow:'stakeout',guys,mast:{sealDesign:'',sealTarget:'',staffCurrent:''},
-    survey:{mode:'coordinates',mapping:'F14',side:'standard',zero:'R41',levelRef:'R41',backsight:'',mastStation:'E',occupied:'auto',
+    survey:{mode:'axis',mapping:'F14',side:'standard',zero:'R41',levelRef:'R41',backsight:'',mastStation:'E',occupied:'F',orientationVersion:2,
       coords:{R41:blankCoord(),R32:blankCoord(),E:blankCoord(),F:blankCoord(),M1:blankCoord()}}};
 }
 export function phiFor(p:TowerProject,id:GuyId):DMS {return id!=='1'&&p.guys[id].phiLinked?p.guys['1'].phi:p.guys[id].phi;}
@@ -86,8 +86,8 @@ export function localBearing(p:TowerProject,id:GuyId):number|null {
   const phi=dms(phiFor(p,id));
   if(!(phi>=0&&phi<90))return null;
   const east=(id==='3'||id==='4')!==(p.survey.side==='mirrored');
-  const north=pivotFor(p,id)==='E';
-  return east?(north?90-phi:90+phi):(north?270+phi:270-phi);
+  const towardPositiveY=pivotFor(p,id)==='E';
+  return east?(towardPositiveY?90-phi:90+phi):(towardPositiveY?270+phi:270-phi);
 }
 export function orientation(p:TowerProject,id:PointId){
   const designStation=pivotFor(p,id),station=occupiedPivotFor(p,id),errors:string[]=[];
@@ -102,6 +102,8 @@ export function orientation(p:TowerProject,id:PointId){
         targetAz=azimuth({n:0,e:0},{n:y,e:x});range=Math.hypot(x,y)+number(p.k);
       }else errors.push('Completa C, e y el ajuste del tirante para medir desde el otro pivote.');
     }
+    // Local +Y is F′→E′ (south). Rotate to north-referenced azimuths before subtracting the zero.
+    if(targetAz!==null)targetAz=normalize(targetAz+180);
     zeroAz=p.survey.zero==='R41'?0:180;
   }else{
     const e=coordinates(p.survey.coords.E),f=coordinates(p.survey.coords.F),ref=coordinates(p.survey.coords[p.survey.zero]);
@@ -132,7 +134,7 @@ export function orientation(p:TowerProject,id:PointId){
   if(targetAz===null&&errors.length===0)errors.push('Revisa φ o la posición del punto para calcular su dirección.');
   const hz=targetAz!==null&&zeroAz!==null&&errors.length===0?normalize(targetAz-zeroAz):null;
   return {station,designStation,hz,angle:hz===null?null:hzDms(hz),targetAz,zeroAz,edge,range,errors,
-    convention:p.survey.mode==='axis'?'Por eje: R41 hacia E′; R32 hacia F′. Confirma que los amarres estén alineados.':'Por coordenadas N/E: giro horario desde la visual real al amarre.'};
+    convention:p.survey.mode==='axis'?'Por cuadrantes: R41 norte · R32 sur · giro horario. Supone amarres alineados con el eje de torre.':'Por coordenadas N/E: giro horario desde la visual real al amarre.'};
 }
 export function excavationControl(remaining:number|null,valid:boolean){
   if(!valid||remaining===null||!Number.isFinite(remaining))return {label:'Control de excavación',sign:'',direction:null,value:null} as const;
@@ -194,7 +196,8 @@ export function readTower(value:unknown):TowerProject|null {
   for(const id of GUYS){const g=guys[id];if(!record(g)||!['c','x0','h0','target','alpha','groundElevation','sealDesign','staffCurrent'].every(k=>typeof g[k]==='string')||!isDms(g.phi)||typeof g.phiLinked!=='boolean'||!['3','4'].includes(String(g.soil))||!['fixed','terrain'].includes(String(g.datum))||!['depth','x','seal'].includes(String(g.mode)))return null;}
   if(!['sealDesign','sealTarget','staffCurrent'].every(k=>typeof mast[k]==='string')||!['coordinates','axis'].includes(String(s.mode))||!['F14','E14'].includes(String(s.mapping))||!['standard','mirrored'].includes(String(s.side))||!['R41','R32'].includes(String(s.zero))||!['R41','R32'].includes(String(s.levelRef))||!['E','F'].includes(String(s.mastStation))||typeof s.backsight!=='string'||!record(s.coords))return null;
   for(const key of ['E','F','R41','R32','M1']){const c=s.coords[key];if(!record(c)||!['n','e','z'].every(k=>typeof c[k]==='string'))return null;}
-  if(v.workflow!==undefined&&v.workflow!=='stakeout'&&v.workflow!=='level'||v.terrainVisible!==undefined&&typeof v.terrainVisible!=='boolean'||s.occupied!==undefined&&s.occupied!=='auto'&&s.occupied!=='E'&&s.occupied!=='F')return null;
+  if(v.workflow!==undefined&&v.workflow!=='stakeout'&&v.workflow!=='level'||v.terrainVisible!==undefined&&typeof v.terrainVisible!=='boolean'||s.occupied!==undefined&&s.occupied!=='auto'&&s.occupied!=='E'&&s.occupied!=='F'||s.orientationVersion!==undefined&&s.orientationVersion!==2)return null;
   // Migrate existing schema-2 sessions without dropping measurements or custom depths.
-  return structuredClone({...v,workflow:v.workflow??'stakeout',terrainVisible:v.terrainVisible??false,survey:{...s,occupied:s.occupied??'auto'}}) as TowerProject;
+  const orientationDefaults=s.orientationVersion===undefined?{mode:'axis',occupied:'F',zero:'R41'}:{occupied:s.occupied??'F'};
+  return structuredClone({...v,workflow:v.workflow??'stakeout',terrainVisible:v.terrainVisible??false,survey:{...s,...orientationDefaults,orientationVersion:2}}) as TowerProject;
 }

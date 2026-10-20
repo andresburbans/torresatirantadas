@@ -1,9 +1,8 @@
 {
-  "fallbackVersion": "2026-10-19.3",
+  "fallbackVersion": "2026-10-19.4",
   "changes": [
-    "Replanteo y Nivelación ahora tienen pestañas independientes, también dentro de Ajustes.",
-    "La barra inferior reúne Torre, Punto de trabajo y el único botón de Ajustes. La torre se cambia desde el catálogo de Ajustes.",
-    "Replanteo permite elegir la posición E′ o F′ y el cero R41/R32. El ajuste de terreno se puede ocultar.",
-    "Nivelación indica falta o exceso de excavación con signo y flecha. Elegir suelo carga su profundidad y X tabuladas."
+    "Se corrigieron los cuadrantes horarios: R41 es norte y R32 es sur, con T1/T4 desde F′ y T2/T3 desde E′.",
+    "Replanteo ahora tiene dos desplegables: posición E′/F′ y referencia del cero R41/R32. Por defecto se usan F′ y R41.",
+    "Desde E′ con cero en R41, T3 usa 270° − φ. La guía incluye la tabla de los ocho giros."
   ]
 }

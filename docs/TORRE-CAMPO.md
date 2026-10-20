@@ -4,9 +4,9 @@ La implementación mantiene el motor de anclaje probado y añade un modelo de to
 
 ## Convenciones que requieren identificación en obra
 
-Las notas intercambiaban E′ y F′ para T1/T4 y mencionaban una vez R42. Se conservan R41 y R32, y la correspondencia inicial de los planos: F′ → T1/T4, E′ → T2/T3. El lado inicial coloca T1/T2 a −X. Ambas decisiones son editables y se usan también en la planta.
+El croquis confirmado identifica R41 al norte y R32 al sur, con F′ → T1/T4 y E′ → T2/T3. El lado inicial coloca T1/T2 a −X. Ambas decisiones son editables y se usan también en la planta.
 
-El eje +Y va de F′ a E′ y +X queda a su derecha. No se presupone que +Y coincida con norte de cuadrícula. El modo inicial es por coordenadas: los campos desconocidos quedan vacíos y no se publica un giro hasta disponer de los datos necesarios. El modo por eje es una elección explícita y muestra su supuesto de alineación R41 hacia E′ y R32 hacia F′.
+El eje +Y va de F′ a E′ y +X queda a su derecha. No se presupone que +Y coincida con norte de cuadrícula. El modo inicial es Cuadrantes, con F′ y cero R41. La disposición confirmada tiene R41 al norte y R32 al sur; en el dibujo el sur está arriba. Por tanto +Y = F′→E′ apunta al sur y R41 está a 180° locales; R32 está a 0° locales. El modo por coordenadas sigue disponible para amarres fuera de eje, usando N/E reales.
 
 ## Ángulos horarios
 
@@ -20,14 +20,18 @@ La dirección de cada tirante resulta del azimut F′→E′ más su dirección 
 
 La visual al amarre parte del pivote ocupado, no del centro del mástil. Así se consideran amarres fuera del eje. Los puntos coincidentes o coordenadas parciales producen una salida pendiente, no un giro inventado.
 
-Para la convención del ejemplo del usuario (T1/T4 en E′, T1 al lado +X), con amarres alineados:
+Para la disposición confirmada y amarres alineados:
 
-| Punto | 0° hacia R41 | 0° hacia R32 |
-| --- | --- | --- |
-| T1 | 90° − φ | 270° − φ |
-| T4 | 270° + φ | 90° + φ |
+| Armado | Punto | 0° hacia R41 (norte) | 0° hacia R32 (sur) |
+| --- | --- | --- | --- |
+| F′ | T1 | 90° − φ₁ | 270° − φ₁ |
+| F′ | T4 | 270° + φ₄ | 90° + φ₄ |
+| E′ | T2 | 90° + φ₂ | 270° + φ₂ |
+| E′ | T3 | 270° − φ₃ | 90° − φ₃ |
 
-Esta tabla no se aplica universalmente a otras numeraciones. La diferencia entre ceros es 180° solo cuando las visuales de amarre son realmente opuestas desde la estación.
+El signo de T3/E′/R41 del croquis se corrige de +φ a −φ. Para φ = 35°27′, los resultados posibles son 54°33′, 125°27′, 234°33′ y 305°27′. Esta tabla no sustituye la visual N/E cuando el amarre queda fuera de eje; la diferencia entre ceros es 180° solo si las visuales son opuestas desde el pivote ocupado. Cambiar a un pivote distinto del de diseño requiere calcular el traslado al mismo borde, conservado por el motor.
+
+Las sesiones anteriores a `survey.orientationVersion: 2` adoptan una sola vez Cuadrantes/F′/R41. Se conservan C, φ, β, X/H, cotas, lecturas, coordenadas y las otras preferencias. Una vez migradas, las elecciones explícitas de modo, estación y cero persisten entre recargas y exportaciones.
 
 Las N/E mostradas son del borde, con distancia C + X₁. K se suma al total de campo y no desplaza esas coordenadas. La posición N/E de M1 puede introducirse; si ambas entradas están vacías se usa el punto medio de los pivotes y se identifica esa suposición.
 

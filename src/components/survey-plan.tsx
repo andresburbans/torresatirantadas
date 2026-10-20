@@ -10,6 +10,7 @@ export function SurveyPlan({project:p}:{project:TowerProject}){
     <rect width="440" height="350" fill="url(#survey-dots)"/>
     <path d={`M30 ${cy}H410 M${cx} 25V315`} stroke="#aaa" strokeDasharray="5 5" fill="none"/>
     <text x="248" y="24">+Y · F′ → E′</text><text x="387" y="158">+X</text>
+    {p.survey.mode==='axis'&&<><text x="20" y="24">R32 · Sur</text><text x="20" y="309">R41 · Norte</text></>}
     <rect x={cx-20} y={cy-8} width="40" height="16" fill="#e3e3e3" stroke="#444"/>
     <path d={`M${cx-20} ${cy-8}L${cx} ${cy-pivot*scale}L${cx+20} ${cy-8} M${cx-20} ${cy+8}L${cx} ${cy+pivot*scale}L${cx+20} ${cy+8}`} fill="none" stroke="#666"/>
     <circle cx={cx} cy={cy} r={p.selected==='M1'?5:3} fill="#333"/><text x={cx+28} y={cy+5}>M1</text>
