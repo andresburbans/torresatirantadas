@@ -10,7 +10,7 @@ export function baselineScale(p:TowerProject){
   if(theoretical===null)errors.push('Completa N/E de R41 y R32; los amarres deben ser distintos.');
   const measured=number(p.survey.baselineDistance);
   if(!(Number.isFinite(measured)&&measured>0))errors.push('Ingresa la distancia horizontal medida R41–R32, mayor que cero.');
-  const ratio=errors.length===0?measured/theoretical!:null;
+  const ratio=errors.length===0?Math.min(measured,theoretical!)/Math.max(measured,theoretical!):null;
   const computed=ratio===null?NaN:ratio;
   if(ratio!==null&&!(Number.isFinite(computed)&&computed>0))errors.push('Los valores no permiten calcular un factor finito positivo.');
   const valid=errors.length===0;
