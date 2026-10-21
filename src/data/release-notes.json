@@ -1,5 +1,5 @@
 {
-  "fallbackVersion": "2026-10-20.3",
+  "fallbackVersion": "2026-10-21.1",
   "changes": [
     "Replanteo y Nivelación organizados en pestañas, con la torre, el punto de trabajo y Ajustes en la barra inferior.",
     "Factor de escala R41–R32 calculado como distancia menor / distancia mayor a 6 decimales, para consultar e ingresar en la estación total. No modifica C + X₁ + K.",
