@@ -8,8 +8,11 @@ export type PointId = typeof POINTS[number] | 'M1';
 export type PivotId = 'E'|'F';
 export type RefId = 'R41'|'R32';
 export type Coord = { n:string; e:string; z:string };
+export type GuyCornerSetup = {
+  mode:'A'|'PL'; localFrame?:'line'|'station'; distanceA:string; stationAlong:string; stationRight:string; offset:string; useUtm:boolean;
+};
 export type GuyData = Pick<Inputs,'c'|'x0'|'h0'|'target'|'mode'|'datum'|'alpha'|'groundElevation'|'phi'|'soil'> & {
-  phiLinked:boolean; sealDesign:string; staffCurrent:string;
+  phiLinked:boolean; sealDesign:string; staffCurrent:string; corners?:GuyCornerSetup;
 };
 export type PointStation = { station: PivotId; zero: RefId };
 export type TowerProject = {
@@ -320,6 +323,10 @@ export function readTower(value:unknown):TowerProject|null {
   if(!['id','referenceAlpha','pivot','k'].every(k=>typeof v[k]==='string')||!['GI6KL','G6KL','GR6KL'].includes(String(v.tower))||!['3','4'].includes(String(v.soil))||!isDms(v.beta)||(!POINTS.some(id=>id===v.selected)&&v.selected!=='M1')||typeof v.diagramsVisible!=='boolean'||!record(v.guys)||!record(v.mast)||!record(v.survey))return null;
   const guys=v.guys,mast=v.mast,s=v.survey;
   for(const id of GUYS){const g=guys[id];if(!record(g)||!['c','x0','h0','target','alpha','groundElevation','sealDesign','staffCurrent'].every(k=>typeof g[k]==='string')||!isDms(g.phi)||typeof g.phiLinked!=='boolean'||!['3','4'].includes(String(g.soil))||!['fixed','terrain'].includes(String(g.datum))||!['depth','x','seal'].includes(String(g.mode)))return null;}
+  for(const id of GUYS){
+    const setup=(guys[id] as Record<string,unknown>).corners;
+    if(setup!==undefined&&(!record(setup)||(setup.mode!=='A'&&setup.mode!=='PL')||(setup.localFrame!==undefined&&setup.localFrame!=='line'&&setup.localFrame!=='station')||typeof setup.useUtm!=='boolean'||!['distanceA','stationAlong','stationRight','offset'].every(k=>typeof setup[k]==='string')))return null;
+  }
   if(!['sealDesign','sealTarget','staffCurrent'].every(k=>typeof mast[k]==='string')||!['coordinates','axis'].includes(String(s.mode))||!['F14','E14'].includes(String(s.mapping))||!['standard','mirrored'].includes(String(s.side))||!['R41','R32'].includes(String(s.zero))||!['R41','R32'].includes(String(s.levelRef))||!['E','F'].includes(String(s.mastStation))||typeof s.backsight!=='string'||!record(s.coords))return null;
   for(const key of ['E','F','R41','R32']){const c=s.coords[key];if(!record(c)||!['n','e','z'].every(k=>typeof c[k]==='string'))return null;}
   const mcCoord=s.coords.MC??s.coords.M1;

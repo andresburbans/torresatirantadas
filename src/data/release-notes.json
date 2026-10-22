@@ -1,9 +1,9 @@
 {
-  "fallbackVersion": "2026-10-22.1",
+  "fallbackVersion": "2026-10-22.2",
   "changes": [
-    "Mástil central renombrado a MC. Cada tirante y el mástil recuerdan su propia estación y referencia del cero; T1/T4 parten en F′ y T2/T3 en E′.",
-    "MC muestra los vértices MC1–MC4 en coordenadas locales o UTM, con offset configurable y un diagrama del mástil, pivotes y referencias.",
-    "En Ajustes puedes autocompletar E′ y F′ desde MC y el eje R41–R32. Al cambiar de estación para MC, se propone R41 desde E′ y R32 desde F′.",
-    "Factor de escala R41–R32: distancia teórica / distancia medida a 7 decimales, para ingresar en la estación total. No modifica los resultados de replanteo."
+    "Nuevos vértices T11–T14, T21–T24, T31–T34 y T41–T44 para prefabricados de 2 × 1 m. C + X₁ + K llega al centro de la cara cercana al pivote.",
+    "Cada tirante guarda su modo de armado, mediciones y offset. Puedes consultar coordenadas locales o UTM y un esquema del prefabricado.",
+    "Modo Tn-A sobre el eje y Tn-PL compatible con Punto–Línea SOUTH N6+: origen en P1 o conversión a estación (0,0) usando N0/E0 de OCC.",
+    "MC conserva sus cuatro vértices locales/UTM, offset y memoria de estación y cero por punto. La guía explica los sistemas de coordenadas y el procedimiento de la N6+."
   ]
 }

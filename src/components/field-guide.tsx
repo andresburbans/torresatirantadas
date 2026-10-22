@@ -147,6 +147,14 @@ export function FieldGuide() {
       <p>T2–T4 heredan φ de T1 mientras estén vinculados. Editar un φ individual lo separa; marcar «Usar φ de T1» recupera la herencia. β, e y K son comunes. C, los sellos y los objetivos de cada anclaje son independientes.</p>
     </div></details>
 
+    <details><summary>Vértices de prefabricados · T11–T44</summary><div className="guide-content">
+      <p>El bloque de cada tirante tiene una cara de 2 m perpendicular al eje y 1 m de fondo. C + X₁ + K llega al centro de la cara cercana al pivote de diseño (F′ para T1/T4 y E′ para T2/T3 en la disposición habitual). Tn1 es el vértice cercano derecho mirando desde el pivote, Tn2 el cercano izquierdo, Tn3 el lejano izquierdo y Tn4 el lejano derecho. Un offset positivo expande cada cara hacia afuera; 0 usa el perímetro del bloque. El modo, las mediciones y el offset se guardan por tirante.</p>
+      <p>En Tn-A, el origen local está en A y el cero hacia el pivote. Introduce la distancia horizontal medida entre ambos. La cara cercana tiene N = DH − (C + X₁ + K) y la opuesta 1 m menos, antes del offset. Si te armas en B sobre el mismo eje, ingresa su propia DH; los signos indican si el vértice queda delante o detrás de la estación.</p>
+      <p>En Tn-PL, el sistema nativo de SOUTH N6+ usa P1 como origen y P1→P2 como norte. Mide P1 = pivote de diseño y P2 = Tn-A. Puedes usar directamente las coordenadas de salida «Punto–Línea · origen en P1». La opción «Estación (0,0) · cero hacia P1» requiere copiar N0/E0 desde OCC y rota las coordenadas hacia la visual real al pivote. Son dos sistemas diferentes: usa la salida que corresponda al sistema configurado en el instrumento.</p>
+      <p>Las UTM usan el eje real E′/F′, el φ propio y C + X₁ + K. No dependen del punto de armado A/PL. Cambiar el pivote ocupado en el resultado principal tampoco cambia los vértices físicos del prefabricado.</p>
+      <p>Fuente: <a href="https://www.manualslib.com/manual/2198162/South-N6Plus-Series.html?page=67" target="_blank" rel="noreferrer">Manual SOUTH N6+ · sección 8.5 Point to Line, páginas impresas 60–61</a>.</p>
+    </div></details>
+
     <details><summary>13 · Nivelación de las cinco excavaciones</summary><div className="guide-content">
       <p>La estación total y el nivel tienen referencias independientes. Puedes poner 0° de estación hacia R41 y tomar la vista (+) del nivel en R32. En Ajustes ingresa la referencia del nivel, su Z, la lectura (+) y los cinco sellos de diseño.</p>
       <p className="guide-equation">HI = Z de referencia + vista (+)</p>

@@ -10,6 +10,7 @@ Está pensada para usarla desde el teléfono, incluso sin conexión. Desarrollad
 
 - **Replanteo:** consultar la distancia al borde del prefabricado y el giro horario desde E′ o F′, con el cero de estación en R41 o R32.
 - **Ajuste de excavación:** recalcular X conservando el afloramiento C y el ángulo vertical β, a partir de una nueva profundidad, proyección o cota de sello.
+- **Vértices de prefabricados:** obtener T11–T14, T21–T24, T31–T34 y T41–T44 para bloques de 2 × 1 m, con offset por tirante, coordenadas locales desde A o Punto–Línea SOUTH N6+ y coordenadas UTM.
 - **Nivelación:** obtener la cota instrumental, la mira al sello y cuánto falta excavar o cuánto se ha sobreexcavado, tanto en T1–T4 como en MC.
 - **Referencias de torre:** buscar una torre y cargar sus coordenadas R41/R32 desde el catálogo, con edición manual de coordenadas disponible.
 - **Factor de escala:** comparar la distancia horizontal medida R41–R32 con la calculada por sus coordenadas N/E. El cociente teórica / medida se muestra para ingresarlo en la estación total; no se aplica a C + X₁ + K ni a los demás resultados.

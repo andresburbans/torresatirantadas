@@ -3,6 +3,7 @@ import { angleLabel, format, number } from '@/lib/geometry';
 import { excavationControl, inputFor, leveling, mastCorners, orientation, resultFor, setPointStation, setPointZero, stationFor, zeroFor, type GuyId, type PivotId, type RefId, type TowerProject } from '@/lib/tower';
 import { baselineScale } from '@/lib/survey';
 import { Field, Select } from './form-controls';
+import { GuyCorners } from './guy-corners';
 
 type Props = { project: TowerProject; change: (fn: (p: TowerProject) => TowerProject) => void; configure: () => void };
 const pointName = (p: TowerProject) => (p.selected === 'MC' || p.selected === 'M1') ? 'MC · Mástil Central' : `T${p.selected} · Tirante ${p.selected}`;
@@ -83,6 +84,7 @@ export function StakeoutResults({ project: p, change, configure }: Props) {
       </div>
     </div>}
 
+    {!mast && <GuyCorners project={p} id={guy} change={change}/>}
     <details className="result-diagnostics"><summary>Ver referencias de replanteo</summary><div>
       {!mast && <><p>C {format(number(p.guys[guy].c))} m · X₁ <span data-testid="result-x">{r.valid ? format(r.x1) : '—'} m</span> · K {format(number(p.k))} m</p><p>H diseño / ajustada: <span data-testid="result-h">{format(number(p.guys[guy].h0))} / {r.valid ? format(r.h1) : '—'} m</span></p></>}
       <p>{o.convention}</p>
