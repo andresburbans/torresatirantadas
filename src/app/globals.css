@@ -333,3 +333,23 @@ body{padding-bottom:calc(100px + env(safe-area-inset-bottom,0px))}
 .release-notice .app-credit{margin:18px 0 0;text-align:center}
 footer{flex-wrap:wrap}
 footer .app-credit{flex-basis:100%;width:100%;order:4;margin:0;text-align:center}
+
+.mast-corners-panel{border-top:1px solid var(--border);background:#fafafa;padding:18px 22px}
+.mast-corners-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.mast-corners-subtitle{display:block;font-size:14px;color:#333;margin-top:4px}
+.mast-utm-check{margin:0;font-size:12px;color:#555}
+.mast-offset-row{max-width:280px;margin-bottom:14px}
+.mast-offset-row .field-label{font-size:11px}
+.mast-table-wrap{overflow-x:auto;border:1px solid #e0e0e0;border-radius:6px;background:#fff}
+.mast-corners-table{width:100%;border-collapse:collapse;font-size:12px;text-align:left}
+.mast-corners-table th{background:#f3f3f3;padding:10px 14px;font-size:11px;font-weight:600;color:#666;border-bottom:1px solid #e0e0e0}
+.mast-corners-table td{padding:10px 14px;border-bottom:1px solid #eee;font-family:var(--mono);color:#333}
+.mast-corners-table tr:last-child td{border-bottom:none}
+.mast-corners-table tr:hover td{background:#fafafa}
+.text-muted{color:#888;font-family:Arial,sans-serif;padding:16px 14px;text-align:center}
+.mast-diagram-svg{max-width:500px;margin:auto}
+@media(max-width:800px){
+  .mast-corners-panel{padding:14px 15px}
+  .mast-corners-header{flex-direction:column;align-items:flex-start;gap:8px}
+  .mast-corners-table th,.mast-corners-table td{padding:8px 10px;font-size:11px}
+}

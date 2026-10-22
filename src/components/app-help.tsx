@@ -6,7 +6,7 @@ export function AppHelp({offlineText,onReferences}:{offlineText:string;onReferen
     <p>Herramienta de topografía para el replanteo y la nivelación de los cuatro tirantes y el mástil central de una torre.</p>
     <ol className="about-steps">
       <li><strong>Prepara la torre.</strong> En Ajustes, revisa las referencias, el suelo y el diseño. Para nivelar, completa los sellos, la referencia del nivel y su vista (+).</li>
-      <li><strong>Selecciona el punto.</strong> Elige T1–T4 o M1 en la barra inferior. Cada punto conserva sus datos.</li>
+      <li><strong>Selecciona el punto.</strong> Elige T1–T4 o MC en la barra inferior. Cada punto conserva sus datos.</li>
       <li><strong>Replantea.</strong> En Replanteo, elige E′/F′ y el cero R41/R32 para consultar la distancia al borde y el giro horario. Abre Ajuste de terreno si cambia la excavación.</li>
       <li><strong>Controla la excavación.</strong> En Nivelación, consulta la mira al sello e ingresa la vista actual: + ↓ indica falta de excavación; − ↑, exceso.</li>
     </ol>

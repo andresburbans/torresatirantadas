@@ -13,12 +13,12 @@ function baseline(){
 }
 const close=(a:number,b:number)=>assert.ok(Math.abs(a-b)<1e-10,`${a} != ${b}`);
 
-test('scale is min / max horizontal distance, without Z or rounding the baseline',()=>{
+test('scale is theoretical / measured horizontal distance, without Z or rounding the baseline',()=>{
   const p=baseline(),s=baselineScale(p);
-  assert.equal(s.theoretical,100);assert.equal(s.valid,true);close(s.factor!,0.9999);
+  assert.equal(s.theoretical,100);assert.equal(s.valid,true);close(s.factor!,100/99.99);assert.ok(s.factor!>1);
   p.survey.coords.R41.z='';assert.deepEqual(baselineScale(p),s);
   p.survey.baselineDistance='100';assert.equal(baselineScale(p).factor,1);
-  p.survey.baselineDistance='100,02';close(baselineScale(p).factor!,100/100.02);
+  p.survey.baselineDistance='100,02';close(baselineScale(p).factor!,100/100.02);assert.ok(baselineScale(p).factor!<1);
   p.survey.coords.R41.n='1001';p.survey.coords.R41.e='1001';
   close(baselineScale(p).factor!,Math.sqrt(2)/100.02);
 });

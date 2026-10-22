@@ -1,8 +1,9 @@
 {
-  "fallbackVersion": "2026-10-21.1",
+  "fallbackVersion": "2026-10-22.1",
   "changes": [
-    "Replanteo y Nivelación organizados en pestañas, con la torre, el punto de trabajo y Ajustes en la barra inferior.",
-    "Factor de escala R41–R32 calculado como distancia menor / distancia mayor a 6 decimales, para consultar e ingresar en la estación total. No modifica C + X₁ + K.",
-    "Información del proyecto más detallada: referencias, coordenadas, parámetros de diseño y cotas de sello, con una guía de uso actualizada."
+    "Mástil central renombrado a MC. Cada tirante y el mástil recuerdan su propia estación y referencia del cero; T1/T4 parten en F′ y T2/T3 en E′.",
+    "MC muestra los vértices MC1–MC4 en coordenadas locales o UTM, con offset configurable y un diagrama del mástil, pivotes y referencias.",
+    "En Ajustes puedes autocompletar E′ y F′ desde MC y el eje R41–R32. Al cambiar de estación para MC, se propone R41 desde E′ y R32 desde F′.",
+    "Factor de escala R41–R32: distancia teórica / distancia medida a 7 decimales, para ingresar en la estación total. No modifica los resultados de replanteo."
   ]
 }

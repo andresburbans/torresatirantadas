@@ -69,6 +69,6 @@ Las pruebas cubren los ocho giros (cuatro tirantes × dos ceros), convenciones i
 
 ## Escala informativa entre amarres
 
-`Dteórica = hypot(N41 − N32, E41 − E32)`; `factor = Dmedida / Dteórica` según la convención solicitada. La observación es horizontal, en metros. No se usa Z. Se reporta un solo valor con nueve decimales en Ajustes y Replanteo. Nunca alimenta las funciones de geometría, orientación, cotas o nivelación; tampoco cambia automáticamente las coordenadas de pivotes/mástil.
+`Dteórica = hypot(N41 − N32, E41 − E32)`; `factor = Dteórica / Dmedida` según la convención solicitada. La observación es horizontal, en metros. No se usa Z. Se reporta un solo valor con siete decimales en Ajustes y Replanteo. Nunca alimenta las funciones de geometría, orientación, cotas o nivelación; tampoco cambia automáticamente las coordenadas de pivotes/mástil.
 
 Cambiar torre o N/E de R41/R32 invalida únicamente la medición de escala. El comportamiento anterior de la vista (+) al cambiar la cota de su referencia se conserva. Al migrar proyectos se añade un campo vacío sin alterar las medidas existentes.

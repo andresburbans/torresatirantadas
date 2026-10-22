@@ -10,17 +10,17 @@ Está pensada para usarla desde el teléfono, incluso sin conexión. Desarrollad
 
 - **Replanteo:** consultar la distancia al borde del prefabricado y el giro horario desde E′ o F′, con el cero de estación en R41 o R32.
 - **Ajuste de excavación:** recalcular X conservando el afloramiento C y el ángulo vertical β, a partir de una nueva profundidad, proyección o cota de sello.
-- **Nivelación:** obtener la cota instrumental, la mira al sello y cuánto falta excavar o cuánto se ha sobreexcavado, tanto en T1–T4 como en M1.
+- **Nivelación:** obtener la cota instrumental, la mira al sello y cuánto falta excavar o cuánto se ha sobreexcavado, tanto en T1–T4 como en MC.
 - **Referencias de torre:** buscar una torre y cargar sus coordenadas R41/R32 desde el catálogo, con edición manual de coordenadas disponible.
-- **Factor de escala:** comparar la distancia horizontal medida R41–R32 con la calculada por sus coordenadas N/E. El cociente medida / teórica se muestra para ingresarlo en la estación total; no se aplica a C + X₁ + K ni a los demás resultados.
+- **Factor de escala:** comparar la distancia horizontal medida R41–R32 con la calculada por sus coordenadas N/E. El cociente teórica / medida se muestra para ingresarlo en la estación total; no se aplica a C + X₁ + K ni a los demás resultados.
 
-Cada punto conserva sus datos. Los diagramas de perfil, anclaje y planta se pueden mostrar u ocultar, y la torre completa se puede exportar e importar en un archivo JSON.
+Cada punto conserva sus datos, su estación E′/F′ y su referencia del cero. MC muestra sus cuatro vértices en coordenadas locales o UTM, con offset configurable; Ajustes permite autocompletar E′/F′ desde MC y los amarres. Los diagramas de perfil, anclaje y planta se pueden mostrar u ocultar, y la torre completa se puede exportar e importar en un archivo JSON.
 
 ## Uso en campo
 
 1. En **Ajustes**, busca la torre y revisa sus referencias. Completa la familia, el suelo, los ángulos y las distancias de diseño.
 2. Para nivelar, ingresa las cinco cotas de sello y la vista (+) a la referencia del nivel.
-3. Selecciona T1–T4 o M1 en la barra inferior y abre **Replanteo** o **Nivelación**, según el trabajo.
+3. Selecciona T1–T4 o MC en la barra inferior y abre **Replanteo** o **Nivelación**, según el trabajo.
 4. Si cambia la excavación de un tirante, muestra **Ajuste de terreno** e introduce el nuevo valor.
 
 La configuración habitual usa F′ para T1/T4 y E′ para T2/T3, con R41 al norte y R32 al sur. El modo por cuadrantes supone que los amarres están alineados con el eje de torre; para referencias fuera del eje está disponible el cálculo por coordenadas.
