@@ -1,14 +1,11 @@
 {
-  "fallbackVersion": "2026-11-04.3",
+  "fallbackVersion": "2026-11-04.4",
   "changes": [
-    "Cambiar de número de torre vacía C de los cuatro tirantes y los sellos de tirantes y MC; conserva ángulos y demás ajustes. Seleccionar la misma torre conserva los datos.",
-    "Lado del prefabricado MC editable: 2,8 m por defecto, 2 m u otro tamaño. Actualiza vértices locales/UTM y diagrama, y se guarda con la torre.",
-    "Cambiar entre profundidad, X y cota de sello conserva el ajuste aunque todavía falte C. Sin cota de referencia, no se propone un sello cero.",
-    "Las sesiones dañadas se conservan antes del guardado automático; si no es posible respaldarlas, el guardado se detiene para evitar pérdida de datos.",
-    "Validación reforzada de archivos importados y resultados fuera del rango numérico.",
-    "Dist MC automática al elegir familia: 3,3 m para GI6KL y 3,4 m para G6KL/GR6KL. Las excavaciones existentes se conservan.",
-    "Seleccionar suelo restablece H/X de campo: S3, 3,5/2,117 m; S4, 4/2,46 m. Las tablas originales siguen disponibles.",
-    "Factor de escala con distancia teórica a nueve decimales y cociente detallado para verificar en calculadora.",
-    "24 referencias nuevas: 340 puntos de 160 torres disponibles sin conexión, conservando los anteriores."
+    "C y sellos se limpian al cambiar de torre. Los ángulos se conservan.",
+    "Tamaño del MC configurable, con 2,8 m por defecto.",
+    "Dist MC y valores S3/S4 automáticos según la selección.",
+    "Más decimales en el factor de escala.",
+    "24 referencias nuevas.",
+    "Corregidos fallos en el cambio de modo de cálculo, la importación y el guardado."
   ]
 }
