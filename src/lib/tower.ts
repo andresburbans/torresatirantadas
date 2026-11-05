@@ -20,7 +20,7 @@ export type TowerProject = {
   pivot:string; k:string; beta:DMS;
   selected:PointId; diagramsVisible:boolean; terrainVisible:boolean; workflow:'stakeout'|'level';
   guys:Record<GuyId,GuyData>;
-  mast:{sealDesign:string;sealTarget:string;staffCurrent:string;offset?:string;useUtm?:boolean};
+  mast:{sealDesign:string;sealTarget:string;staffCurrent:string;side?:string;offset?:string;useUtm?:boolean};
   survey:{mode:'coordinates'|'axis'; mapping:'F14'|'E14'; side:'standard'|'mirrored'; zero:RefId; levelRef:RefId; backsight:string; mastStation:PivotId; occupied:'auto'|PivotId; orientationVersion:2; baselineDistance:string;
     pointStations?:Partial<Record<PointId,PointStation>>;
     coords:Record<RefId|PivotId|'MC'|'M1',Coord>};
@@ -34,7 +34,7 @@ export function newTower():TowerProject {
     phiLinked:id!=='1',sealDesign:'',staffCurrent:'',
   }])) as Record<GuyId,GuyData>;
   return {schema:2,id:DEFAULTS.id,tower:DEFAULTS.tower,soil:'3',referenceAlpha:'5',pivot:DEFAULTS.pivot,k:DEFAULTS.k,beta:{...DEFAULTS.beta},
-    selected:'1',diagramsVisible:false,terrainVisible:false,workflow:'stakeout',guys,mast:{sealDesign:'',sealTarget:'',staffCurrent:'',offset:'0',useUtm:false},
+    selected:'1',diagramsVisible:false,terrainVisible:false,workflow:'stakeout',guys,mast:{sealDesign:'',sealTarget:'',staffCurrent:'',side:'2.8',offset:'0',useUtm:false},
     survey:{mode:'axis',mapping:'F14',side:'standard',zero:'R41',levelRef:'R41',backsight:'',mastStation:'E',occupied:'auto',orientationVersion:2,baselineDistance:'',
       pointStations:{},
       coords:{R41:blankCoord(),R32:blankCoord(),E:blankCoord(),F:blankCoord(),MC:blankCoord(),M1:blankCoord()}}};
@@ -46,8 +46,20 @@ export function inputFor(p:TowerProject,id:GuyId):Inputs {
     groundElevation:Number.isFinite(seal)&&Number.isFinite(h0)?String(seal+h0):g.groundElevation};
 }
 export function resultFor(p:TowerProject,id:GuyId){return calculate(inputFor(p,id));}
+/** Mode conversion depends on vertical geometry, even before C is entered. */
+export function setGuyMode(p:TowerProject,id:GuyId,mode:Inputs['mode']):TowerProject {
+  const input=inputFor(p,id),g=p.guys[id];
+  const r=calculate({...input,c:'1',k:'0',pivot:'0',phi:zeroAngle});
+  const value=mode==='depth'?r.h1:mode==='x'?r.x1:r.seal1;
+  const target=r.valid&&value!==null&&Number.isFinite(value)
+    ?String(value):mode==='depth'?g.h0:mode==='x'?g.x0:'';
+  return {...p,guys:{...p.guys,[id]:{...g,mode,target}}};
+}
 export function setPhi(p:TowerProject,id:GuyId,phi:DMS):TowerProject {
   return {...p,guys:{...p.guys,[id]:{...p.guys[id],phi,phiLinked:false}}};
+}
+export function selectTowerFamily(p:TowerProject,tower:Tower):TowerProject {
+  return {...p,tower,pivot:tower==='GI6KL'?'3.3':'3.4',beta:toDms(CATALOG[tower].beta)};
 }
 /** A preset replaces its complete reference pair, retaining custom field targets. */
 export function applyPreset(p:TowerProject,tower:Tower,soil:Soil,alpha:string,only?:GuyId):TowerProject {
@@ -60,7 +72,7 @@ export function applyPreset(p:TowerProject,tower:Tower,soil:Soil,alpha:string,on
     const followsDesign=g.mode==='depth'&&number(g.target)===number(g.h0);
     guys[id]={...g,soil,alpha,x0:String(table.x[index]),h0:String(table.h),datum:'terrain',target:followsDesign?String(table.h):g.target};
   }
-  return {...p,tower,soil:only?p.soil:soil,referenceAlpha:alpha,beta:toDms(CATALOG[tower].beta),guys};
+  return {...p,tower,pivot:tower!==p.tower?(tower==='GI6KL'?'3.3':'3.4'):p.pivot,soil:only?p.soil:soil,referenceAlpha:alpha,beta:toDms(CATALOG[tower].beta),guys};
 }
 
 export function defaultStationFor(p:TowerProject,id:PointId):PivotId {
@@ -132,11 +144,11 @@ export function occupiedPivotFor(p:TowerProject,id:PointId):PivotId {
   if(custom)return custom;
   return p.survey.occupied==='E'||p.survey.occupied==='F'?p.survey.occupied:defaultStationFor(p,normId);
 }
-/** Explicit soil selection starts at the approved reference; later field adjustments remain possible. */
+/** Field defaults requested for S3/S4. Original plan tables remain available through applyPreset. */
 export function selectSoil(p:TowerProject,soil:Soil,only?:GuyId):TowerProject {
-  const next=applyPreset(p,p.tower,soil,p.referenceAlpha,only),guys={...next.guys};
-  for(const id of only?[only]:GUYS)guys[id]={...guys[id],mode:'depth',target:guys[id].h0};
-  return {...next,guys};
+  const h0=soil==='4'?'4':'3.5',x0=soil==='4'?'2.46':'2.117',guys={...p.guys};
+  for(const id of only?[only]:GUYS)guys[id]={...guys[id],soil,alpha:'5',datum:'terrain',h0,x0,mode:'depth',target:h0};
+  return {...p,soil:only?p.soil:soil,referenceAlpha:'5',guys};
 }
 export const normalize=(degrees:number)=>((degrees%360)+360)%360;
 export function hzDms(degrees:number):DMS {
@@ -280,8 +292,8 @@ export function calculatePivotsFromMast(coords:Record<string,Coord>,pivotDist:nu
 export type MastCorner={id:string;n:number;e:number};
 
 export function mastCorners(p:TowerProject,offset:number=0,useUtm:boolean=false):MastCorner[]{
-  const distance=number(p.pivot),half=1.4+offset;
-  if(!Number.isFinite(offset)||half<=0)return [];
+  const distance=number(p.pivot),side=number(p.mast.side??'2.8'),half=side/2+offset;
+  if(!Number.isFinite(side)||side<=0||!Number.isFinite(offset)||!Number.isFinite(half)||half<=0)return [];
   // Fixed physical numbering from the sketch: NE, SE, SW, NW in the tower frame.
   const corners=[
     {id:'MC1',ax:half,tr:half}, {id:'MC2',ax:-half,tr:half},
@@ -320,8 +332,10 @@ export function readTower(value:unknown):TowerProject|null {
     return {...p,id:legacy.id,tower:legacy.tower,soil:legacy.soil,pivot:legacy.pivot,k:legacy.k,beta:legacy.beta,selected:id,
       guys:{...p.guys,[id]:{...active,phiLinked:false,sealDesign:Number.isFinite(number(seal))?seal:'',staffCurrent:''}}};
   }
-  if(!['id','referenceAlpha','pivot','k'].every(k=>typeof v[k]==='string')||!['GI6KL','G6KL','GR6KL'].includes(String(v.tower))||!['3','4'].includes(String(v.soil))||!isDms(v.beta)||(!POINTS.some(id=>id===v.selected)&&v.selected!=='M1')||typeof v.diagramsVisible!=='boolean'||!record(v.guys)||!record(v.mast)||!record(v.survey))return null;
+  if(!['id','referenceAlpha','pivot','k','tower','soil'].every(k=>typeof v[k]==='string')||!['GI6KL','G6KL','GR6KL'].includes(String(v.tower))||!['3','4'].includes(String(v.soil))||!isDms(v.beta)||(!POINTS.some(id=>id===v.selected)&&v.selected!=='M1')||typeof v.diagramsVisible!=='boolean'||!record(v.guys)||!record(v.mast)||!record(v.survey))return null;
   const guys=v.guys,mast=v.mast,s=v.survey;
+  if(!['mode','mapping','side','zero','levelRef','mastStation'].every(key=>typeof s[key]==='string'))return null;
+  for(const id of GUYS){const g=guys[id];if(!record(g)||!['soil','mode','datum'].every(key=>typeof g[key]==='string'))return null;}
   for(const id of GUYS){const g=guys[id];if(!record(g)||!['c','x0','h0','target','alpha','groundElevation','sealDesign','staffCurrent'].every(k=>typeof g[k]==='string')||!isDms(g.phi)||typeof g.phiLinked!=='boolean'||!['3','4'].includes(String(g.soil))||!['fixed','terrain'].includes(String(g.datum))||!['depth','x','seal'].includes(String(g.mode)))return null;}
   for(const id of GUYS){
     const setup=(guys[id] as Record<string,unknown>).corners;
@@ -331,16 +345,22 @@ export function readTower(value:unknown):TowerProject|null {
   for(const key of ['E','F','R41','R32']){const c=s.coords[key];if(!record(c)||!['n','e','z'].every(k=>typeof c[k]==='string'))return null;}
   const mcCoord=s.coords.MC??s.coords.M1;
   if(!record(mcCoord)||!['n','e','z'].every(k=>typeof mcCoord[k]==='string'))return null;
+  // Both names are read by the UI and geometry, including the legacy fallback.
+  for(const key of ['MC','M1']){
+    const coord=s.coords[key];
+    if(coord!==undefined&&(!record(coord)||!['n','e','z'].every(k=>typeof coord[k]==='string')))return null;
+  }
   if(v.workflow!==undefined&&v.workflow!=='stakeout'&&v.workflow!=='level'||v.terrainVisible!==undefined&&typeof v.terrainVisible!=='boolean'||s.occupied!==undefined&&s.occupied!=='auto'&&s.occupied!=='E'&&s.occupied!=='F'||s.orientationVersion!==undefined&&s.orientationVersion!==2)return null;
   if(s.baselineDistance!==undefined&&typeof s.baselineDistance!=='string')return null;
   // Migrate existing schema-2 sessions without dropping measurements or custom depths.
   const orientationDefaults=s.orientationVersion===undefined?{mode:'axis',occupied:'F',zero:'R41'}:{occupied:s.occupied??'F'};
   if(mast.offset!==undefined&&typeof mast.offset!=='string'||mast.useUtm!==undefined&&typeof mast.useUtm!=='boolean')return null;
+  if(mast.side!==undefined&&typeof mast.side!=='string')return null;
   const pointStations:Partial<Record<PointId,PointStation>>={};
   if(s.pointStations!==undefined){
     if(!record(s.pointStations))return null;
     for(const [key,entry] of Object.entries(s.pointStations)){
-      if(![...POINTS,'M1'].includes(key)||!record(entry)||!['E','F'].includes(String(entry.station))||!['R41','R32'].includes(String(entry.zero)))return null;
+      if(![...POINTS,'M1'].includes(key)||!record(entry)||typeof entry.station!=='string'||typeof entry.zero!=='string'||!['E','F'].includes(entry.station)||!['R41','R32'].includes(entry.zero))return null;
       pointStations[key as PointId]={station:entry.station as PivotId,zero:entry.zero as RefId};
     }
     if(!pointStations.MC&&pointStations.M1)pointStations.MC={...pointStations.M1};
@@ -355,6 +375,6 @@ export function readTower(value:unknown):TowerProject|null {
       pointStations[selected]={station:s.occupied,zero:s.zero as RefId};
     }
   }
-  const mastData={sealDesign:mast.sealDesign,sealTarget:mast.sealTarget,staffCurrent:mast.staffCurrent,offset:typeof mast.offset==='string'?mast.offset:'0',useUtm:Boolean(mast.useUtm)};
+  const mastData={sealDesign:mast.sealDesign,sealTarget:mast.sealTarget,staffCurrent:mast.staffCurrent,side:typeof mast.side==='string'?mast.side:'2.8',offset:typeof mast.offset==='string'?mast.offset:'0',useUtm:Boolean(mast.useUtm)};
   return structuredClone({...v,selected:v.selected==='M1'?'MC':v.selected,mast:mastData,workflow:v.workflow??'stakeout',terrainVisible:v.terrainVisible??false,survey:{...s,...orientationDefaults,orientationVersion:2,baselineDistance:s.baselineDistance??'',pointStations,coords:{...s.coords,MC:s.coords.MC??s.coords.M1??blankCoord(),M1:s.coords.M1??s.coords.MC??blankCoord()}}}) as TowerProject;
 }

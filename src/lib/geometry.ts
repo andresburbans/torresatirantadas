@@ -49,23 +49,28 @@ export function calculate(input: Inputs) {
   if (elevation !== null && !Number.isFinite(elevation)) errors.push('La cota de terreno debe ser un número válido o dejarse vacía.');
   const deltaX = x1 - x0, deltaH = h1 - h0, distance = c + x1;
   const groundShift = input.datum === 'terrain' ? -deltaX * Math.tan(alpha * rad) : 0;
+  const plan = [ [-1,-1], [-1,1], [1,1], [1,-1] ].map(([sx,sy]) => ({
+    x: sx * distance * Math.cos(phi * rad),
+    y: sy * (pivot + distance * Math.sin(phi * rad)),
+  }));
+  const seal0 = elevation === null ? null : elevation - h0;
+  const seal1 = elevation === null ? null : elevation + groundShift - h1;
+  if(![x1,h1,deltaX,deltaH,distance,distance+k,...plan.flatMap(point=>[point.x,point.y]),...(seal0===null?[]:[seal0,seal1!])].every(Number.isFinite)){
+    errors.push('Los valores exceden el rango de cálculo. Revisa las distancias y cotas.');
+  }
   return {
     errors, valid: errors.length === 0, c, k, x0, x1, h0, h1, pivot, beta, phi, alpha, slope,
     deltaX, deltaH, distance, distanceTotal: distance + k,
-    seal0: elevation === null ? null : elevation - h0,
-    seal1: elevation === null ? null : elevation + groundShift - h1,
+    seal0, seal1,
     // Local X transversal, Y longitudinal. φ measured from ±X. Pivot at ±Y.
-    plan: [ [-1,-1], [-1,1], [1,1], [1,-1] ].map(([sx,sy]) => ({
-      x: sx * distance * Math.cos(phi * rad),
-      y: sy * (pivot + distance * Math.sin(phi * rad)),
-    })),
+    plan,
   };
 }
 export type Result = ReturnType<typeof calculate>;
 export function isInputs(value: unknown): value is Inputs {
   if (!value || typeof value !== 'object') return false;
   const v = value as Record<string,unknown>;
-  const textKeys = ['alpha','pivot','c','k','x0','h0','target','groundElevation','id','guy'];
+  const textKeys = ['alpha','pivot','c','k','x0','h0','target','groundElevation','id','guy','tower','soil','datum','mode'];
   const angle = (a: unknown) => !!a && typeof a === 'object' && ['deg','min','sec'].every(k => typeof (a as Record<string,unknown>)[k] === 'string');
   return textKeys.every(k => typeof v[k] === 'string') && angle(v.beta) && angle(v.phi) && ['GI6KL','G6KL','GR6KL'].includes(String(v.tower)) && ['3','4'].includes(String(v.soil)) && ['fixed','terrain'].includes(String(v.datum)) && ['depth','x','seal'].includes(String(v.mode)) && ['1','2','3','4'].includes(String(v.guy));
 }

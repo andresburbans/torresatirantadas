@@ -129,3 +129,17 @@ Las coordenadas de prueba son sintéticas. La configuración inicial conserva F�
 - Ayuda revisada a 393 × 852 px; guía accesible sin desbordamiento horizontal a 360 px y presentación de laptop revisada. Captura `docs/screenshots/ayuda-uso-mobile.png`.
 - Con servidor detenido y HTTP inaccesible, recarga recupera la ayuda final y permite abrir «Uso, fórmulas y referencias» desde caché.
 - 49 pruebas correctas, compilación estática y TypeScript correctos, 30 recursos de precarga PWA. Versión y novedades actualizadas a 2.0.2.
+
+
+## Revisión preventiva · 4 de noviembre de 2026
+
+- Conversión entre profundidad, X y sello independiente de C: conserva el ajuste vertical antes de completar el replanteo y evita fabricar una cota cero cuando falta el datum altimétrico.
+- Recuperación local: JSON dañado, vacío o incompatible se respalda literalmente en `rumbo3d-tirantes-tower-v2-recovery` antes del primer guardado. Si ya existe otro respaldo o el almacenamiento falla, se detiene el guardado automático; una importación válida permite reanudarlo. La exportación manual sigue disponible.
+- Importación: se validan ambas coordenadas MC/M1, incluidos los alias inactivos; se rechazan arreglos usados en lugar de texto en familias, suelos y estaciones.
+- Desbordamientos: entradas numéricas finitas que producen distancias, sellos o planta no finitos no se consideran resultados válidos.
+
+
+## Cambio de torre y tamaño del MC · 4 de noviembre de 2026
+
+- Seleccionar otra torre del catálogo vacía C, sello de diseño y terreno de referencia de cada tirante, y el objetivo si es una cota de sello. Vacía ambos sellos del MC y exige nuevas observaciones de referencia. Conserva los demás ajustes, incluidos α, φ, β, profundidades y tamaño de MC. Volver a elegir el mismo número normalizado no limpia el trabajo.
+- El lado cuadrado del MC se guarda en `mast.side`, con 2,8 m como valor inicial y migración de archivos anteriores. Se usa `lado / 2 + offset` para los cuatro vértices locales y UTM, y para el dibujo. Se admiten coma y punto; tamaños no positivos o inválidos bloquean los vértices.

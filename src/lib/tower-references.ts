@@ -1,5 +1,5 @@
 import data from '../data/tower-references.json';
-import type { Coord, RefId, TowerProject } from './tower';
+import { GUYS, type Coord, type RefId, type TowerProject } from './tower';
 import { updateSurveyCoordinate } from './survey';
 
 export type TowerReference={id:string;tower:string;ref:RefId|null;n:string;e:string;z:string;description:string;date:string};
@@ -37,7 +37,14 @@ export function loadTowerReferences(p:TowerProject,tower:string):TowerProject {
     next=replaceReference(next,ref,rows.length===1?rows[0]:undefined);
   }
   // A different tower requires a fresh observation even if two benchmark elevations match.
-  if(normalizeTowerId(p.id)!==id)next={...next,survey:{...next.survey,backsight:'',baselineDistance:''}};
+  if(normalizeTowerId(p.id)!==id){
+    const guys={...next.guys};
+    for(const guy of GUYS){
+      const g=guys[guy];
+      guys[guy]={...g,c:'',sealDesign:'',groundElevation:'',target:g.mode==='seal'?'':g.target};
+    }
+    next={...next,guys,mast:{...next.mast,sealDesign:'',sealTarget:''},survey:{...next.survey,backsight:'',baselineDistance:''}};
+  }
   return next;
 }
 export function selectTowerReference(p:TowerProject,ref:RefId,sourceId:string):TowerProject {

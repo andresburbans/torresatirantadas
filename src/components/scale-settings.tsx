@@ -6,9 +6,10 @@ import { Field } from './form-controls';
 export function ScaleSettings({project:p,change}:{project:TowerProject;change:(fn:(p:TowerProject)=>TowerProject)=>void}){
   const s=baselineScale(p);
   return <details className="scale-settings"><summary>Factor de escala · R41 ↔ R32</summary><div className="settings-section">
-    <div className="settings-reference"><span>Distancia teórica planimétrica · R41–R32</span><strong data-testid="baseline-theoretical">{s.theoretical===null?'—':format(s.theoretical,3)+' m'}</strong></div>
+    <div className="settings-reference"><span>Distancia teórica planimétrica · R41–R32</span><strong data-testid="baseline-theoretical">{s.theoretical===null?'—':format(s.theoretical,9)+' m'}</strong></div>
     <Field id="baseline-measured" label="Distancia horizontal medida con estación" value={p.survey.baselineDistance} onChange={baselineDistance=>change(q=>({...q,survey:{...q.survey,baselineDistance}}))} hint="DH entre los mismos amarres; no distancia inclinada ni una lectura ya escalada."/>
-    <div className="scale-result"><span>Factor de escala · teórica / medida</span><strong data-testid="settings-scale">{s.valid?format(s.factor!,7):'—'}</strong><small>k = DH teórica / DH medida</small></div>
+    <div className="scale-result"><span>Factor de escala · teórica / medida</span><strong data-testid="settings-scale">{s.valid?format(s.factor!,10):'—'}</strong><small>k = DH teórica / DH medida</small></div>
+    {s.valid&&<p className="setting-note" data-testid="scale-calculation">{format(s.theoretical!,9)} / {format(s.measured!,9)} = {format(s.factor!,10)}. Se calcula con la precisión completa de las coordenadas, sin redondear la distancia a milímetros.</p>}
     {(p.survey.baselineDistance.trim()!==''||s.theoretical===null)&&s.errors.map(error=><p className="setting-note" key={error}>{error}</p>)}
     <p className="setting-note">Cambiar la torre o N/E de los amarres vacía la distancia medida para evitar reutilizar otra medición.</p>
     <p className="setting-note">Solo es un valor de referencia para la estación total. No se aplica a C + X₁ + K, a coordenadas, giros, profundidades ni cotas.</p>

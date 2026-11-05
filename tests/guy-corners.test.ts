@@ -3,10 +3,20 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { GuyCorners } from '../src/components/guy-corners';
+import { StakeoutResults } from '../src/components/work-results';
+import { MastDiagram } from '../src/components/mast-diagram';
 import { guyCorners, guyCornerSetup, updateGuyCornerSetup } from '../src/lib/guy-corners';
 import { GUYS, azimuth, localBearing, newTower, pivotFor, readTower, resultFor, setPointStation, setPointZero } from '../src/lib/tower';
 
 const close=(a:number,b:number)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
+test('MC panel and diagram display the selected side and explain invalid dimensions',()=>{
+ const p=newTower();p.selected='MC';p.mast.side='2';
+ const render=()=>renderToStaticMarkup(createElement(StakeoutResults,{project:p,change:()=>{},configure:()=>{}}));
+ const html=render();assert.match(html,/id="mast-side"/);assert.match(html,/2,000 × 2,000 m/);
+ const diagram=renderToStaticMarkup(createElement(MastDiagram,{project:p}));
+ assert.match(diagram,/1,000/);assert.doesNotMatch(diagram,/1\.4 m/);
+ p.mast.side='0';assert.match(render(),/lado de prefabricado mayor que cero/);
+});
 function project(){
  let p=newTower();
  for(const id of GUYS){p.guys[id].c='26.219';p=updateGuyCornerSetup(p,id,{distanceA:'35'});}

@@ -15,7 +15,7 @@ Está pensada para usarla desde el teléfono, incluso sin conexión. Desarrollad
 - **Referencias de torre:** buscar una torre y cargar sus coordenadas R41/R32 desde el catálogo, con edición manual de coordenadas disponible.
 - **Factor de escala:** comparar la distancia horizontal medida R41–R32 con la calculada por sus coordenadas N/E. El cociente teórica / medida se muestra para ingresarlo en la estación total; no se aplica a C + X₁ + K ni a los demás resultados.
 
-Cada punto conserva sus datos, su estación E′/F′ y su referencia del cero. MC muestra sus cuatro vértices en coordenadas locales o UTM, con offset configurable; Ajustes permite autocompletar E′/F′ desde MC y los amarres. Los diagramas de perfil, anclaje y planta se pueden mostrar u ocultar, y la torre completa se puede exportar e importar en un archivo JSON.
+Cada punto conserva sus datos, su estación E′/F′ y su referencia del cero. MC muestra sus cuatro vértices en coordenadas locales o UTM, con lado cuadrado editable (2,8 m por defecto) y offset configurable; Ajustes permite autocompletar E′/F′ desde MC y los amarres. Los diagramas de perfil, anclaje y planta se pueden mostrar u ocultar, y la torre completa se puede exportar e importar en un archivo JSON.
 
 ## Uso en campo
 

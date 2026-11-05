@@ -16,7 +16,9 @@
 | Zt₀ | Cota del terreno en el borde de viga de referencia | Opcional, necesaria para calcular por cota de sello |
 | Zs₀, Zs₁ | Cotas de sello original y ajustada | Respecto del mismo datum altimétrico |
 
-E′ y F′ son dos puntos distintos. Si cada uno está a e del mástil en lados opuestos, su separación es 2e. e no se suma escalarmente a C + X, porque el replanteo radial parte del pivote. El par e = 3,30/3,40 m no pudo asignarse con certeza por tipo usando los planos de fundaciones suministrados; por eso es una entrada manual.
+E′ y F′ son dos puntos distintos. Si cada uno está a e del mástil en lados opuestos, su separación es 2e. e no se suma escalarmente a C + X, porque el replanteo radial parte del pivote. Al seleccionar familia se asigna e = 3,30 m para GI6KL y 3,40 m para G6KL/GR6KL, según el criterio de campo indicado por el usuario; sigue siendo editable.
+
+La selección de suelo usa los valores iniciales de campo indicados por el usuario para todas las familias: S3, H₀ = H₁ = 3,50 m y X₀ = 2,117 m; S4, H₀ = H₁ = 4,00 m y X₀ = 2,460 m, con α = 5°. Estos valores se distinguen de las tablas originales por familia que se conservan en «Ver tabla» y al aplicar una fila α. Cambiar familia conserva las excavaciones existentes y actualiza β y e. Las sesiones guardadas conservan sus mediciones hasta una selección explícita.
 
 ## Cambios de profundidad
 

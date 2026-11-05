@@ -77,3 +77,10 @@ test('saved cases without K migrate to 0.1 and explicit values survive JSON roun
  for(const k of ['0','0.2'])assert.equal(readInputs(JSON.parse(JSON.stringify({...DEFAULTS,k})))?.k,k);
  assert.equal(readInputs({...DEFAULTS,k:null}),null);
 });
+
+
+test('finite inputs that overflow derived distances never yield valid stakeout',()=>{
+ const huge='9'.repeat(308);
+ const result=calculate({...DEFAULTS,c:huge,k:huge});
+ assert.equal(result.valid,false);assert.ok(result.errors.some(error=>error.includes('rango')));
+});

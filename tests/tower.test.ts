@@ -1,8 +1,49 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULTS, calculate, dms } from '../src/lib/geometry';
-import { applyPreset, azimuth, excavationControl, hzDms, inputFor, leveling, newTower, normalize, occupiedPivotFor, orientation, phiFor, readTower, resultFor, sealFor, selectSoil, setPhi, GUYS, POINTS, stationFor, zeroFor, setPointStation, setPointZero, calculatePivotsFromMast, mastCorners } from '../src/lib/tower';
+import { applyPreset, azimuth, excavationControl, hzDms, inputFor, leveling, newTower, normalize, occupiedPivotFor, orientation, phiFor, readTower, resultFor, sealFor, selectSoil, selectTowerFamily, setGuyMode, setPhi, GUYS, POINTS, stationFor, zeroFor, setPointStation, setPointZero, calculatePivotsFromMast, mastCorners } from '../src/lib/tower';
 const close=(a:number,b:number)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
+test('MC side controls square vertices in local and UTM frames and survives export/import',()=>{
+ const p=newTower();p.survey.coords.MC={n:'100',e:'200',z:''};
+ p.survey.coords.R41={n:'110',e:'200',z:''};p.survey.coords.R32={n:'90',e:'200',z:''};
+ for(const side of ['2.8','2','3,6']){
+  p.mast.side=side;
+  const half=Number(side.replace(',','.'))/2;
+  const utm=mastCorners(p,0,true),local=mastCorners(p);
+  close(utm[0].n,100+half);close(utm[0].e,200+half);
+  close(Math.abs(local[0].e),half);
+  close(Math.hypot(utm[0].n-utm[1].n,utm[0].e-utm[1].e),2*half);
+  close(mastCorners(p,.1,true)[0].n,100+half+.1);
+  assert.equal(readTower(JSON.parse(JSON.stringify(p)))?.mast.side,side);
+ }
+ for(const side of ['', '0','-2','bad']){p.mast.side=side;assert.deepEqual(mastCorners(p),[]);assert.deepEqual(mastCorners(p,0,true),[]);}
+ const old=JSON.parse(JSON.stringify(newTower()));delete old.mast.side;
+ assert.equal(readTower(old)?.mast.side,'2.8');
+ assert.equal(readTower({...newTower(),mast:{...newTower().mast,side:2}}),null);
+});
+test('family selection assigns MC distance and keeps each existing excavation and observation',()=>{
+ let p=newTower();p.guys['1'].target='4.2';p.survey.baselineDistance='53.18';
+ const guys=structuredClone(p.guys),survey=structuredClone(p.survey);
+ for(const tower of ['G6KL','GR6KL','GI6KL'] as const){
+  p=selectTowerFamily(p,tower);
+  assert.equal(p.pivot,tower==='GI6KL'?'3.3':'3.4');
+  assert.deepEqual(p.guys,guys);assert.deepEqual(p.survey,survey);
+ }
+});
+test('soil defaults reset all four guys for every family and previous reference row',()=>{
+ for(const tower of ['GI6KL','G6KL','GR6KL'] as const){
+  let p=applyPreset(newTower(),tower,'3','15');p.guys['1'].mode='seal';p.guys['1'].target='100';
+  for(const soil of ['4','3'] as const){
+   p=selectSoil(p,soil);assert.equal(p.referenceAlpha,'5');
+   for(const id of GUYS){
+    const g=p.guys[id];g.c='26.219';
+    assert.equal(g.h0,soil==='4'?'4':'3.5');assert.equal(g.target,g.h0);
+    assert.equal(g.x0,soil==='4'?'2.46':'2.117');assert.equal(g.alpha,'5');
+    assert.equal(resultFor(p,id).x1,Number(g.x0));assert.equal(resultFor(p,id).h1,Number(g.h0));
+   }
+  }
+ }
+});
 function coordinateTower(){
  const p=newTower();p.survey.mode='coordinates';p.survey.occupied='auto';p.survey.coords.E={n:'993.4',e:'1000',z:''};p.survey.coords.F={n:'1000',e:'1000',z:''};
  p.survey.coords.R41={n:'1100',e:'1000',z:'100'};p.survey.coords.R32={n:'900',e:'1000',z:'101'};p.survey.backsight='1.5';
@@ -120,7 +161,7 @@ test('soil selection loads approved GI6KL alpha-5 depth and X for design and fie
  assert.equal(s3.guys['2'].sealDesign,'100');assert.equal(s3.guys['1'].c,p.guys['1'].c);
  s3.guys['1'].target='3.7';assert.equal(inputFor(s3,'1').target,'3.7');
  const only=selectSoil(s4,'3','2');assert.equal(only.guys['1'].target,'4');assert.equal(only.guys['2'].target,'3.5');
- const other=selectSoil({...p,tower:'G6KL'},'3');assert.equal(other.guys['1'].h0,'3');assert.equal(other.guys['1'].x0,'1.822');
+ const other=selectSoil({...p,tower:'G6KL'},'3');assert.equal(other.guys['1'].h0,'3.5');assert.equal(other.guys['1'].x0,'2.117');
 });
 test('legacy schema-2 sessions gain hidden terrain and work tabs without overwriting custom measurements',()=>{
  const old=JSON.parse(JSON.stringify(newTower()));delete old.workflow;delete old.terrainVisible;delete old.survey.occupied;delete old.survey.orientationVersion;old.survey.mode='coordinates';old.survey.zero='R32';
@@ -347,4 +388,33 @@ test('incomplete mast geometry and corrupt station memories do not produce plaus
  p.survey.coords.MC={n:'100',e:'200',z:''};
  p.survey.coords.R41={n:'100',e:'200',z:''};p.survey.coords.R32={...p.survey.coords.R41};
  assert.equal(calculatePivotsFromMast(p.survey.coords,3.3),null);assert.deepEqual(mastCorners(p,0,true),[]);
+});
+
+
+test('mode conversion preserves excavation without C and never invents elevation zero',()=>{
+ let p=newTower();p.guys['1'].c='';p.guys['1'].target='4.2';
+ const expected=calculate({...inputFor(p,'1'),c:'1'}).x1;
+ p=setGuyMode(p,'1','x');close(Number(p.guys['1'].target),expected);
+ p=setGuyMode(p,'1','depth');close(Number(p.guys['1'].target),4.2);
+ p=setGuyMode(p,'1','seal');assert.equal(p.guys['1'].target,'');
+ p.guys['1'].mode='depth';p.guys['1'].target='4.2';p.guys['1'].sealDesign='100';
+ const seal=sealFor(p,'1');p=setGuyMode(p,'1','seal');close(Number(p.guys['1'].target),seal!);
+ p=setGuyMode(p,'1','depth');close(Number(p.guys['1'].target),4.2);
+});
+test('import rejects malformed MC and legacy aliases even when the other alias is valid',()=>{
+ for(const key of ['MC','M1'])for(const value of [null,[],{n:12,e:'0',z:''},{n:'0'}]){
+  const p=JSON.parse(JSON.stringify(newTower()));p.survey.coords[key]=value;
+  assert.equal(readTower(p),null);
+ }
+});
+
+
+test('import rejects arrays masquerading as enum strings',()=>{
+ const p=newTower();
+ assert.equal(readTower({...p,tower:['GI6KL']}),null);
+ assert.equal(readTower({...p,soil:['3']}),null);
+ assert.equal(readTower({...p,survey:{...p.survey,mode:['axis']}}),null);
+ assert.equal(readTower({...p,survey:{...p.survey,pointStations:{MC:{station:['E'],zero:'R41'}}}}),null);
+ assert.equal(readTower({...p,guys:{...p.guys,'1':{...p.guys['1'],soil:['3']}}}),null);
+ assert.equal(readTower({...DEFAULTS,tower:['GI6KL']}),null);
 });

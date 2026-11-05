@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Lock, LockOpen, Search } from 'lucide-react';
 import { ALPHAS, CATALOG, type Soil, type Tower } from '@/lib/catalog';
 import { angleLabel, format, number } from '@/lib/geometry';
-import { applyPreset, calculatePivotsFromMast, GUYS, POINTS, leveling, orientation, phiFor, pivotFor, selectSoil, setPhi, setPointStation, setPointZero, stationFor, zeroFor, type Coord, type PointId, type TowerProject } from '@/lib/tower';
+import { applyPreset, calculatePivotsFromMast, GUYS, POINTS, leveling, orientation, phiFor, pivotFor, selectSoil, selectTowerFamily, setPhi, setPointStation, setPointZero, stationFor, zeroFor, type Coord, type PointId, type TowerProject } from '@/lib/tower';
 import { updateSurveyCoordinate } from '@/lib/survey';
 import { ScaleSettings } from './scale-settings';
 import { Angle, Field, Select } from './form-controls';
@@ -28,22 +28,22 @@ export function TowerSettings({project:p,change,tab}:Props){
         <label className="field" htmlFor="tower-search"><span className="field-label">Buscar torre · T#</span><span className="tower-search-input"><Search size={18} aria-hidden="true"/><input id="tower-search" type="search" autoComplete="off" placeholder="Ej. 574 o T274A" value={query} onChange={e=>setQuery(e.target.value)}/></span></label>
         <p className="setting-note">Torre actual: <strong>{p.id||'Sin número'}</strong> · {REFERENCE_TOWERS.length} torres en el catálogo sin conexión. Selecciona un resultado para cargar sus referencias.</p>
         {query.trim()&&<div className="tower-search-results" aria-label="Resultados de torres">{matches.slice(0,8).map(id=><button type="button" key={id} onClick={()=>chooseTower(id)}><strong>{id}</strong><span>Cargar RF41 / RF32</span></button>)}<p role="status">{matches.length?`${matches.length} coincidencia${matches.length===1?'':'s'}${matches.length>8?' · Escribe más cifras para afinar la búsqueda.':''}`:'Sin coincidencias. Comprueba el número; puedes introducir coordenadas manualmente.'}</p></div>}
-        {loaded&&<p className="settings-reference" role="status">Catálogo de {p.id} seleccionado. Revisa abajo las referencias cargadas o pendientes. Los demás datos se conservan: comprueba pivotes, sellos y diseño al cambiar de torre.</p>}
+        {loaded&&<p className="settings-reference" role="status">Catálogo de {p.id} seleccionado. Revisa abajo las referencias cargadas o pendientes. Al cambiar de número de torre se vacían C de los cuatro tirantes y los sellos de tirantes y MC. Se conservan los ángulos y demás ajustes; revisa las coordenadas de MC y pivotes antes de medir.</p>}
       </div>
     </div></details>
     <div id="settings-stakeout-panel" role="tabpanel" aria-labelledby="settings-stakeout-tab" hidden={tab!=='stakeout'}>
       <details open><summary>Referencia de diseño · suelo y torre</summary><div className="settings-section">
       <div className="settings-grid">
-        <Select id="settings-tower" label="Familia de torre" value={p.tower} onChange={v=>change(q=>applyPreset(q,v as Tower,q.soil,q.referenceAlpha))}>{['GI6KL','G6KL','GR6KL'].map(t=><option key={t}>{t}</option>)}</Select>
+        <Select id="settings-tower" label="Familia de torre" value={p.tower} onChange={v=>change(q=>selectTowerFamily(q,v as Tower))}>{['GI6KL','G6KL','GR6KL'].map(t=><option key={t}>{t}</option>)}</Select>
         <Select id="settings-soil" label="Suelo general" value={p.soil} onChange={v=>change(q=>selectSoil(q,v as Soil))}><option value="3">S3 · Tipo 3</option><option value="4">S4 · Tipo 4</option></Select>
         <Select id="settings-alpha" label="α · Fila de referencia" value={p.referenceAlpha} onChange={v=>change(q=>applyPreset(q,q.tower,q.soil,v))}>{ALPHAS.map(a=><option key={a} value={a}>{format(a,1)}°</option>)}</Select>
         <Field id="settings-e" label="Dist MC → cada pivote" value={p.pivot} onChange={v=>change(q=>({...q,pivot:v}))}/>
         <Field id="settings-k" label="K · Alineación lateral" value={p.k} onChange={v=>change(q=>({...q,k:v}))}/>
         <Angle label="β · Vertical común" prefix="Beta común" value={p.beta} onChange={v=>change(q=>({...q,beta:v}))}/>
       </div>
-      <p className="setting-note">Elegir suelo o aplicar diseño inicia los cuatro tirantes en su profundidad y X tabuladas. Después puedes ajustar cada excavación. Cambiar familia o fila conserva los objetivos personalizados. C, sellos, K y φ se conservan.</p>
+      <p className="setting-note">Elegir suelo inicia los cuatro tirantes con los valores de campo: S3, H = 3,5 m y X = 2,117 m; S4, H = 4 m y X = 2,46 m (α = 5°). Cambiar familia actualiza β y Dist MC (GI6KL: 3,3 m; otras: 3,4 m), conservando cada excavación. Elegir una fila α o aplicar una tabla carga los valores originales del plano. C, sellos, K y φ se conservan.</p>
       <div className="settings-reference">{p.tower} · S{p.soil} · H₀ tabulada {format(CATALOG[p.tower][p.soil].h)} m · Revisa X₀/H₀ de cada ficha antes de replantear.</div>
-      <button className="button secondary" onClick={()=>change(q=>selectSoil(q,q.soil))}>Aplicar diseño a los 4 tirantes</button>
+      <button className="button secondary" onClick={()=>change(q=>selectSoil(q,q.soil))}>Restablecer suelo en los 4 tirantes</button>
       </div></details>
       <ScaleSettings project={p} change={change}/>
       <details><summary>Coordenadas N / E / Z</summary><div className="settings-section">

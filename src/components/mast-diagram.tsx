@@ -3,10 +3,10 @@ import { stationFor, zeroFor, type TowerProject } from '@/lib/tower';
 
 export function MastDiagram({project:p}:{project:TowerProject}){
   const station=stationFor(p,'MC'),zero=zeroFor(p,'MC');
-  const distance=number(p.pivot),offset=number(p.mast.offset??'0');
-  const valid=Number.isFinite(distance)&&distance>0&&Number.isFinite(offset)&&1.4+offset>0;
-  const cx=220,cy=230,scale=valid?160/Math.max(distance,1.4+offset,1.4):45;
-  const half=1.4*scale,expanded=valid?(1.4+offset)*scale:half;
+  const distance=number(p.pivot),offset=number(p.mast.offset??'0'),side=number(p.mast.side??'2.8');
+  const valid=Number.isFinite(distance)&&distance>0&&Number.isFinite(side)&&side>0&&Number.isFinite(offset)&&side/2+offset>0;
+  const cx=220,cy=230,scale=valid?160/Math.max(distance,side/2+offset,side/2):45;
+  const half=(Number.isFinite(side)&&side>0?side/2:1.4)*scale,expanded=valid?(side/2+offset)*scale:half;
   const fy=cy-(valid?distance*scale:160),ey=cy+(valid?distance*scale:160);
   const corners=[{id:'MC1',x:1,y:-1},{id:'MC2',x:1,y:1},{id:'MC3',x:-1,y:1},{id:'MC4',x:-1,y:-1}];
   return <svg className="survey-plan technical-svg mast-diagram-svg" viewBox="0 0 440 470" role="img" aria-label="Mástil central con MC1 arriba derecha, MC2 abajo derecha, MC3 abajo izquierda y MC4 arriba izquierda; eje R41, F′, MC, E′, R32">
@@ -26,10 +26,10 @@ export function MastDiagram({project:p}:{project:TowerProject}){
       <text x={cx+c.x*expanded+c.x*8} y={cy+c.y*expanded+c.y*12+4} textAnchor={c.x>0?'start':'end'}>{c.id}</text>
     </g>)}
     {[-1,1].map(sign=><g key={sign}>
-      <text x={cx+sign*half/2} y={cy-half-9} textAnchor="middle" className="svg-muted">1.4 m</text>
-      <text x={cx+sign*half/2} y={cy+half+22} textAnchor="middle" className="svg-muted">1.4 m</text>
-      <text x={cx-half-12} y={cy+sign*half/2+4} textAnchor="end" className="svg-muted">1.4 m</text>
-      <text x={cx+half+12} y={cy+sign*half/2+4} className="svg-muted">1.4 m</text>
+      <text x={cx+sign*half/2} y={cy-half-9} textAnchor="middle" className="svg-muted">{format(side/2)} m</text>
+      <text x={cx+sign*half/2} y={cy+half+22} textAnchor="middle" className="svg-muted">{format(side/2)} m</text>
+      <text x={cx-half-12} y={cy+sign*half/2+4} textAnchor="end" className="svg-muted">{format(side/2)} m</text>
+      <text x={cx+half+12} y={cy+sign*half/2+4} className="svg-muted">{format(side/2)} m</text>
     </g>)}
     {(['F','E'] as const).map(id=>{const y=id==='F'?fy:ey;return <g key={id}>
       {station===id&&<circle cx={cx} cy={y} r="9" fill="none" stroke="#444" strokeDasharray="3 3"/>}

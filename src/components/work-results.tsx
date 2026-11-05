@@ -15,6 +15,7 @@ export function StakeoutResults({ project: p, change, configure }: Props) {
   const currentStation = stationFor(p, p.selected);
   const currentZero = zeroFor(p, p.selected);
   const offset = number(p.mast.offset ?? '0');
+  const side = number(p.mast.side ?? '2.8');
   const off = offset;
   const useUtm = Boolean(p.mast.useUtm);
   const corners = mast ? mastCorners(p, off, useUtm) : [];
@@ -45,12 +46,12 @@ export function StakeoutResults({ project: p, change, configure }: Props) {
         {o.errors.length > 0 && <button className="metric-config" onClick={configure}>Completar orientación<ArrowUpRight size={13} /></button>}
       </div>
     </div>
-    {scale.valid && <div className="scale-summary"><span>Factor R41–R32</span><strong data-testid="result-scale">{format(scale.factor!, 7)}</strong></div>}
+    {scale.valid && <div className="scale-summary"><span>Factor R41–R32</span><strong data-testid="result-scale">{format(scale.factor!, 10)}</strong></div>}
 
     {mast && <div className="mast-corners-panel">
       <div className="mast-corners-header">
         <div>
-          <span className="tiny-label">CUATRO VÉRTICES DEL MÁSTIL CENTRAL (2.8 × 2.8 m)</span>
+          <span className="tiny-label">CUATRO VÉRTICES DEL MÁSTIL CENTRAL ({format(side)} × {format(side)} m)</span>
           <strong className="mast-corners-subtitle">{useUtm ? 'Coordenadas UTM' : `Coordenadas Locales desde ${currentStation}′ (0° a ${currentZero})`}</strong>
         </div>
         <label className="inherit-check mast-utm-check">
@@ -59,6 +60,7 @@ export function StakeoutResults({ project: p, change, configure }: Props) {
         </label>
       </div>
       <div className="mast-offset-row">
+        <Field id="mast-side" label="Lado del prefabricado MC" value={p.mast.side ?? '2.8'} onChange={side => change(q => ({ ...q, mast: { ...q.mast, side } }))} hint="Cuadrado: 2.8 m por defecto, 2 m u otro tamaño mayor que cero." />
         <Field id="mast-offset" label="Offset adicional (m)" value={p.mast.offset ?? '0'} onChange={v => change(q => ({ ...q, mast: { ...q.mast, offset: v } }))} hint="Desplaza las estacas hacia afuera (ej. 0.05, 0.10). 0: borde de mástil" />
       </div>
       <p className="setting-note">N local apunta al cero elegido; E local es positivo a la derecha de esa visual. El offset se aplica a cada cara del perímetro.</p>
@@ -77,7 +79,7 @@ export function StakeoutResults({ project: p, change, configure }: Props) {
               <td>{format(c.n, 3)} m</td>
               <td>{format(c.e, 3)} m</td>
             </tr>) : <tr>
-              <td colSpan={3} className="text-muted">{!Number.isFinite(off)||1.4+off<=0?'Ingresa un offset válido mayor que −1.4 m.':useUtm?'Completa N/E de R41, R32 y MC y verifica que las referencias no coincidan.':'Completa Dist MC → cada pivote en Ajustes.'}</td>
+              <td colSpan={3} className="text-muted">{!Number.isFinite(side)||side<=0?'Ingresa un lado de prefabricado mayor que cero.':!Number.isFinite(off)||side/2+off<=0?'El offset debe dejar un semilado mayor que cero.':useUtm?'Completa N/E de R41, R32 y MC y verifica que las referencias no coincidan.':'Completa Dist MC → cada pivote en Ajustes.'}</td>
             </tr>}
           </tbody>
         </table>

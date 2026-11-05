@@ -13,6 +13,22 @@ function baseline(){
 }
 const close=(a:number,b:number)=>assert.ok(Math.abs(a-b)<1e-10,`${a} != ${b}`);
 
+test('T574 calculator comparison uses the full NE baseline for factors below and above one',()=>{
+  const p=loadTowerReferences(newTower(),'574');
+  // Independently evaluated with 40-digit decimal arithmetic from the source coordinates.
+  const theoretical=53.1895374768384313311949905260995;
+  for(const measured of ['53.18','53.20','53,20']){
+    p.survey.baselineDistance=measured;
+    const s=baselineScale(p);assert.ok(s.valid);
+    // Subtracting million-metre UTM coordinates introduces less than a nanometre of binary error.
+    assert.ok(Math.abs(s.theoretical!-theoretical)<1e-9);
+    close(s.factor!,theoretical/Number(measured.replace(',','.')));
+    assert.ok(Math.abs(s.factor!-53.190/Number(measured.replace(',','.')))>0.000008);
+  }
+  p.survey.baselineDistance='53.20';assert.ok(baselineScale(p).factor!<1);
+  p.selected='4';const factor=baselineScale(p).factor;p.selected='1';assert.equal(baselineScale(p).factor,factor);
+});
+
 test('scale is theoretical / measured horizontal distance, without Z or rounding the baseline',()=>{
   const p=baseline(),s=baselineScale(p);
   assert.equal(s.theoretical,100);assert.equal(s.valid,true);close(s.factor!,100/99.99);assert.ok(s.factor!>1);
