@@ -353,3 +353,22 @@ footer .app-credit{flex-basis:100%;width:100%;order:4;margin:0;text-align:center
   .mast-corners-header{flex-direction:column;align-items:flex-start;gap:8px}
   .mast-corners-table th,.mast-corners-table td{padding:8px 10px;font-size:11px}
 }
+
+/* Templado de conductores · vista previa /v2. */
+.preview-badge{font-family:var(--mono);font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:#555;border:1px solid #cfcfcf;border-radius:4px;padding:6px 9px;background:#fff}
+.preview-note{font-size:12px;line-height:1.75;color:#777;margin:0 0 16px}
+.field-result-heading>.span-mode{flex-shrink:0;display:inline-flex;flex-direction:row;gap:2px}.span-mode button{min-height:40px;font-size:12px;padding:6px 12px}
+.span-temp{align-items:start}.span-temp .depth-controls button{min-height:40px;font-size:12px;color:#444;border-color:#cfcfcf}
+.span-temp>.field:only-child,.span-temp>div:only-child{grid-column:1/-1}
+.metric-value.span-angle{font-size:40px;letter-spacing:-1.5px;white-space:normal}
+.span-empty{padding:22px}.span-empty p{font-size:13px;line-height:1.8;color:#666;margin:0 0 8px}
+.span-table{border-bottom:1px solid var(--border)}.span-table .current-row td{background:#f0f0ed;font-weight:600}
+.span-warning{margin:0;padding:12px 22px;border-top:1px solid #ead9b0;background:#fbf5e3;color:#6b5514;font-size:12px;line-height:1.7}
+.span-verdict.ok{background:#dfeee4;color:#215a3a}.span-verdict.bad{background:#f6dedb;color:#8c2a20}
+.settings-modal .settings-point h3 .span-phase-state{display:block;font:400 11px var(--mono);color:#888;margin-top:6px}
+.span-sag-rows{display:grid;gap:10px;margin:14px 0}.span-sag-row{display:grid;grid-template-columns:1fr 1fr 44px;gap:12px;align-items:end}
+.span-sag-row .field-label:empty{display:none}.span-sag-row .icon-button{width:44px;height:46px}
+.work-metrics.span-metrics{grid-template-columns:1.3fr 1fr 1fr}.span-metrics .work-metric{grid-column:auto;border-top:0}.span-metrics .work-metric+.work-metric{border-left:1px solid #e3e3e3}.span-metrics .angle-value{font-size:29px}
+.tower-diagrams .span-svg{display:block;width:100%;max-width:720px;margin:auto}
+@media(max-width:800px){.work-metrics.span-metrics{grid-template-columns:1fr}.span-metrics .work-metric+.work-metric{border-left:0;border-top:1px solid #ddd}.span-metrics .angle-value{font-size:27px}}
+@media(max-width:600px){.field-result-heading:has(.span-mode){align-items:flex-start;flex-direction:column}.field-result-heading>.span-mode{display:grid;grid-template-columns:1fr 1fr;width:100%}.span-mode button{min-height:44px}.span-temp{grid-template-columns:1fr}.metric-value.span-angle{font-size:34px}.span-empty{padding:16px 15px}.span-warning{padding:12px 15px}.span-sag-row .icon-button{height:50px}.span-sag-row .field-label{min-height:0}}
