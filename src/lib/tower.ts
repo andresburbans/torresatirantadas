@@ -1,4 +1,4 @@
-import { ALPHAS, CATALOG, type Soil, type Tower } from './catalog';
+import { ALPHAS, CATALOG, DEFAULT_ALPHA, type Soil, type Tower } from './catalog';
 import { DEFAULTS, calculate, dms, number, readInputs, toDms, type DMS, type Inputs } from './geometry';
 
 export const GUYS = ['1','2','3','4'] as const;
@@ -40,15 +40,22 @@ export function newTower():TowerProject {
       coords:{R41:blankCoord(),R32:blankCoord(),E:blankCoord(),F:blankCoord(),MC:blankCoord(),M1:blankCoord()}}};
 }
 export function phiFor(p:TowerProject,id:GuyId):DMS {return id!=='1'&&p.guys[id].phiLinked?p.guys['1'].phi:p.guys[id].phi;}
-export function inputFor(p:TowerProject,id:GuyId):Inputs {
+/**
+ * El ajuste de terreno (nueva profundidad, proyección o cota de sello) está retirado de la interfaz.
+ * Su lógica se conserva: con false, cada tirante usa su diseño (H₁ = H₀, X₁ = X₀) aunque una
+ * sesión antigua guarde otro objetivo. Ver src/components/terrain-adjustment.tsx.
+ */
+export const TERRAIN_ADJUSTMENT_ENABLED=false;
+export function inputFor(p:TowerProject,id:GuyId,terrain:boolean=TERRAIN_ADJUSTMENT_ENABLED):Inputs {
   const g=p.guys[id],seal=number(g.sealDesign),h0=number(g.h0);
-  return {...DEFAULTS,...g,id:p.id,tower:p.tower,guy:id,pivot:p.pivot,k:p.k,beta:p.beta,phi:phiFor(p,id),
+  const adjust=terrain?{}:{mode:'depth' as const,target:g.h0};
+  return {...DEFAULTS,...g,...adjust,id:p.id,tower:p.tower,guy:id,pivot:p.pivot,k:p.k,beta:p.beta,phi:phiFor(p,id),
     groundElevation:Number.isFinite(seal)&&Number.isFinite(h0)?String(seal+h0):g.groundElevation};
 }
-export function resultFor(p:TowerProject,id:GuyId){return calculate(inputFor(p,id));}
+export function resultFor(p:TowerProject,id:GuyId,terrain:boolean=TERRAIN_ADJUSTMENT_ENABLED){return calculate(inputFor(p,id,terrain));}
 /** Mode conversion depends on vertical geometry, even before C is entered. */
 export function setGuyMode(p:TowerProject,id:GuyId,mode:Inputs['mode']):TowerProject {
-  const input=inputFor(p,id),g=p.guys[id];
+  const input=inputFor(p,id,true),g=p.guys[id];
   const r=calculate({...input,c:'1',k:'0',pivot:'0',phi:zeroAngle});
   const value=mode==='depth'?r.h1:mode==='x'?r.x1:r.seal1;
   const target=r.valid&&value!==null&&Number.isFinite(value)
@@ -58,9 +65,8 @@ export function setGuyMode(p:TowerProject,id:GuyId,mode:Inputs['mode']):TowerPro
 export function setPhi(p:TowerProject,id:GuyId,phi:DMS):TowerProject {
   return {...p,guys:{...p.guys,[id]:{...p.guys[id],phi,phiLinked:false}}};
 }
-export function selectTowerFamily(p:TowerProject,tower:Tower):TowerProject {
-  return {...p,tower,pivot:tower==='GI6KL'?'3.3':'3.4',beta:toDms(CATALOG[tower].beta)};
-}
+/** Distancia MC → E′/F′ por familia (criterio de campo guardado en tower-designs.json). */
+export const pivotForTower=(tower:Tower)=>String(CATALOG[tower].pivot);
 /** A preset replaces its complete reference pair, retaining custom field targets. */
 export function applyPreset(p:TowerProject,tower:Tower,soil:Soil,alpha:string,only?:GuyId):TowerProject {
   const index=ALPHAS.findIndex(a=>a===number(alpha));
@@ -70,9 +76,30 @@ export function applyPreset(p:TowerProject,tower:Tower,soil:Soil,alpha:string,on
   for(const id of only?[only]:GUYS){
     const g=guys[id];
     const followsDesign=g.mode==='depth'&&number(g.target)===number(g.h0);
-    guys[id]={...g,soil,alpha,x0:String(table.x[index]),h0:String(table.h),datum:'terrain',target:followsDesign?String(table.h):g.target};
+    guys[id]={...g,soil,alpha:String(ALPHAS[index]),x0:String(table.x[index]),h0:String(table.h),datum:'terrain',target:followsDesign?String(table.h):g.target};
   }
-  return {...p,tower,pivot:tower!==p.tower?(tower==='GI6KL'?'3.3':'3.4'):p.pivot,soil:only?p.soil:soil,referenceAlpha:alpha,beta:toDms(CATALOG[tower].beta),guys};
+  return {...p,tower,pivot:tower!==p.tower?pivotForTower(tower):p.pivot,soil:only?p.soil:soil,referenceAlpha:String(ALPHAS[index]),beta:toDms(CATALOG[tower].beta),guys};
+}
+/** Familia: carga β, e y X₀/H₀ del plano para el suelo y la fila α actuales (5° por defecto). */
+export function selectTowerFamily(p:TowerProject,tower:Tower):TowerProject {
+  const alpha=ALPHAS.some(a=>a===number(p.referenceAlpha))?p.referenceAlpha:DEFAULT_ALPHA;
+  return {...designDefaults(p,tower,p.soil,alpha),pivot:pivotForTower(tower)};
+}
+function designDefaults(p:TowerProject,tower:Tower,soil:Soil,alpha:string,only?:GuyId):TowerProject {
+  const next=applyPreset(p,tower,soil,alpha,only),guys={...next.guys};
+  for(const id of only?[only]:GUYS)guys[id]={...guys[id],mode:'depth',target:guys[id].h0};
+  return {...next,guys};
+}
+/** X₀ común de la fila: se escribe en los cuatro tirantes. */
+export function setCommonX0(p:TowerProject,x0:string):TowerProject {
+  return {...p,guys:Object.fromEntries(GUYS.map(id=>[id,{...p.guys[id],x0}])) as Record<GuyId,GuyData>};
+}
+/** φ común (T1) heredado por T2–T4, o un φ independiente por tirante. */
+export const phiIndividual=(p:TowerProject)=>GUYS.some(id=>id!=='1'&&!p.guys[id].phiLinked);
+export function setPhiIndividual(p:TowerProject,individual:boolean):TowerProject {
+  const guys={...p.guys};
+  for(const id of GUYS)if(id!=='1')guys[id]={...guys[id],phi:{...phiFor(p,id)},phiLinked:!individual};
+  return {...p,guys};
 }
 
 export function defaultStationFor(p:TowerProject,id:PointId):PivotId {
@@ -144,11 +171,10 @@ export function occupiedPivotFor(p:TowerProject,id:PointId):PivotId {
   if(custom)return custom;
   return p.survey.occupied==='E'||p.survey.occupied==='F'?p.survey.occupied:defaultStationFor(p,normId);
 }
-/** Field defaults requested for S3/S4. Original plan tables remain available through applyPreset. */
+/** Suelo: carga H₀ y X₀ del plano de la familia actual en la fila α elegida (5° por defecto). */
 export function selectSoil(p:TowerProject,soil:Soil,only?:GuyId):TowerProject {
-  const h0=soil==='4'?'4':'3.5',x0=soil==='4'?'2.46':'2.117',guys={...p.guys};
-  for(const id of only?[only]:GUYS)guys[id]={...guys[id],soil,alpha:'5',datum:'terrain',h0,x0,mode:'depth',target:h0};
-  return {...p,soil:only?p.soil:soil,referenceAlpha:'5',guys};
+  const alpha=ALPHAS.some(a=>a===number(p.referenceAlpha))?p.referenceAlpha:DEFAULT_ALPHA;
+  return designDefaults(p,p.tower,soil,alpha,only);
 }
 export const normalize=(degrees:number)=>((degrees%360)+360)%360;
 export function hzDms(degrees:number):DMS {
@@ -238,12 +264,12 @@ export function excavationControl(remaining:number|null,valid:boolean){
   if(Math.abs(remaining)<.0005)return {label:'En sello',sign:'',direction:null,value:0} as const;
   return remaining>0?{label:'Falta excavar',sign:'+',direction:'down',value:remaining} as const:{label:'Exceso de excavación',sign:'−',direction:'up',value:Math.abs(remaining)} as const;
 }
-export function sealFor(p:TowerProject,id:PointId):number|null {
+export function sealFor(p:TowerProject,id:PointId,terrain:boolean=TERRAIN_ADJUSTMENT_ENABLED):number|null {
   if(id==='MC'||id==='M1'){
     const z=number(p.mast.sealTarget.trim()===''?p.mast.sealDesign:p.mast.sealTarget);
     return Number.isFinite(z)?z:null;
   }
-  const input=inputFor(p,id as GuyId);
+  const input=inputFor(p,id as GuyId,terrain);
   // Leveling does not require C, K, e or horizontal φ; validate vertical geometry separately.
   const vertical=calculate({...input,c:'1',k:'0',pivot:'0',phi:zeroAngle});
   return vertical.valid&&vertical.seal1!==null&&Number.isFinite(vertical.seal1)?vertical.seal1:null;

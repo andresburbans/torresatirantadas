@@ -1,7 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULTS, calculate, dms } from '../src/lib/geometry';
-import { applyPreset, azimuth, excavationControl, hzDms, inputFor, leveling, newTower, normalize, occupiedPivotFor, orientation, phiFor, readTower, resultFor, sealFor, selectSoil, selectTowerFamily, setGuyMode, setPhi, GUYS, POINTS, stationFor, zeroFor, setPointStation, setPointZero, calculatePivotsFromMast, mastCorners } from '../src/lib/tower';
+import { CATALOG, designRow } from '../src/lib/catalog';
+import { applyPreset, azimuth, excavationControl, hzDms, inputFor, leveling, newTower, normalize, occupiedPivotFor, orientation, phiFor, readTower, resultFor, sealFor, selectSoil, selectTowerFamily, setCommonX0, setGuyMode, setPhi, setPhiIndividual, phiIndividual, GUYS, POINTS, stationFor, zeroFor, setPointStation, setPointZero, calculatePivotsFromMast, mastCorners } from '../src/lib/tower';
 const close=(a:number,b:number)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
 test('MC side controls square vertices in local and UTM frames and survives export/import',()=>{
  const p=newTower();p.survey.coords.MC={n:'100',e:'200',z:''};
@@ -21,28 +22,50 @@ test('MC side controls square vertices in local and UTM frames and survives expo
  assert.equal(readTower(old)?.mast.side,'2.8');
  assert.equal(readTower({...newTower(),mast:{...newTower().mast,side:2}}),null);
 });
-test('family selection assigns MC distance and keeps each existing excavation and observation',()=>{
- let p=newTower();p.guys['1'].target='4.2';p.survey.baselineDistance='53.18';
- const guys=structuredClone(p.guys),survey=structuredClone(p.survey);
- for(const tower of ['G6KL','GR6KL','GI6KL'] as const){
-  p=selectTowerFamily(p,tower);
-  assert.equal(p.pivot,tower==='GI6KL'?'3.3':'3.4');
-  assert.deepEqual(p.guys,guys);assert.deepEqual(p.survey,survey);
+test('family selection loads beta, MC distance and the plan X0/H0 for the current soil and alpha row',()=>{
+ let p=newTower();p.guys['1'].target='4.2';p.guys['1'].c='26';p.guys['2'].sealDesign='100';p.survey.baselineDistance='53.18';
+ const survey=structuredClone(p.survey);
+ for(const tower of ['G6KL','GR6KL','GI6KL'] as const)for(const soil of ['3','4'] as const){
+  p=selectTowerFamily(selectSoil(p,soil),tower);
+  const row=designRow(tower,soil,'5')!;
+  assert.equal(p.pivot,tower==='GI6KL'?'3.3':'3.4');assert.equal(p.referenceAlpha,'5');
+  close(dms(p.beta),CATALOG[tower].beta);
+  for(const id of GUYS){assert.equal(Number(p.guys[id].x0),row.x);assert.equal(Number(p.guys[id].h0),row.h);assert.equal(p.guys[id].target,p.guys[id].h0);}
+  assert.equal(p.guys['1'].c,'26');assert.equal(p.guys['2'].sealDesign,'100');assert.deepEqual(p.survey,survey);
  }
+ p=applyPreset(p,'G6KL','3','7.5');p=selectTowerFamily(p,'GR6KL');
+ assert.equal(p.referenceAlpha,'7.5');assert.equal(p.guys['3'].x0,'1.902');
 });
-test('soil defaults reset all four guys for every family and previous reference row',()=>{
+test('soil selection loads the plan values of each family and keeps the chosen alpha row',()=>{
+ const expected={GI6KL:{'3':['3.5','2.117'],'4':['4','2.46']},G6KL:{'3':['3','1.822'],'4':['3.5','2.278']},GR6KL:{'3':['3','1.825'],'4':['3.5','2.282']}} as const;
  for(const tower of ['GI6KL','G6KL','GR6KL'] as const){
-  let p=applyPreset(newTower(),tower,'3','15');p.guys['1'].mode='seal';p.guys['1'].target='100';
+  let p=selectTowerFamily(newTower(),tower);p.guys['1'].mode='seal';p.guys['1'].target='100';
   for(const soil of ['4','3'] as const){
    p=selectSoil(p,soil);assert.equal(p.referenceAlpha,'5');
    for(const id of GUYS){
     const g=p.guys[id];g.c='26.219';
-    assert.equal(g.h0,soil==='4'?'4':'3.5');assert.equal(g.target,g.h0);
-    assert.equal(g.x0,soil==='4'?'2.46':'2.117');assert.equal(g.alpha,'5');
+    assert.equal(g.h0,expected[tower][soil][0]);assert.equal(g.target,g.h0);
+    assert.equal(g.x0,expected[tower][soil][1]);assert.equal(g.alpha,'5');
     assert.equal(resultFor(p,id).x1,Number(g.x0));assert.equal(resultFor(p,id).h1,Number(g.h0));
    }
   }
+  const row15=selectSoil(applyPreset(p,tower,'3','15'),'4');
+  assert.equal(row15.referenceAlpha,'15');assert.equal(Number(row15.guys['2'].x0),CATALOG[tower]['4'].x[6]);
  }
+});
+test('without terrain adjustment the stakeout uses the design X0/H0 even if an old session saved another target',()=>{
+ const p=newTower();p.guys['1'].target='4.2';p.guys['1'].sealDesign='100';
+ assert.equal(resultFor(p,'1').x1,2.117);assert.equal(resultFor(p,'1').h1,3.5);assert.equal(sealFor(p,'1'),100);
+ assert.ok(resultFor(p,'1',true).x1>2.117);
+ const q=setCommonX0(p,'2.2');for(const id of GUYS)assert.equal(resultFor(q,id).x1,2.2);
+});
+test('common phi applies to four guys; individual mode keeps each value',()=>{
+ let p=setPhi(newTower(),'1',{deg:'30',min:'0',sec:'0'});
+ assert.equal(phiIndividual(p),false);for(const id of GUYS)assert.equal(dms(phiFor(p,id)),30);
+ p=setPhiIndividual(p,true);assert.equal(phiIndividual(p),true);
+ p=setPhi(p,'3',{deg:'33',min:'0',sec:'0'});p=setPhi(p,'1',{deg:'31',min:'0',sec:'0'});
+ assert.equal(dms(phiFor(p,'2')),30);assert.equal(dms(phiFor(p,'3')),33);
+ p=setPhiIndividual(p,false);for(const id of GUYS)assert.equal(dms(phiFor(p,id)),31);
 });
 function coordinateTower(){
  const p=newTower();p.survey.mode='coordinates';p.survey.occupied='auto';p.survey.coords.E={n:'993.4',e:'1000',z:''};p.survey.coords.F={n:'1000',e:'1000',z:''};
@@ -53,16 +76,16 @@ test('tower migration preserves the active old case and leaves other C values un
  const old={...DEFAULTS,guy:'3',target:'4.2',groundElevation:'100'};
  const p=readTower({schema:1,inputs:old})!;
  assert.ok(p);assert.equal(p.selected,'3');assert.equal(p.guys['3'].c,old.c);assert.equal(p.guys['2'].c,'');
- close(resultFor(p,'3').distanceTotal,calculate(old).distanceTotal);
+ close(resultFor(p,'3',true).distanceTotal,calculate(old).distanceTotal);
  close(Number(p.guys['3'].sealDesign),96.5);
- assert.equal(inputFor(p,'3').target,'4.2');assert.deepEqual(readTower(JSON.parse(JSON.stringify(p))),p);
+ assert.equal(inputFor(p,'3',true).target,'4.2');assert.deepEqual(readTower(JSON.parse(JSON.stringify(p))),p);
  assert.equal(readTower({...p,guys:{}}),null);assert.equal(readTower({}),null);
  const migrated=readTower({...old,tower:'G6KL',soil:'3'})!;
  assert.equal(migrated.guys['2'].h0,'3');assert.equal(migrated.guys['2'].x0,'1.822');
 });
 test('each point retains independent depth, C, seal and reading',()=>{
  const p=newTower();p.guys['2'].c='24';p.guys['2'].target='3.7';p.guys['1'].sealDesign='96.5';p.guys['2'].sealDesign='98';
- assert.equal(inputFor(p,'1').c,DEFAULTS.c);assert.equal(inputFor(p,'2').target,'3.7');assert.notEqual(sealFor(p,'1'),sealFor(p,'2'));
+ assert.equal(inputFor(p,'1').c,DEFAULTS.c);assert.equal(inputFor(p,'2',true).target,'3.7');assert.notEqual(sealFor(p,'1'),sealFor(p,'2'));
 });
 test('T2-T4 inherit T1 phi until individually overridden',()=>{
  let p=setPhi(newTower(),'1',{deg:'30',min:'0',sec:'0'});
@@ -153,15 +176,14 @@ test('missing backsight coordinates block Hz without hiding an independently kno
  assert.equal(orientation(p,'M1').station,'E');close(orientation(p,'M1').range!,3.3);
  p.survey.occupied='F';close(orientation(p,'M1').range!,3.3);
 });
-test('soil selection loads approved GI6KL alpha-5 depth and X for design and field target, leaving subsequent edits available',()=>{
+test('soil selection resets design and field target, keeping seals and C',()=>{
  const p=newTower();p.guys['1'].target='4.2';p.guys['1'].mode='x';p.guys['2'].sealDesign='100';
  const s4=selectSoil(p,'4');
  for(const id of GUYS){assert.equal(s4.guys[id].h0,'4');assert.equal(s4.guys[id].x0,'2.46');assert.equal(s4.guys[id].target,'4');assert.equal(s4.guys[id].mode,'depth');}
  const s3=selectSoil(s4,'3');for(const id of GUYS){assert.equal(s3.guys[id].h0,'3.5');assert.equal(s3.guys[id].target,'3.5');assert.equal(s3.guys[id].x0,'2.117');}
  assert.equal(s3.guys['2'].sealDesign,'100');assert.equal(s3.guys['1'].c,p.guys['1'].c);
- s3.guys['1'].target='3.7';assert.equal(inputFor(s3,'1').target,'3.7');
  const only=selectSoil(s4,'3','2');assert.equal(only.guys['1'].target,'4');assert.equal(only.guys['2'].target,'3.5');
- const other=selectSoil({...p,tower:'G6KL'},'3');assert.equal(other.guys['1'].h0,'3.5');assert.equal(other.guys['1'].x0,'2.117');
+ const other=selectSoil(selectTowerFamily(p,'G6KL'),'3');assert.equal(other.guys['1'].h0,'3');assert.equal(other.guys['1'].x0,'1.822');
 });
 test('legacy schema-2 sessions gain hidden terrain and work tabs without overwriting custom measurements',()=>{
  const old=JSON.parse(JSON.stringify(newTower()));delete old.workflow;delete old.terrainVisible;delete old.survey.occupied;delete old.survey.orientationVersion;old.survey.mode='coordinates';old.survey.zero='R32';
@@ -393,12 +415,12 @@ test('incomplete mast geometry and corrupt station memories do not produce plaus
 
 test('mode conversion preserves excavation without C and never invents elevation zero',()=>{
  let p=newTower();p.guys['1'].c='';p.guys['1'].target='4.2';
- const expected=calculate({...inputFor(p,'1'),c:'1'}).x1;
+ const expected=calculate({...inputFor(p,'1',true),c:'1'}).x1;
  p=setGuyMode(p,'1','x');close(Number(p.guys['1'].target),expected);
  p=setGuyMode(p,'1','depth');close(Number(p.guys['1'].target),4.2);
  p=setGuyMode(p,'1','seal');assert.equal(p.guys['1'].target,'');
  p.guys['1'].mode='depth';p.guys['1'].target='4.2';p.guys['1'].sealDesign='100';
- const seal=sealFor(p,'1');p=setGuyMode(p,'1','seal');close(Number(p.guys['1'].target),seal!);
+ const seal=sealFor(p,'1',true);p=setGuyMode(p,'1','seal');close(Number(p.guys['1'].target),seal!);
  p=setGuyMode(p,'1','depth');close(Number(p.guys['1'].target),4.2);
 });
 test('import rejects malformed MC and legacy aliases even when the other alias is valid',()=>{

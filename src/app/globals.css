@@ -372,3 +372,8 @@ footer .app-credit{flex-basis:100%;width:100%;order:4;margin:0;text-align:center
 .tower-diagrams .span-svg{display:block;width:100%;max-width:720px;margin:auto}
 @media(max-width:800px){.work-metrics.span-metrics{grid-template-columns:1fr}.span-metrics .work-metric+.work-metric{border-left:0;border-top:1px solid #ddd}.span-metrics .angle-value{font-size:27px}}
 @media(max-width:600px){.field-result-heading:has(.span-mode){align-items:flex-start;flex-direction:column}.field-result-heading>.span-mode{display:grid;grid-template-columns:1fr 1fr;width:100%}.span-mode button{min-height:44px}.span-temp{grid-template-columns:1fr}.metric-value.span-angle{font-size:34px}.span-empty{padding:16px 15px}.span-warning{padding:12px 15px}.span-sag-row .icon-button{height:50px}.span-sag-row .field-label{min-height:0}}
+.settings-grid.design-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tower-search-results button.tower-add{border-style:dashed;border-color:#888;background:#f7f7f7}
+.tower-search-results button.tower-add strong{color:#222}
+.design-table{border-top:0!important;margin:4px 0 14px}.design-table summary{padding:10px 0!important;min-height:44px!important;font-size:13px!important}
+.phi-mode-check{margin:18px 0 22px!important}.guy-c-grid{margin-top:4px}

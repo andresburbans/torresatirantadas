@@ -27,8 +27,8 @@ export function GuyCorners({project:p,id,change}:{project:TowerProject;id:GuyId;
         <Field id={`guy-${id}-station-e`} label="E0 · Estación, pantalla OCC" value={setup.stationRight} onChange={stationRight=>update({stationRight})} hint={`Positivo a la derecha mirando de ${pivot}′ hacia T${id}-A; negativo a la izquierda.`}/>
       </>}
     </div>
-    <p className="setting-note">Referencia de diseño: {pivot}′ → centro de la cara cercana = C + X₁ + K = <strong>{distance===null?'—':format(distance)} m</strong>. Cara de 2 m: 1 m a cada lado del eje. Cara opuesta: 1 m más lejos. Los vértices conservan su posición aunque cambies el armado del resultado principal.</p>
-    {setup.mode==='A'&&!setup.useUtm?<p className="setting-note">Local: N apunta desde A/B hacia {pivot}′; E es positivo a la derecha de esa visual. Sin offset, la cara cercana queda en N = DH medida − (C + X₁ + K); la opuesta, 1 m menos.</p>:setup.mode==='PL'?<p className="setting-note">En SOUTH N6+: Programas → Punto–Línea. Mide primero P1 = {pivot}′ y después P2 = T{id}-A. El sistema usa P1 como (0,0) y P1→P2 como norte. {setup.useUtm?'Desmarca UTM para ver la salida local correspondiente.':line?'Puedes usar directamente estas N/E en ese sistema.':'Copia N0/E0 desde OCC. Esta salida transforma los vértices a origen en la estación y cero hacia P1; no son las coordenadas del sistema Punto–Línea.'}</p>:null}
+    <p className="setting-note">Referencia de diseño: {pivot}′ → centro de la cara cercana = C + X₁ = <strong>{distance===null?'—':format(distance)} m</strong>. Cara de 2 m: 1 m a cada lado del eje. Cara opuesta: 1 m más lejos. K no se usa en los vértices. Los vértices conservan su posición aunque cambies el armado del resultado principal.</p>
+    {setup.mode==='A'&&!setup.useUtm?<p className="setting-note">Local: N apunta desde A/B hacia {pivot}′; E es positivo a la derecha de esa visual. Sin offset, la cara cercana queda en N = DH medida − (C + X₁); la opuesta, 1 m menos.</p>:setup.mode==='PL'?<p className="setting-note">En SOUTH N6+: Programas → Punto–Línea. Mide primero P1 = {pivot}′ y después P2 = T{id}-A. El sistema usa P1 como (0,0) y P1→P2 como norte. {setup.useUtm?'Desmarca UTM para ver la salida local correspondiente.':line?'Puedes usar directamente estas N/E en ese sistema.':'Copia N0/E0 desde OCC. Esta salida transforma los vértices a origen en la estación y cero hacia P1; no son las coordenadas del sistema Punto–Línea.'}</p>:null}
     {setup.useUtm&&<p className="setting-note">UTM usa las N/E de E′ y F′ y φ del tirante. No requiere DH de A ni N0/E0; el origen es el sistema de coordenadas de Ajustes.</p>}
     <div className="mast-table-wrap"><table className="mast-corners-table">
       <caption className="hidden">Vértices T{id}1 a T{id}4 · {frame}</caption>
@@ -52,7 +52,7 @@ function GuyCornerDiagram({id,data}:{id:GuyId;data:ReturnType<typeof guyCorners>
     <text x="220" y="105" textAnchor="middle">2 m</text><text x="306" y="160">1 m</text>
     <circle cx="220" cy="330" r="4" fill="#333"/><text x="232" y="336">{pivot}′ · P1</text>
     <circle cx="220" cy="50" r="4" fill="#333"/><text x="232" y="55">T{id}-A · P2</text>
-    <text x="206" y="264" textAnchor="end" className="svg-muted">C + X₁ + K</text>
+    <text x="206" y="264" textAnchor="end" className="svg-muted">C + X₁</text>
     {pl&&<><circle cx="350" cy="245" r="4" fill="#333"/><path d="M220 245H350L220 330" stroke="#888" strokeDasharray="4 4" fill="none"/><text x="350" y="231" textAnchor="middle">T{id}-PL</text><text x="282" y="260" textAnchor="middle" className="svg-muted">E0</text><text x="230" y="305" className="svg-muted">N0</text></>}
     <text x="20" y="367" className="svg-muted">Esquema sin escala · numeración fija mirando desde el pivote</text>
   </svg>;

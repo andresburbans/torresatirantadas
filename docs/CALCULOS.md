@@ -16,9 +16,11 @@
 | Zt₀ | Cota del terreno en el borde de viga de referencia | Opcional, necesaria para calcular por cota de sello |
 | Zs₀, Zs₁ | Cotas de sello original y ajustada | Respecto del mismo datum altimétrico |
 
-E′ y F′ son dos puntos distintos. Si cada uno está a e del mástil en lados opuestos, su separación es 2e. e no se suma escalarmente a C + X, porque el replanteo radial parte del pivote. Al seleccionar familia se asigna e = 3,30 m para GI6KL y 3,40 m para G6KL/GR6KL, según el criterio de campo indicado por el usuario; sigue siendo editable.
+E′ y F′ son dos puntos distintos. Si cada uno está a e del mástil en lados opuestos, su separación es 2e. e no se suma escalarmente a C + X, porque el replanteo radial parte del pivote. Al seleccionar familia se asigna e = 3,30 m para GI6KL y 3,40 m para G6KL/GR6KL, según el criterio de campo (CAD de la torre); las láminas de fundación no acotan e. Sigue siendo editable.
 
-La selección de suelo usa los valores iniciales de campo indicados por el usuario para todas las familias: S3, H₀ = H₁ = 3,50 m y X₀ = 2,117 m; S4, H₀ = H₁ = 4,00 m y X₀ = 2,460 m, con α = 5°. Estos valores se distinguen de las tablas originales por familia que se conservan en «Ver tabla» y al aplicar una fila α. Cambiar familia conserva las excavaciones existentes y actualiza β y e. Las sesiones guardadas conservan sus mediciones hasta una selección explícita.
+Desde v2.3.0 las tablas están en `src/data/tower-designs.json`. Cambiar familia o suelo carga β, e, H₀ y X₀ del plano para la fila α elegida (5° por defecto) en los cuatro tirantes. X₀ se muestra junto a la fila y se puede editar para los cuatro.
+
+> **Ajuste de terreno retirado (v2.3.0).** Las fórmulas siguientes se conservan en el código (`TERRAIN_ADJUSTMENT_ENABLED` en `src/lib/tower.ts` y `src/components/terrain-adjustment.tsx`), pero la app usa H₁ = H₀ y X₁ = X₀.
 
 ## Cambios de profundidad
 
@@ -105,7 +107,7 @@ El resultado principal de campo incorpora la constante de alineación lateral in
 
 `D_total = C + X₁ + K`
 
-K vale 0,10 m por defecto, admite cero y otros valores no negativos, y se guarda en la sesión y en los casos exportados. Se aplica como suma escalar al total de campo; no modifica X₁, H₁, ΔX ni las coordenadas geométricas del borde, que conservan R = C + X₁. Al importar casos anteriores sin K se asignan 0,10 m y se conservan las demás entradas.
+K vale 0,10 m por defecto, admite cero y otros valores no negativos, y se guarda en la sesión y en los casos exportados. Se aplica como suma escalar al total de campo; no modifica X₁, H₁, ΔX, las coordenadas geométricas del borde ni los vértices de los prefabricados, que usan R = C + X₁. Al importar casos anteriores sin K se asignan 0,10 m y se conservan las demás entradas.
 
 Los dibujos de la app son esquemáticos; las cifras provienen del motor numérico. La posición de la barra en la viga y la forma de excavación dibujadas no son detalles constructivos. La figura general no establece la altura real de la torre.
 

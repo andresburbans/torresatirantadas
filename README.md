@@ -1,6 +1,6 @@
 # Líneas & Tirantes
 
-Aplicación de campo para el replanteo y la nivelación de torres atirantadas HVDC ±600 kV. Permite trabajar con los cuatro tirantes y el mástil central, consultar los datos de cada punto y ajustar la proyección del anclaje cuando cambia la profundidad de excavación.
+Aplicación de campo para el replanteo y la nivelación de torres atirantadas HVDC ±600 kV. Permite trabajar con los cuatro tirantes y el mástil central, y consultar los datos de cada punto con las tablas de diseño de cada familia.
 
 Está pensada para usarla desde el teléfono, incluso sin conexión. Desarrollada con TypeScript, Next.js y Tailwind CSS; se publica como sitio estático en Cloudflare Pages.
 
@@ -9,20 +9,19 @@ Está pensada para usarla desde el teléfono, incluso sin conexión. Desarrollad
 ## Qué permite hacer
 
 - **Replanteo:** consultar la distancia al borde del prefabricado y el giro horario desde E′ o F′, con el cero de estación en R41 o R32.
-- **Ajuste de excavación:** recalcular X conservando el afloramiento C y el ángulo vertical β, a partir de una nueva profundidad, proyección o cota de sello.
-- **Vértices de prefabricados:** obtener T11–T14, T21–T24, T31–T34 y T41–T44 para bloques de 2 × 1 m, con offset por tirante, coordenadas locales desde A o Punto–Línea SOUTH N6+ y coordenadas UTM.
+- **Diseño por familia:** G6KL, GR6KL y GI6KL con suelos 3 y 4. Familia y suelo cargan β, Dist MC, H₀ y X₀ de la fila α elegida (5° por defecto).
+- **Vértices de prefabricados:** obtener T11–T14, T21–T24, T31–T34 y T41–T44 para bloques de 2 × 1 m a C + X₁ (sin K), con offset por tirante, coordenadas locales desde A o Punto–Línea SOUTH N6+ y coordenadas UTM.
 - **Nivelación:** obtener la cota instrumental, la mira al sello y cuánto falta excavar o cuánto se ha sobreexcavado, tanto en T1–T4 como en MC.
-- **Referencias de torre:** buscar una torre y cargar sus coordenadas R41/R32 desde el catálogo, con edición manual de coordenadas disponible.
+- **Referencias de torre:** buscar una torre y cargar sus coordenadas R41/R32 desde el catálogo. Si no existe, «Agregar torre» la crea en el dispositivo con coordenadas manuales.
 - **Factor de escala:** comparar la distancia horizontal medida R41–R32 con la calculada por sus coordenadas N/E. El cociente teórica / medida se muestra para ingresarlo en la estación total; no se aplica a C + X₁ + K ni a los demás resultados.
 
 Cada punto conserva sus datos, su estación E′/F′ y su referencia del cero. MC muestra sus cuatro vértices en coordenadas locales o UTM, con lado cuadrado editable (2,8 m por defecto) y offset configurable; Ajustes permite autocompletar E′/F′ desde MC y los amarres. Los diagramas de perfil, anclaje y planta se pueden mostrar u ocultar, y la torre completa se puede exportar e importar en un archivo JSON.
 
 ## Uso en campo
 
-1. En **Ajustes**, busca la torre y revisa sus referencias. Completa la familia, el suelo, los ángulos y las distancias de diseño.
+1. En **Ajustes**, busca la torre (o agrégala) y revisa sus referencias. Elige familia, suelo y fila α; completa el ángulo φ común y las C de los cuatro tirantes.
 2. Para nivelar, ingresa las cinco cotas de sello y la vista (+) a la referencia del nivel.
 3. Selecciona T1–T4 o MC en la barra inferior y abre **Replanteo** o **Nivelación**, según el trabajo.
-4. Si cambia la excavación de un tirante, muestra **Ajuste de terreno** e introduce el nuevo valor.
 
 La configuración habitual usa F′ para T1/T4 y E′ para T2/T3, con R41 al norte y R32 al sur. El modo por cuadrantes supone que los amarres están alineados con el eje de torre; para referencias fuera del eje está disponible el cálculo por coordenadas.
 

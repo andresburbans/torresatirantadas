@@ -9,14 +9,15 @@ export function updateGuyCornerSetup(p:TowerProject,id:GuyId,patch:Partial<GuyCo
 export type GuyCorner={id:string;along:number;right:number;n:number;e:number};
 
 /** Along points from the design pivot toward the block; right is clockwise from it.
- * C+X+K ends at the midpoint of the near 2 m face. The block extends 1 m outward.
+ * C+X ends at the midpoint of the near 2 m face. The block extends 1 m outward.
+ * K is only part of the displayed field distance (C+X+K); it never moves the vertices.
  * Numbering follows the sketch: near right, near left, far left, far right.
  */
 export function guyCorners(p:TowerProject,id:GuyId){
   const setup=guyCornerSetup(p,id),pivot=pivotFor(p,id),result=resultFor(p,id);
   const errors:string[]=[],offset=number(setup.offset);
-  const distance=result.valid?result.distanceTotal:null;
-  if(distance===null||distance<=0)errors.push('Completa C, X y K y revisa el ajuste de terreno del tirante.');
+  const distance=result.valid?result.distance:null;
+  if(distance===null||distance<=0)errors.push('Completa C y X del tirante en Ajustes.');
   if(!Number.isFinite(offset)||offset<0)errors.push('Ingresa un offset mayor o igual que cero.');
   const along=number(setup.mode==='A'?setup.distanceA:setup.stationAlong);
   const right=setup.mode==='A'?0:number(setup.stationRight);

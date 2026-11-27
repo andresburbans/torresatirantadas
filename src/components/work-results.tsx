@@ -37,7 +37,7 @@ export function StakeoutResults({ project: p, change, configure }: Props) {
         <span className="metric-label">{mast ? `Distancia desde ${currentStation}′ al centro MC` : `Distancia total desde ${currentStation}′ al borde`}</span>
         <strong className="metric-value" data-testid="result-total">{distance === null ? '—' : format(distance)}<small>m</small></strong>
         <span className="metric-formula">{mast ? 'Distancia horizontal · centro de mástil' : o.station === o.designStation ? 'C + X₁ + K' : `Distancia horizontal al borde + K · diseño desde ${o.designStation}′`}</span>
-        {!mast && <span className="delta-pill">{r.valid ? (Math.abs(r.deltaX) < .0005 ? 'Sin desplazamiento' : `${r.deltaX > 0 ? '+' : ''}${format(r.deltaX)} m · ${r.deltaX > 0 ? 'se aleja' : 'se acerca'}`) : 'Completa los datos de este tirante'}</span>}
+        {!mast && !r.valid && <span className="delta-pill">Completa C y X₀ de este tirante en Ajustes</span>}
       </div>
       <div className="work-metric">
         <span className="metric-label">Giro horario de estación · Hz</span>
@@ -88,7 +88,7 @@ export function StakeoutResults({ project: p, change, configure }: Props) {
 
     {!mast && <GuyCorners project={p} id={guy} change={change}/>}
     <details className="result-diagnostics"><summary>Ver referencias de replanteo</summary><div>
-      {!mast && <><p>C {format(number(p.guys[guy].c))} m · X₁ <span data-testid="result-x">{r.valid ? format(r.x1) : '—'} m</span> · K {format(number(p.k))} m</p><p>H diseño / ajustada: <span data-testid="result-h">{format(number(p.guys[guy].h0))} / {r.valid ? format(r.h1) : '—'} m</span></p></>}
+      {!mast && <><p>C {format(number(p.guys[guy].c))} m · X₁ <span data-testid="result-x">{r.valid ? format(r.x1) : '—'} m</span> · K {format(number(p.k))} m</p><p>H de diseño: <span data-testid="result-h">{r.valid ? format(r.h1) : format(number(p.guys[guy].h0))} m</span> · Vértices del prefabricado a C + X₁ = {r.valid ? format(r.distance) : '—'} m (sin K)</p></>}
       <p>{o.convention}</p>
       <p>{[...o.errors, ...(mast ? [] : r.errors)].join(' ') || 'Datos completos para el replanteo.'}</p>
       {o.edge && <p>N/E del {mast ? 'mástil' : 'borde sin K'}: {format(o.edge.n)} / {format(o.edge.e)} m{mast && (!p.survey.coords.MC?.n.trim() && !p.survey.coords.M1?.n.trim()) ? ' · punto medio E′–F′' : ''}</p>}
@@ -102,12 +102,12 @@ export function LevelResults({ project: p, change, configure }: Props) {
   return <section className="field-results" aria-label="Resultados de nivelación" aria-live="polite">
     <div className="field-result-heading"><div><span className="tiny-label">{pointName(p)}</span><span className="station-label">Nivel referido a {p.survey.levelRef}</span></div><span className="level-backsight">Vista (+) {format(number(p.survey.backsight))} m</span></div>
     <div className="work-metrics leveling-metrics">
-      <div className="work-metric work-primary"><span className="metric-label">Mira al sello · Vista (−)</span><strong className="metric-value" data-testid="result-staff">{l.staff !== null && l.staff >= 0 ? format(l.staff) : '—'}<small>m</small></strong><span className="metric-formula">Cota instrumental − cota de sello efectivo</span>{l.errors.length > 0 && <button className="metric-config" onClick={configure}>Completar nivel y sellos<ArrowUpRight size={13} /></button>}</div>
+      <div className="work-metric work-primary"><span className="metric-label">Mira al sello · Vista (−)</span><strong className="metric-value" data-testid="result-staff">{l.staff !== null && l.staff >= 0 ? format(l.staff) : '—'}<small>m</small></strong><span className="metric-formula">Cota instrumental − cota de sello</span>{l.errors.length > 0 && <button className="metric-config" onClick={configure}>Completar nivel y sellos<ArrowUpRight size={13} /></button>}</div>
       <div className="work-metric"><span className="metric-label">Cota instrumental · HI</span><strong className="metric-value secondary seal-value" data-testid="result-hi">{l.hi === null ? '—' : format(l.hi)}<small>m</small></strong></div>
-      <div className="work-metric"><span className="metric-label">Cota de sello efectivo</span><strong className="metric-value secondary seal-value" data-testid="result-seal">{l.seal === null ? '—' : format(l.seal)}<small>m</small></strong></div>
+      <div className="work-metric"><span className="metric-label">Cota de sello</span><strong className="metric-value secondary seal-value" data-testid="result-seal">{l.seal === null ? '—' : format(l.seal)}<small>m</small></strong></div>
     </div>
     {l.staff !== null && l.staff < 0 && <p className="field-warning">El sello está sobre la cota instrumental. Reposiciona el nivel para leer con una mira vertical normal.</p>}
     <div className="level-check"><Field id="staff-current" label={`Vista actual (−) · ${mast ? 'MC' : `T${guy}`}`} value={reading} onChange={value => change(q => mast ? { ...q, mast: { ...q.mast, staffCurrent: value } } : { ...q, guys: { ...q.guys, [guy]: { ...q.guys[guy], staffCurrent: value } } })} hint="Terreno o fondo actual" /><div><span className="metric-label">{control.label}</span><strong className="excavation-value" data-testid="result-remaining">{control.value === null ? '—' : <>{control.sign}{format(control.value)} m{control.direction && <span role="img" aria-label={control.direction === 'down' ? 'Excavar hacia abajo' : 'Exceso: fondo por debajo del sello'}>{control.direction === 'down' ? '↓' : '↑'}</span>}</>}</strong><small>Mira al sello − vista actual</small></div></div>
-    <details className="result-diagnostics"><summary>Ver referencias de nivelación</summary><div><p>{l.errors.join(' ') || 'Datos completos para la nivelación.'}</p><p>Sello de diseño: {format(number(mast ? p.mast.sealDesign : p.guys[guy].sealDesign))} m</p>{!mast && <p>Terreno de diseño: {format(number(inputFor(p, guy).groundElevation))} m · El ajuste de excavación se modifica en Replanteo.</p>}</div></details>
+    <details className="result-diagnostics"><summary>Ver referencias de nivelación</summary><div><p>{l.errors.join(' ') || 'Datos completos para la nivelación.'}</p><p>Sello de diseño: {format(number(mast ? p.mast.sealDesign : p.guys[guy].sealDesign))} m</p>{!mast && <p>Terreno de diseño: {format(number(inputFor(p, guy).groundElevation))} m</p>}</div></details>
   </section>;
 }

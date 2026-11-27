@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { GUYS, newTower, readTower, resultFor, sealFor } from '../src/lib/tower';
-import { loadTowerReferences, matchingReference, normalizeTowerId, referencesFor, REFERENCE_TOWERS, searchTowers, selectTowerReference, TOWER_REFERENCES } from '../src/lib/tower-references';
+import { addTower, canAddTower, loadTowerReferences, matchingReference, normalizeTowerId, readCustomTowers, referencesFor, REFERENCE_TOWERS, searchAllTowers, searchTowers, selectTowerReference, syncCustomTower, TOWER_REFERENCES } from '../src/lib/tower-references';
 
 test('changing T584 to T588 clears C and all seals, retaining angles and other configuration',()=>{
   const p=loadTowerReferences(newTower(),'584');p.mast.sealDesign='100';p.mast.sealTarget='99';p.mast.side='2';
@@ -94,4 +94,26 @@ test('ambiguous or missing references never inherit old coordinates or acquire i
   const row=referencesFor('251','R41')[1],loaded=loadTowerReferences(p,'251');
   assert.equal(selectTowerReference(loaded,'R41',row.id).survey.coords.R41.n,row.n);
   assert.equal(selectTowerReference(loaded,'R41',referencesFor('574','R41')[0].id),loaded);
+});
+
+test('Agregar torre creates a tower missing from the catalog with blank references, clearing the previous work',()=>{
+  const p=loadTowerReferences(newTower(),'584');p.guys['1'].c='26';p.mast.sealDesign='100';
+  assert.equal(canAddTower('584'),null);assert.equal(canAddTower(''),null);assert.equal(canAddTower('abc'),null);
+  assert.equal(canAddTower('t9999'),'T9999');
+  const added=addTower(p,'9999',[])!;
+  assert.equal(added.project.id,'T9999');assert.deepEqual(added.project.survey.coords.R41,{n:'',e:'',z:''});
+  assert.equal(added.project.guys['1'].c,'');assert.equal(added.project.mast.sealDesign,'');
+  assert.deepEqual(added.custom,[{tower:'T9999',R41:{n:'',e:'',z:''},R32:{n:'',e:'',z:''}}]);
+  assert.equal(addTower(p,'9999',added.custom),null);assert.equal(addTower(p,'584',[]),null);
+});
+test('added towers keep their typed coordinates, appear in search and reload from the device list',()=>{
+  const added=addTower(newTower(),'9999',[])!;
+  const typed=structuredClone(added.project);typed.survey.coords.R41={n:'100.000',e:'200.000',z:'10.000'};
+  const custom=syncCustomTower(added.custom,typed);
+  assert.deepEqual(custom[0].R41,{n:'100.000',e:'200.000',z:'10.000'});assert.equal(syncCustomTower(custom,typed),custom);
+  assert.deepEqual(searchAllTowers('999',custom),['T9999']);assert.ok(searchAllTowers('58',custom).includes('T584'));
+  const reloaded=loadTowerReferences(loadTowerReferences(newTower(),'584'),'9999',readCustomTowers(JSON.parse(JSON.stringify(custom))));
+  assert.equal(reloaded.id,'T9999');assert.deepEqual(reloaded.survey.coords.R41,{n:'100.000',e:'200.000',z:'10.000'});
+  assert.deepEqual(readCustomTowers([{tower:'584',R41:{n:'',e:'',z:''},R32:{n:'',e:'',z:''}},{tower:'x'},null,'bad']),[]);
+  assert.deepEqual(readCustomTowers('bad'),[]);
 });

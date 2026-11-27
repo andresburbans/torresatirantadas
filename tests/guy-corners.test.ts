@@ -25,10 +25,11 @@ function project(){
  return p;
 }
 
-test('four guys use the sketch numbering, near 2 m face and 1 m outward depth including K',()=>{
+test('four guys use the sketch numbering, near 2 m face and 1 m outward depth at C + X without K',()=>{
  const p=project();
  for(const id of GUYS){
-  const {corners,distance,pivot}=guyCorners(p,id),d=resultFor(p,id).distanceTotal;
+  const {corners,distance,pivot}=guyCorners(p,id),d=resultFor(p,id).distance;
+  close(d,resultFor(p,id).distanceTotal-Number(p.k));
   close(distance!,d);assert.equal(pivot,id==='1'||id==='4'?'F':'E');
   assert.deepEqual(corners.map(c=>c.id),[1,2,3,4].map(n=>`T${id}${n}`));
   assert.deepEqual(corners.map(c=>c.right),[1,-1,-1,1]);
@@ -48,7 +49,8 @@ test('outward offset expands every face; A inside the block is allowed with sign
  assert.ok(data.corners.every(c=>c.n<0));
  const before=data.corners;p={...p,k:String(Number(p.k)+.2)};
  const after=guyCorners(p,'1').corners;
- after.forEach((c,i)=>{close(c.n,before[i].n-.2);close(c.e,before[i].e);});
+ // K only changes the displayed C + X + K distance; vertices stay at C + X.
+ after.forEach((c,i)=>{close(c.n,before[i].n);close(c.e,before[i].e);});
 });
 
 test('SOUTH point-line outputs use P1 origin, N toward P2 and E positive right without requiring station position',()=>{
