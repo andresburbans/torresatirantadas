@@ -133,7 +133,7 @@ test('changing depth updates the effective seal, without changing its design ele
 });
 test('invalid level data and seals above collimation are flagged; over-excavation is signed',()=>{
  const p=coordinateTower();p.mast.sealDesign='98';p.mast.staffCurrent='4';close(leveling(p,'M1').remaining!,-0.5);
- p.survey.backsight='-1';assert.equal(leveling(p,'M1').valid,false);p.survey.backsight='1.5';p.mast.sealTarget='102';assert.equal(leveling(p,'M1').valid,false);
+ p.survey.backsight='-1';assert.equal(leveling(p,'M1').valid,false);p.survey.backsight='1.5';p.mast.sealDesign='102';assert.equal(leveling(p,'M1').valid,false);
  p.mast.staffCurrent='abc';assert.equal(leveling(p,'M1').remaining,null);
 });
 test('M1 uses explicit coordinates or the labeled pivot midpoint, and angles round at 360 degrees',()=>{
@@ -450,5 +450,19 @@ test('T499 G6KL replanteo protocol: A = C·cos φ and B = e + C·sin φ with e =
   const [,A,B]=protocol[point.id];
   assert.ok(Math.abs(Math.abs(point.position!.x)-A)<.006,`A T${point.id}`);
   assert.ok(Math.abs(Math.abs(point.position!.y)-B)<.004,`B T${point.id}`);
+ }
+});
+test('leveling always follows the design seals edited in Ajustes, even with old targets saved in the session',()=>{
+ const p=newTower();p.survey.coords.R41.z='1600';p.survey.backsight='1.5';
+ p.mast.sealDesign='1598.24';p.mast.sealTarget='1598.10';
+ for(const id of GUYS){p.guys[id].sealDesign='1597.82';p.guys[id].staffCurrent='2';}
+ p.guys['2'].mode='seal';p.guys['2'].target='1597.50';p.guys['3'].mode='x';p.guys['3'].target='2.6';p.guys['4'].target='4.2';
+ const old=readTower(JSON.parse(JSON.stringify(p)))!;
+ for(const q of [p,old]){
+  close(leveling(q,'MC').seal!,1598.24);close(leveling(q,'MC').staff!,1601.5-1598.24);
+  for(const id of GUYS)close(leveling(q,id).seal!,1597.82);
+  q.mast.sealDesign='1597.00';for(const id of GUYS)q.guys[id].sealDesign='1596.00';
+  close(leveling(q,'MC').seal!,1597);close(leveling(q,'MC').staff!,4.5);
+  for(const id of GUYS){close(leveling(q,id).seal!,1596);close(leveling(q,id).remaining!,5.5-2);}
  }
 });

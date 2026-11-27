@@ -266,7 +266,8 @@ export function excavationControl(remaining:number|null,valid:boolean){
 }
 export function sealFor(p:TowerProject,id:PointId,terrain:boolean=TERRAIN_ADJUSTMENT_ENABLED):number|null {
   if(id==='MC'||id==='M1'){
-    const z=number(p.mast.sealTarget.trim()===''?p.mast.sealDesign:p.mast.sealTarget);
+    // The optional MC target belongs to the retired terrain adjustment: Ajustes' design seal is the only source.
+    const z=number(terrain&&p.mast.sealTarget.trim()!==''?p.mast.sealTarget:p.mast.sealDesign);
     return Number.isFinite(z)?z:null;
   }
   const input=inputFor(p,id as GuyId,terrain);

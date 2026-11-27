@@ -86,7 +86,7 @@ export default function Home(){
       </div>
       <div id="work-level-panel" role="tabpanel" aria-labelledby="work-level-tab" hidden={p.workflow!=='level'}>
       <LevelResults project={p} change={setP} configure={()=>openSettings('level')}/>
-      {isMast?<details className="point-data"><summary>Cotas del mástil central</summary><section><h2>Nivelación · MC</h2><p className="point-note">El mástil usa su propio sello. Las distancias C/X y β corresponden a tirantes y no se aplican a MC.</p><div className="point-grid"><Field id="mast-design" label="Cota de sello de diseño" value={p.mast.sealDesign} onChange={v=>setP(q=>({...q,mast:{...q.mast,sealDesign:v}}))}/><Field id="mast-target" label="Nueva cota de sello (opcional)" value={p.mast.sealTarget} onChange={v=>setP(q=>({...q,mast:{...q.mast,sealTarget:v}}))} hint="Vacía: se usa el sello de diseño"/></div></section></details>:null}
+      {isMast?<details className="point-data"><summary>Cotas del mástil central</summary><section><h2>Nivelación · MC</h2><p className="point-note">El mástil usa su propio sello. Las distancias C/X y β corresponden a tirantes y no se aplican a MC.</p><div className="point-grid"><Field id="mast-design" label="Cota de sello de diseño · MC" value={p.mast.sealDesign} onChange={v=>setP(q=>({...q,mast:{...q.mast,sealDesign:v}}))}/></div></section></details>:null}
       </div>
       <footer><span>RUMBO3D / LÍNEAS &amp; TIRANTES</span><p>Geometría y nivelación de apoyo al replanteo · cinco puntos por torre</p><span data-testid="footer-version">v{APP_VERSION} · PWA</span><p className="app-credit">{APP_CREDIT}</p></footer>
     </main>:<main className="tower-app"><p className="point-note" role="status">Recuperando la torre guardada…</p></main>}

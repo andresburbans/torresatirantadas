@@ -1,6 +1,7 @@
 {
-  "fallbackVersion": "2026-11-27.2",
+  "fallbackVersion": "2026-11-27.3",
   "changes": [
+    "Corregido: la nivelación usa siempre la cota de sello ingresada en Ajustes (MC y tirantes).",
     "79 referencias nuevas de 40 torres (listado del 26-nov-2026), incluida T499.",
     "Nuevo: «Agregar torre» cuando el número no está en el catálogo.",
     "Familia y suelo cargan X₀, H₀, β y Dist MC del plano (fila α 5° por defecto).",
