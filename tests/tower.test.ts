@@ -466,3 +466,8 @@ test('leveling always follows the design seals edited in Ajustes, even with old 
   for(const id of GUYS){close(leveling(q,id).seal!,1596);close(leveling(q,id).remaining!,5.5-2);}
  }
 });
+test('coordinates mode refuses to orient from pivots more than 1 km away from the zero reference',()=>{
+ const p=coordinateTower();p.guys['1'].c='26';assert.deepEqual(orientation(p,'1').errors,[]);
+ p.survey.coords.R41={n:'40000',e:'1000',z:'100'};
+ assert.equal(orientation(p,'1').angle,null);assert.match(orientation(p,'1').errors.join(' '),/más de 1 km de R41/);
+});

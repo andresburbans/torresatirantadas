@@ -1,6 +1,8 @@
 {
-  "fallbackVersion": "2026-11-27.3",
+  "fallbackVersion": "2026-11-27.4",
   "changes": [
+    "Corregido: al cambiar de torre se vacían E′, F′, MC, vistas (−) y DH de la torre anterior.",
+    "Botón ± para N0/E0 de Punto–Línea (iPhone no tiene tecla menos).",
     "Corregido: la nivelación usa siempre la cota de sello ingresada en Ajustes (MC y tirantes).",
     "79 referencias nuevas de 40 torres (listado del 26-nov-2026), incluida T499.",
     "Nuevo: «Agregar torre» cuando el número no está en el catálogo.",

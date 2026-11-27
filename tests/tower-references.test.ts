@@ -7,14 +7,19 @@ test('changing T584 to T588 clears C and all seals, retaining angles and other c
   const p=loadTowerReferences(newTower(),'584');p.mast.sealDesign='100';p.mast.sealTarget='99';p.mast.side='2';
   p.survey.backsight='1.5';p.survey.baselineDistance='100';
   for(const id of GUYS){p.guys[id].c='26';p.guys[id].sealDesign='100';p.guys[id].groundElevation='103.5';}
+  p.guys['1'].staffCurrent='2.345';p.mast.staffCurrent='1.1';p.guys['1'].corners={mode:'PL',localFrame:'station',distanceA:'35',stationAlong:'30',stationRight:'-2',offset:'0.1',useUtm:false};
+  p.survey.coords.E={n:'7245296',e:'430861',z:''};p.survey.coords.MC={n:'7245290',e:'430861',z:''};
   p.guys['2'].mode='seal';p.guys['2'].target='98';
   const before=structuredClone(p),q=loadTowerReferences(p,'588');
   assert.deepEqual(p,before);assert.equal(q.id,'T588');
   for(const id of GUYS){
-    assert.deepEqual(q.guys[id],{...p.guys[id],c:'',sealDesign:'',groundElevation:'',target:p.guys[id].mode==='seal'?'':p.guys[id].target});
+    const corners=p.guys[id].corners&&{...p.guys[id].corners!,distanceA:'',stationAlong:'',stationRight:''};
+    assert.deepEqual(q.guys[id],{...p.guys[id],c:'',sealDesign:'',groundElevation:'',staffCurrent:'',target:p.guys[id].mode==='seal'?'':p.guys[id].target,...(corners?{corners}:{})});
     assert.equal(resultFor(q,id).valid,false);assert.equal(sealFor(q,id),null);
   }
-  assert.deepEqual(q.mast,{...p.mast,sealDesign:'',sealTarget:''});assert.equal(sealFor(q,'MC'),null);
+  assert.deepEqual(q.mast,{...p.mast,sealDesign:'',sealTarget:'',staffCurrent:''});
+  for(const key of ['E','F','MC','M1'] as const)assert.deepEqual(q.survey.coords[key],{n:'',e:'',z:''});
+  assert.equal(q.guys['1'].corners?.mode,'PL');assert.equal(q.guys['1'].corners?.offset,'0.1');assert.equal(sealFor(q,'MC'),null);
   assert.deepEqual(q.beta,p.beta);assert.equal(q.pivot,p.pivot);assert.equal(q.referenceAlpha,p.referenceAlpha);
   assert.equal(q.survey.backsight,'');assert.equal(q.survey.baselineDistance,'');
   assert.equal(q.survey.coords.R41.n,referencesFor('588','R41')[0].n);

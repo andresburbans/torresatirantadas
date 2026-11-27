@@ -46,9 +46,14 @@ function clearTowerWork(p:TowerProject,next:TowerProject,id:string):TowerProject
     const guys={...next.guys};
     for(const guy of GUYS){
       const g=guys[guy];
-      guys[guy]={...g,c:'',sealDesign:'',groundElevation:'',target:g.mode==='seal'?'':g.target};
+      // Field readings and DH to the A/PL stations belong to the previous tower.
+      const corners=g.corners&&{...g.corners,distanceA:'',stationAlong:'',stationRight:''};
+      guys[guy]={...g,c:'',sealDesign:'',groundElevation:'',staffCurrent:'',target:g.mode==='seal'?'':g.target,...(corners?{corners}:{})};
     }
-    next={...next,guys,mast:{...next.mast,sealDesign:'',sealTarget:''},survey:{...next.survey,backsight:'',baselineDistance:''}};
+    // E′, F′ and MC are tower-specific: keeping them would orient the new tower from the old one without error.
+    const blank={n:'',e:'',z:''};
+    next={...next,guys,mast:{...next.mast,sealDesign:'',sealTarget:'',staffCurrent:''},
+      survey:{...next.survey,backsight:'',baselineDistance:'',coords:{...next.survey.coords,E:{...blank},F:{...blank},MC:{...blank},M1:{...blank}}}};
   }
   return next;
 }

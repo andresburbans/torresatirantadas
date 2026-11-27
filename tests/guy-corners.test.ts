@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { GuyCorners } from '../src/components/guy-corners';
+import { toggleSign } from '../src/components/form-controls';
 import { StakeoutResults } from '../src/components/work-results';
 import { MastDiagram } from '../src/components/mast-diagram';
 import { guyCorners, guyCornerSetup, updateGuyCornerSetup } from '../src/lib/guy-corners';
@@ -130,4 +131,10 @@ test('results panel identifies the coordinate origin and shows only measurements
  html=render();assert.match(html,/guy-1-station-n/);assert.match(html,/guy-1-station-e/);
  p=updateGuyCornerSetup(p,'1',{useUtm:true});
  html=render();assert.match(html,/Norte UTM/);assert.doesNotMatch(html,/guy-1-station-n/);assert.doesNotMatch(html,/Puedes usar directamente estas/);
+});
+test('signed PL fields toggle the sign without a minus key',()=>{
+ assert.equal(toggleSign('2.35'),'-2.35');assert.equal(toggleSign('-2.35'),'2.35');assert.equal(toggleSign(' +1,5'),'-1,5');assert.equal(toggleSign(''),'-');
+ const p=updateGuyCornerSetup(project(),'2',{mode:'PL',localFrame:'station'});
+ const html=renderToStaticMarkup(createElement(GuyCorners,{project:p,id:'2',change:()=>{}}));
+ assert.equal((html.match(/class="sign-toggle"/g)??[]).length,2);
 });

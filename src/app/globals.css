@@ -377,3 +377,4 @@ footer .app-credit{flex-basis:100%;width:100%;order:4;margin:0;text-align:center
 .tower-search-results button.tower-add strong{color:#222}
 .design-table{border-top:0!important;margin:4px 0 14px}.design-table summary{padding:10px 0!important;min-height:44px!important;font-size:13px!important}
 .phi-mode-check{margin:18px 0 22px!important}.guy-c-grid{margin-top:4px}
+.signed-input input{padding-right:74px!important}.sign-toggle{position:absolute;right:30px;top:50%;transform:translateY(-50%);min-width:40px;min-height:40px;border:1px solid #cfcfcf;border-radius:6px;background:#f3f3f3;color:#333;font-size:18px;line-height:1}

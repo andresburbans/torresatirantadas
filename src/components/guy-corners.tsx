@@ -23,8 +23,8 @@ export function GuyCorners({project:p,id,change}:{project:TowerProject;id:GuyId;
         <option value="line">Punto–Línea · origen en P1</option><option value="station">Estación (0,0) · cero hacia P1</option>
       </Select>}
       {setup.mode==='PL'&&!line&&!setup.useUtm&&<>
-        <Field id={`guy-${id}-station-n`} label="N0 · Estación, pantalla OCC" value={setup.stationAlong} onChange={stationAlong=>update({stationAlong})} hint="Coordenada longitudinal de la estación en Punto–Línea, con su signo."/>
-        <Field id={`guy-${id}-station-e`} label="E0 · Estación, pantalla OCC" value={setup.stationRight} onChange={stationRight=>update({stationRight})} hint={`Positivo a la derecha mirando de ${pivot}′ hacia T${id}-A; negativo a la izquierda.`}/>
+        <Field signed id={`guy-${id}-station-n`} label="N0 · Estación, pantalla OCC" value={setup.stationAlong} onChange={stationAlong=>update({stationAlong})} hint="Coordenada longitudinal de la estación en Punto–Línea, con su signo."/>
+        <Field signed id={`guy-${id}-station-e`} label="E0 · Estación, pantalla OCC" value={setup.stationRight} onChange={stationRight=>update({stationRight})} hint={`Positivo a la derecha mirando de ${pivot}′ hacia T${id}-A; negativo a la izquierda.`}/>
       </>}
     </div>
     <p className="setting-note">Referencia de diseño: {pivot}′ → centro de la cara cercana = C + X₁ = <strong>{distance===null?'—':format(distance)} m</strong>. Cara de 2 m: 1 m a cada lado del eje. Cara opuesta: 1 m más lejos. K no se usa en los vértices. Los vértices conservan su posición aunque cambies el armado del resultado principal.</p>

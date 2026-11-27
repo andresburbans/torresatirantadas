@@ -234,6 +234,8 @@ export function orientation(p:TowerProject,id:PointId){
       zeroAz=ref?azimuth(occupied!,ref):null;
       if(axis===null)errors.push('E′ y F′ no pueden coincidir.');
       if(ref&&zeroAz===null)errors.push('El punto de amarre no puede coincidir con la estación.');
+      // Amarres are tens of metres from the tower: a kilometre means pivots or references of another tower.
+      if(ref&&Math.hypot(ref.n-occupied!.n,ref.e-occupied!.e)>1000)errors.push(`${station}′ está a más de 1 km de ${zero}: revisa que E′, F′ y los amarres sean de esta torre.`);
       if(isMast){
         const m=(p.survey.coords.MC?.n.trim()||p.survey.coords.MC?.e.trim())
           ?p.survey.coords.MC
