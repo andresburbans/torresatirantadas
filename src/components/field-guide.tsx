@@ -40,7 +40,7 @@ export function FieldGuide() {
       <ul>{(['GI6KL','G6KL','GR6KL'] as const).map(tower=><li key={tower}><strong>{tower}:</strong> β = {format(CATALOG[tower].beta)}° = {angleLabel(toDms(CATALOG[tower].beta))}.</li>)}</ul>
       <p>A 5°, pasar de la referencia de suelo 3 a la de suelo 4 aumenta H en 0,50 m en las tres familias. La diferencia de X es aproximadamente 0,343 m en GI6KL, 0,456 m en G6KL y 0,457 m en GR6KL. El ángulo β menor de G6KL y GR6KL hace que el mismo descenso vertical produzca una corrección horizontal mayor, con la misma pendiente local.</p>
       <p>Los números corresponden a las revisiones incorporadas a la app. Al recibir otra revisión o una solución distinta, usa las entradas manuales con su par de referencia X₀/H₀. No mezcles H de una lámina con X de otra ni β de otra familia.</p>
-      <p>La separación e y la distancia C se toman de la ficha de replanteo de cada torre. Las láminas de fundación incorporadas no acotan e. Al elegir familia se carga el criterio de campo (GI6KL: 3,30 m; G6KL y GR6KL: 3,40 m), tomado del CAD de la torre; sigue siendo editable y debe verificarse con la ficha de replanteo.</p>
+      <p>La separación e y la distancia C se toman de la ficha de replanteo de cada torre. Las láminas de fundación no acotan e, pero el protocolo de replanteo de tirantes lo contiene implícitamente: A = C·cos φ y B = e + C·sen φ. En T499 (G6KL) da e = 3,400 m en los cuatro tirantes. Al elegir familia se carga GI6KL: 3,30 m; G6KL y GR6KL: 3,40 m. Para GI6KL y GR6KL es criterio de campo/CAD hasta verificarlo con su protocolo (e = B − C·sen φ). Sigue siendo editable.</p>
     </div></details>
 
     <details><summary>04 · Cuatro ángulos que no debes confundir</summary><div className="guide-content">

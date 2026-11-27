@@ -38,8 +38,8 @@ test('November reference update adds twelve towers without duplicating prior poi
 });
 
 test('offline catalog retains all source points, precision, descriptions and dates',()=>{
-  assert.equal(TOWER_REFERENCES.length,340);assert.equal(REFERENCE_TOWERS.length,160);
-  assert.equal(new Set(TOWER_REFERENCES.map(r=>r.id)).size,340);
+  assert.equal(TOWER_REFERENCES.length,419);assert.equal(REFERENCE_TOWERS.length,200);
+  assert.equal(new Set(TOWER_REFERENCES.map(r=>r.id)).size,419);
   assert.equal(TOWER_REFERENCES.filter(r=>r.ref===null).length,7);
   for(const r of TOWER_REFERENCES){
     for(const k of ['n','e','z'] as const)assert.match(r[k],/^\d+\.\d{3}$/);
@@ -52,6 +52,19 @@ test('offline catalog retains all source points, precision, descriptions and dat
   assert.equal(matchingReference('574','R41',p.survey.coords.R41)?.date,'03-oct-2026');
   assert.equal(referencesFor('216','R41')[0].n,'7429227.486');
   assert.equal(referencesFor('588','R32')[0].z,'2413.041');
+});
+
+test('26-nov-2026 reference update adds 79 points of 40 towers, including T499, without changing prior points',()=>{
+  const p=loadTowerReferences(newTower(),'499');
+  assert.deepEqual(p.survey.coords.R41,{n:'7288086.503',e:'426759.403',z:'1596.759'});
+  assert.deepEqual(p.survey.coords.R32,{n:'7287928.976',e:'426780.105',z:'1601.649'});
+  assert.equal(referencesFor('499','R41')[0].description,'T499-RFL41-2');assert.equal(referencesFor('499','R41')[0].date,'26-nov-2026');
+  for(const id of ['213','217','221','229','239','240','352','355','369','376','497','502','591','623','631'])
+    for(const ref of ['R41','R32'] as const)assert.equal(referencesFor(id,ref).length,1,`${id} ${ref}`);
+  // As in T251/T476/T480, the source lists two R41 and no R32 for T622/T626; T632 only has R41.
+  for(const id of ['622','626']){assert.equal(referencesFor(id,'R41').length,2);assert.equal(referencesFor(id,'R32').length,0);}
+  assert.equal(referencesFor('632','R41').length,1);assert.equal(referencesFor('632','R32').length,0);
+  assert.equal(canAddTower('499'),null);
 });
 
 test('search accepts tower numbers, T#, case and suffixed towers without merging T274 and T274A',()=>{

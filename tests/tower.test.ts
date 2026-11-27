@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULTS, calculate, dms } from '../src/lib/geometry';
 import { CATALOG, designRow } from '../src/lib/catalog';
-import { applyPreset, azimuth, excavationControl, hzDms, inputFor, leveling, newTower, normalize, occupiedPivotFor, orientation, phiFor, readTower, resultFor, sealFor, selectSoil, selectTowerFamily, setCommonX0, setGuyMode, setPhi, setPhiIndividual, phiIndividual, GUYS, POINTS, stationFor, zeroFor, setPointStation, setPointZero, calculatePivotsFromMast, mastCorners } from '../src/lib/tower';
+import { applyPreset, azimuth, excavationControl, hzDms, inputFor, leveling, newTower, normalize, occupiedPivotFor, orientation, phiFor, readTower, resultFor, sealFor, selectSoil, selectTowerFamily, setCommonX0, setGuyMode, setPhi, setPhiIndividual, phiIndividual, localPlan, GUYS, POINTS, stationFor, zeroFor, setPointStation, setPointZero, calculatePivotsFromMast, mastCorners } from '../src/lib/tower';
 const close=(a:number,b:number)=>assert.ok(Math.abs(a-b)<1e-8,`${a} != ${b}`);
 test('MC side controls square vertices in local and UTM frames and survives export/import',()=>{
  const p=newTower();p.survey.coords.MC={n:'100',e:'200',z:''};
@@ -439,4 +439,16 @@ test('import rejects arrays masquerading as enum strings',()=>{
  assert.equal(readTower({...p,survey:{...p.survey,pointStations:{MC:{station:['E'],zero:'R41'}}}}),null);
  assert.equal(readTower({...p,guys:{...p.guys,'1':{...p.guys['1'],soil:['3']}}}),null);
  assert.equal(readTower({...DEFAULTS,tower:['GI6KL']}),null);
+});
+test('T499 G6KL replanteo protocol: A = C·cos φ and B = e + C·sin φ with e = 3.40 m',()=>{
+ let p=selectSoil(selectTowerFamily(newTower(),'G6KL'),'4');
+ assert.equal(p.pivot,'3.4');assert.equal(Math.round(dms(p.beta)*3600*10)/10,Math.round((49+50/60+34.8/3600)*3600*10)/10);
+ p=setPhi(p,'1',{deg:'39',min:'4',sec:'7'});
+ const protocol={'1':[42.085,32.674,29.921],'2':[39.962,31.031,28.584],'3':[40.326,31.309,28.816],'4':[42.835,33.257,30.397]} as const;
+ for(const id of GUYS){p.guys[id].c=String(protocol[id][0]);p.guys[id].x0='0';}
+ for(const point of localPlan(p)){
+  const [,A,B]=protocol[point.id];
+  assert.ok(Math.abs(Math.abs(point.position!.x)-A)<.006,`A T${point.id}`);
+  assert.ok(Math.abs(Math.abs(point.position!.y)-B)<.004,`B T${point.id}`);
+ }
 });

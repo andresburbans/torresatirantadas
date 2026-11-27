@@ -16,7 +16,9 @@
 | Zt₀ | Cota del terreno en el borde de viga de referencia | Opcional, necesaria para calcular por cota de sello |
 | Zs₀, Zs₁ | Cotas de sello original y ajustada | Respecto del mismo datum altimétrico |
 
-E′ y F′ son dos puntos distintos. Si cada uno está a e del mástil en lados opuestos, su separación es 2e. e no se suma escalarmente a C + X, porque el replanteo radial parte del pivote. Al seleccionar familia se asigna e = 3,30 m para GI6KL y 3,40 m para G6KL/GR6KL, según el criterio de campo (CAD de la torre); las láminas de fundación no acotan e. Sigue siendo editable.
+E′ y F′ son dos puntos distintos. Si cada uno está a e del mástil en lados opuestos, su separación es 2e. e no se suma escalarmente a C + X, porque el replanteo radial parte del pivote. Al seleccionar familia se asigna e = 3,30 m para GI6KL y 3,40 m para G6KL/GR6KL, Las láminas de fundación no acotan e. El protocolo de replanteo de tirantes (PRT-E-0013) lo contiene implícitamente: A = C·cos φ y B = e + C·sen φ, de modo que e = B − C·sen φ. En T499 (G6KL, φ = 39°04′07″) resulta 3,397–3,401 m en los cuatro tirantes: e = 3,40 m confirmado para G6KL. GI6KL (3,30 m) y GR6KL (3,40 m) siguen como criterio de campo/CAD hasta revisar un protocolo de esas familias. Sigue siendo editable.
+
+El protocolo de trazado (PRT-E-0006) de T499 ubica el centro de excavación a C + 2,78 m en la dirección del tirante, que coincide con X₀ = 2,278 m (G6KL S4, α = 5°) más 0,50 m (mitad del fondo de 1 m de la viga).
 
 Desde v2.3.0 las tablas están en `src/data/tower-designs.json`. Cambiar familia o suelo carga β, e, H₀ y X₀ del plano para la fila α elegida (5° por defecto) en los cuatro tirantes. X₀ se muestra junto a la fila y se puede editar para los cuatro.
 
