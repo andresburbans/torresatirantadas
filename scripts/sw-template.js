@@ -45,7 +45,13 @@ self.addEventListener('fetch',event=>{
   event.respondWith((async()=>{
     const cache=await caches.open(CACHE_NAME);
     // Navigation always uses the current worker's complete matching build.
-    if(event.request.mode==='navigate')return (await cache.match(url.pathname))||(await cache.match('/'))||fetch(event.request);
+    // Static export stores pages as /ruta/index.html: /v2, /v2/ and //v2 all open /v2/.
+    if(event.request.mode==='navigate'){
+      const clean=url.pathname.replace(/\/{2,}/g,'/'),page=clean.endsWith('/')||clean.endsWith('.html')?clean:clean+'/';
+      const hit=await cache.match(page)||(page.endsWith('/')?await cache.match(page+'index.html'):undefined);
+      if(hit)return page===url.pathname?hit:Response.redirect(url.origin+page+url.search,301);
+      try{return await fetch(event.request);}catch{return (await cache.match('/'))||Response.error();}
+    }
     const cached=await cache.match(event.request);
     if(cached)return cached;
     if(url.pathname.startsWith('/_next/static/')){

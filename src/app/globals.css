@@ -378,3 +378,21 @@ footer .app-credit{flex-basis:100%;width:100%;order:4;margin:0;text-align:center
 .design-table{border-top:0!important;margin:4px 0 14px}.design-table summary{padding:10px 0!important;min-height:44px!important;font-size:13px!important}
 .phi-mode-check{margin:18px 0 22px!important}.guy-c-grid{margin-top:4px}
 .signed-input input{padding-right:74px!important}.sign-toggle{position:absolute;right:30px;top:50%;transform:translateY(-50%);min-width:40px;min-height:40px;border:1px solid #cfcfcf;border-radius:6px;background:#f3f3f3;color:#333;font-size:18px;line-height:1}
+
+/* Templado v2.4 */
+.span-phase{border:1px solid #ddd;border-radius:7px;padding:0 16px;margin-top:14px}
+.span-phase>summary{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;min-height:52px;padding:15px 0;font-size:15px;font-weight:600;color:#444;cursor:pointer}
+.span-phase[open]>summary{border-bottom:1px solid #eee;margin-bottom:16px}
+.span-phase .span-phase-state{font:400 11px var(--mono);color:#999}.span-phase .span-phase-state.ok{color:#2f6b45}
+.span-phase>.setting-note{margin:14px 0}
+.span-phase>.button{margin-bottom:6px}.span-phase>.span-sag-rows{margin-top:16px}
+.span-copy{margin:8px 0 6px;font-size:12px;color:#777}
+.span-subhead{grid-column:1/-1;font-size:13px;color:#666;margin:10px 0 0}
+.span-save{display:flex;align-items:center;gap:14px;padding:16px 22px;border-top:1px solid var(--border)}.span-save span{font-size:12px;color:#888;line-height:1.6}.span-save .button{min-height:48px;flex-shrink:0}
+.span-log{border-top:1px solid var(--border)}.span-log>summary{padding:15px 22px;min-height:48px;font-size:13px;color:#555;cursor:pointer}
+.span-log td.log-ok{color:#215a3a}.span-log td.log-bad{color:#8c2a20;font-weight:600}
+.span-log-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 22px}.span-log-actions .button{min-height:44px;font-size:12px}.span-log-actions span{font-size:11px;color:#888}
+.span-offline{display:inline-flex;align-items:center;gap:5px}
+.not-found{padding-top:40px}.not-found h1{font-size:26px;margin:0 0 12px}.not-found p{color:#777}.not-found ul{line-height:2.4;padding-left:20px}.not-found a{color:#333;text-decoration:underline}
+@media(max-width:600px){.span-phase{padding:0 14px}.span-save{flex-direction:column;align-items:stretch;padding:14px 15px}.span-log>summary,.span-log-actions{padding-left:15px;padding-right:15px}.span-log .span-table th,.span-log .span-table td{padding:10px 5px;font-size:11px}}
+.workbar.span-workbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto}

@@ -1,15 +1,15 @@
 {
-  "fallbackVersion": "2026-11-27.4",
+  "fallbackVersion": "2026-11-28.1",
   "changes": [
+    "Vista previa de Templado accesible desde (?) y en /v2, también con la app instalada y sin conexión.",
+    "Templado: varios vanos guardados y «Siguiente vano del cantón» con la misma tabla.",
+    "Templado: Δ vertical por fase (cadena o polea) y tabla propia del cable de guarda.",
+    "Templado: registro de verificaciones con fecha y temperatura, exportable a CSV.",
+    "Templado: vano de la tabla (regulador), tensión corregida por desnivel y avisos por lectura.",
     "Corregido: al cambiar de torre se vacían E′, F′, MC, vistas (−) y DH de la torre anterior.",
     "Botón ± para N0/E0 de Punto–Línea (iPhone no tiene tecla menos).",
     "Corregido: la nivelación usa siempre la cota de sello ingresada en Ajustes (MC y tirantes).",
     "79 referencias nuevas de 40 torres (listado del 26-nov-2026), incluida T499.",
-    "Nuevo: «Agregar torre» cuando el número no está en el catálogo.",
-    "Familia y suelo cargan X₀, H₀, β y Dist MC del plano (fila α 5° por defecto).",
-    "X₀ de la fila junto a α; Dist MC junto a K.",
-    "Ángulo φ común para los 4 tirantes, con opción de φ distinto por tirante.",
-    "Corregido: K ya no desplaza los vértices de los prefabricados.",
-    "Se retira el ajuste de terreno; quedan los diagramas."
+    "Nuevo: «Agregar torre» cuando el número no está en el catálogo."
   ]
 }

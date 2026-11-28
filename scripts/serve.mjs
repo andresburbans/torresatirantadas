@@ -10,5 +10,9 @@ http.createServer(async(req,res)=>{
     if(!file.startsWith(root+path.sep)&&file!==root){res.writeHead(403);res.end();return;}
     if((await stat(file)).isDirectory())file=path.join(file,'index.html');
     const data=await readFile(file);res.writeHead(200,{'Content-Type':mime[path.extname(file)]||'application/octet-stream','Cache-Control':'no-cache'});res.end(data);
-  } catch {res.writeHead(404);res.end('No encontrado');}
+  } catch {
+    // Igual que Cloudflare Pages: las rutas inexistentes reciben 404.html con estado 404.
+    try{const page=await readFile(path.join(root,'404.html'));res.writeHead(404,{'Content-Type':mime['.html'],'Cache-Control':'no-cache'});res.end(page);}
+    catch{res.writeHead(404);res.end('No encontrado');}
+  }
 }).listen(port,'127.0.0.1',()=>console.log(`Local: http://127.0.0.1:${port}`));

@@ -2,11 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
-function harness(fail=false,version='test',store=new Map<string,Map<string,Response>>()) {
+function harness(fail=false,version='test',store=new Map<string,Map<string,Response>>(),assets=['/','/app.js','/styles.css']) {
  const handlers:Record<string,(e:any)=>void>={};
  const saved=new Map<string,Response>();store.set('tirantes-'+version,saved);let online=true,claimed=false,skipped=false;
  const navigations:string[]=[];const updates:string[]=[];
- const code=readFileSync('scripts/sw-template.js','utf8').replace('__CACHE_NAME__','tirantes-'+version).replace('__ASSETS__',JSON.stringify(['/','/app.js','/styles.css']));
+ const code=readFileSync('scripts/sw-template.js','utf8').replace('__CACHE_NAME__','tirantes-'+version).replace('__ASSETS__',JSON.stringify(assets));
  vm.runInNewContext(code,{
   Request:class extends Request {constructor(url:string,opts?:RequestInit){super(new URL(url,'https://test.local'),opts);}},Response,URL,
   caches:{open:async(name:string)=>{const entries=store.get(name)!;return {put:async(k:string,v:Response)=>{entries.set(k,v.clone());},match:async(k:string|Request)=>entries.get(typeof k==='string'?k:new URL(k.url).pathname)?.clone()};},keys:async()=>['unrelated',...store.keys()],delete:async(name:string)=>store.delete(name)},
@@ -56,4 +56,14 @@ test('complete updates activate immediately and reload all windows once without 
  assert.equal(await (await legacyAsset!).text(),'previous hashed asset');
  const third=harness(false,'v3',store);await third.lifecycle('install');await third.lifecycle('activate');
  assert.equal(store.has('tirantes-v1'),false);assert.ok(store.has('tirantes-v2'));
+});
+
+test('static export subpages open from cache with or without trailing slash and with double slash',async()=>{
+ const h=harness(false,'test',new Map(),['/','/index.html','/v2/index.html','/app.js']);await h.lifecycle('install');await h.lifecycle('activate');h.offline();
+ const open=async(path:string)=>{let response:Promise<Response>|undefined;h.handlers.fetch({request:{url:'https://test.local'+path,mode:'navigate',method:'GET'},respondWith:(r:Promise<Response>)=>response=r});return response!;};
+ assert.equal(await (await open('/v2/')).text(),'/v2/index.html');
+ for(const path of ['/v2','//v2','//v2/','/v2//']){const r=await open(path);assert.equal(r.status,301,path);assert.equal(r.headers.get('location'),'https://test.local/v2/',path);}
+ const query=await open('/v2?vano=1');assert.equal(query.headers.get('location'),'https://test.local/v2/?vano=1');
+ assert.equal(await (await open('/')).text(),'/'); // The tower app is still the root page.
+ assert.equal(await (await open('/no-existe/')).text(),'/'); // Unknown pages offline fall back to the app.
 });

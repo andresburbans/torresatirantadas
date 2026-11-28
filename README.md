@@ -13,6 +13,7 @@ Está pensada para usarla desde el teléfono, incluso sin conexión. Desarrollad
 - **Vértices de prefabricados:** obtener T11–T14, T21–T24, T31–T34 y T41–T44 para bloques de 2 × 1 m a C + X₁ (sin K), con offset por tirante, coordenadas locales desde A o Punto–Línea SOUTH N6+ y coordenadas UTM.
 - **Nivelación:** obtener la cota instrumental, la mira al sello y cuánto falta excavar o cuánto se ha sobreexcavado, tanto en T1–T4 como en MC.
 - **Referencias de torre:** buscar una torre y cargar sus coordenadas R41/R32 desde el catálogo. Si no existe, «Agregar torre» la crea en el dispositivo con coordenadas manuales.
+- **Templado (vista previa):** en `/v2/`, flechado y verificación de conductores con estación total lateral, varios vanos por dispositivo y registro CSV. Ver [docs/TEMPLADO.md](docs/TEMPLADO.md).
 - **Factor de escala:** comparar la distancia horizontal medida R41–R32 con la calculada por sus coordenadas N/E. El cociente teórica / medida se muestra para ingresarlo en la estación total; no se aplica a C + X₁ + K ni a los demás resultados.
 
 Cada punto conserva sus datos, su estación E′/F′ y su referencia del cero. MC muestra sus cuatro vértices en coordenadas locales o UTM, con lado cuadrado editable (2,8 m por defecto) y offset configurable; Ajustes permite autocompletar E′/F′ desde MC y los amarres. Los diagramas de perfil, anclaje y planta se pueden mostrar u ocultar, y la torre completa se puede exportar e importar en un archivo JSON.
@@ -82,6 +83,7 @@ El comando incluye la generación de la caché de la PWA. La carpeta `out/` se g
 - [Cálculos y tablas de diseño](docs/CALCULOS.md)
 - [Replanteo y nivelación en campo](docs/TORRE-CAMPO.md)
 - [Validación y pruebas realizadas](docs/VALIDACION.md)
+- [Templado de conductores · vista previa en /v2](docs/TEMPLADO.md)
 
 ---
 

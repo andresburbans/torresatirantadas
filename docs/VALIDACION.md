@@ -143,3 +143,10 @@ Las coordenadas de prueba son sintéticas. La configuración inicial conserva F�
 
 - Seleccionar otra torre del catálogo vacía C, sello de diseño y terreno de referencia de cada tirante, y el objetivo si es una cota de sello. Vacía ambos sellos del MC y exige nuevas observaciones de referencia. Conserva los demás ajustes, incluidos α, φ, β, profundidades y tamaño de MC. Volver a elegir el mismo número normalizado no limpia el trabajo.
 - El lado cuadrado del MC se guarda en `mast.side`, con 2,8 m como valor inicial y migración de archivos anteriores. Se usa `lado / 2 + offset` para los cuatro vértices locales y UTM, y para el dibujo. Se admiten coma y punto; tamaños no positivos o inválidos bloquean los vértices.
+
+## v2.4.0 · Templado en /v2
+
+- Corregido el acceso: con la app instalada, el service worker servía la app de torre en `/v2/` (solo tenía `/v2/index.html` en caché). Ahora `/v2`, `/v2/`, `//v2` y `/v2/index` abren Templado, con y sin conexión (Chromium 393 px, servidor de vista previa con 404.html como Cloudflare Pages).
+- 107 pruebas correctas; TypeScript estricto y exportación estática correctos.
+- Migración del vano de esquema 1 (v2.3.x) comprobada en navegador: se conserva el vano y se guarda en el almacén nuevo.
+- Verificación → Guardar lectura → registro visible, y se conserva al cambiar de vano. Sin desbordamiento horizontal a 393 px.

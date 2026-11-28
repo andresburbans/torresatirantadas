@@ -13,5 +13,6 @@ export function AppHelp({offlineText,onReferences}:{offlineText:string;onReferen
     <p>Los cambios se guardan en este dispositivo. Exporta o importa una copia JSON desde Ajustes → Archivos de torre.</p>
     <div className="install-state"><WifiOff size={19}/>{offlineText}</div>
     <button className="text-button about-details" onClick={onReferences}>Ver fórmulas y referencias<ArrowUpRight size={14}/></button>
+    <a className="text-button about-details" href="/v2/">Vista previa · Templado de conductores<ArrowUpRight size={14}/></a>
   </>;
 }
